@@ -114,6 +114,11 @@
       const [isLoading, setIsLoading] = useState(false);
       const [darkMode, setDarkMode] = useState(false);
 
+      // Leaderboard view toggle & popover date picker state
+      const [leaderboardView, setLeaderboardView] = useState('list'); // 'list' (Table) | 'grid' (Gallery)
+      const [leaderboardDatePreset, setLeaderboardDatePreset] = useState('this_month');
+      const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
       // AI Sidebar State
       const [isAiOpen, setIsAiOpen] = useState(false);
       const [aiMessages, setAiMessages] = useState([
@@ -444,12 +449,12 @@
           ]
         };
 
-        // Table Posts Data with Platform Branding
+        // Table & Gallery Posts Data with Platform Branding
         const allPosts = [
-          { id: 1, platform: 'instagram', icon: 'fa-brands fa-instagram text-pink-500', thumb: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&fit=crop', caption: 'Ljetni popust 20% na sve usluge! 🚀', type: 'Reel', reach: 42100, err: '7.8%', coreActionLabel: 'Saves', coreActionValue: 890 },
-          { id: 2, platform: 'facebook', icon: 'fa-brands fa-facebook text-blue-600', thumb: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=120&fit=crop', caption: 'Objava novog vodiča za poslovne klijente 📈', type: 'Link Post', reach: 38400, err: '6.9%', coreActionLabel: 'Shares', coreActionValue: 720 },
-          { id: 3, platform: 'instagram', icon: 'fa-brands fa-instagram text-pink-500', thumb: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=120&fit=crop', caption: 'Vodič kroz marketing strategiju 📊', type: 'Carousel', reach: 31400, err: '6.5%', coreActionLabel: 'Saves', coreActionValue: 1120 },
-          { id: 4, platform: 'facebook', icon: 'fa-brands fa-facebook text-blue-600', thumb: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=120&fit=crop', caption: 'Kako doći do više konverzija uz Meta Ads? 💡', type: 'Video Post', reach: 29800, err: '5.8%', coreActionLabel: 'Shares', coreActionValue: 540 }
+          { id: 1, platform: 'instagram', icon: 'fa-brands fa-instagram text-pink-500', thumb: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&fit=crop', caption: 'Ljetni popust 20% na sve usluge! 🚀', type: 'Reel', datePublished: '22. Aug 2026', reach: 42100, err: '7.8%', coreActionLabel: 'Saves', coreActionValue: 890 },
+          { id: 2, platform: 'facebook', icon: 'fa-brands fa-facebook text-blue-600', thumb: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&fit=crop', caption: 'Objava novog vodiča za poslovne klijente 📈', type: 'Link Post', datePublished: '20. Aug 2026', reach: 38400, err: '6.9%', coreActionLabel: 'Shares', coreActionValue: 720 },
+          { id: 3, platform: 'instagram', icon: 'fa-brands fa-instagram text-pink-500', thumb: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&fit=crop', caption: 'Vodič kroz marketing strategiju 📊', type: 'Carousel', datePublished: '18. Aug 2026', reach: 31400, err: '6.5%', coreActionLabel: 'Saves', coreActionValue: 1120 },
+          { id: 4, platform: 'facebook', icon: 'fa-brands fa-facebook text-blue-600', thumb: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&fit=crop', caption: 'Kako doći do više konverzija uz Meta Ads? 💡', type: 'Video Post', datePublished: '15. Aug 2026', reach: 29800, err: '5.8%', coreActionLabel: 'Shares', coreActionValue: 540 }
         ];
 
         const posts = isComb 
@@ -821,7 +826,7 @@
                   </div>
                 ) : clientTab === 'organic' ? (
                   /* ========================================================================= */
-                  /* TAB 1: ORGANIC (INSTAGRAM & FACEBOOK) WITH SEGMENTED PLATFORM TOGGLE */
+                  /* TAB 1: ORGANIC (INSTAGRAM & FACEBOOK) */
                   /* ========================================================================= */
                   <div className="space-y-6">
                     
@@ -956,52 +961,146 @@
                       </div>
                     </div>
 
-                    {/* CHARTS ROW 2: AUDIENCE HEALTH & CONTENT LEADERBOARD TABLE */}
+                    {/* CHARTS ROW 2: AUDIENCE HEALTH */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                      <div className="lg:col-span-5 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                      <div className="lg:col-span-12 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
                         <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">
                           Audience Health (New vs Unfollows/Unlikes)
                         </h4>
                         <EChartComponent option={organicData.audienceHealthOption} style={{ height: '280px', width: '100%' }} />
                       </div>
+                    </div>
 
-                      {/* Content Leaderboard Table */}
-                      <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
-                        <div className="flex justify-between items-center mb-4">
-                          <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider">Content Leaderboard</h4>
-                          <span className="text-xs font-bold text-gray-400">{organicData.posts.length} Objava</span>
+                    {/* ========================================================================= */}
+                    {/* FULL-WIDTH CONTENT LEADERBOARD SECTION (TABLE VIEW VS GALLERY GRID VIEW) */}
+                    {/* ========================================================================= */}
+                    <div className="w-full min-w-0 z-card-white dark:bg-[#161618] rounded-[2rem] p-7 shadow-xs border border-gray-200 dark:border-gray-800 space-y-6">
+                      
+                      {/* Leaderboard Header Controls */}
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 dark:border-gray-800 pb-5">
+                        <div>
+                          <h3 className="text-lg font-black text-[#111113] dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <i className="fa-solid fa-trophy text-zorange"></i> Top Performing Content
+                          </h3>
+                          <p className="text-xs text-gray-500 font-semibold mt-0.5">
+                            Pregled i usporedba najuspješnijih objava s ključnim metrikama angažmana
+                          </p>
                         </div>
+
+                        <div className="flex items-center gap-3 flex-wrap">
+                          
+                          {/* Modern Date Picker Popover Dropdown */}
+                          <div className="relative">
+                            <button 
+                              onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+                              className="px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold text-[#111113] dark:text-white flex items-center gap-2 hover:border-zorange transition-colors"
+                            >
+                              <i className="fa-solid fa-calendar-days text-zorange"></i>
+                              <span>
+                                {leaderboardDatePreset === '7d' ? 'Zadnjih 7 dana' : leaderboardDatePreset === 'last_month' ? 'Prošli Mjesec' : 'Ovaj Mjesec'}
+                              </span>
+                              <i className="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+                            </button>
+
+                            {/* Calendar Popover */}
+                            {isCalendarOpen && (
+                              <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-2xl z-50 space-y-3">
+                                <div className="flex justify-between items-center border-b border-gray-100 dark:border-gray-800 pb-2">
+                                  <span className="text-xs font-black text-[#111113] dark:text-white">Odabir Razdoblja</span>
+                                  <button onClick={() => setIsCalendarOpen(false)} className="text-gray-400 text-xs font-bold">✕</button>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 gap-1 text-xs font-bold">
+                                  <button 
+                                    onClick={() => { setLeaderboardDatePreset('7d'); setIsCalendarOpen(false); }} 
+                                    className={`px-3 py-2 rounded-xl text-left transition-colors ${leaderboardDatePreset === '7d' ? 'bg-orange-100 text-zorange dark:bg-orange-950/80' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                                  >
+                                    📅 Zadnjih 7 dana (Last 7 Days)
+                                  </button>
+                                  <button 
+                                    onClick={() => { setLeaderboardDatePreset('this_month'); setIsCalendarOpen(false); }} 
+                                    className={`px-3 py-2 rounded-xl text-left transition-colors ${leaderboardDatePreset === 'this_month' ? 'bg-orange-100 text-zorange dark:bg-orange-950/80' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                                  >
+                                    📅 Ovaj Mjesec (This Month)
+                                  </button>
+                                  <button 
+                                    onClick={() => { setLeaderboardDatePreset('last_month'); setIsCalendarOpen(false); }} 
+                                    className={`px-3 py-2 rounded-xl text-left transition-colors ${leaderboardDatePreset === 'last_month' ? 'bg-orange-100 text-zorange dark:bg-orange-950/80' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                                  >
+                                    📅 Prošli Mjesec (Last Month)
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* View Toggle: Segmented Control (List vs Grid) */}
+                          <div className="inline-flex bg-gray-100 dark:bg-gray-800 rounded-full p-1 border border-gray-200 dark:border-gray-700">
+                            <button 
+                              onClick={() => setLeaderboardView('list')}
+                              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+                                leaderboardView === 'list'
+                                  ? 'bg-[#111113] dark:bg-white text-white dark:text-[#111113] shadow-sm'
+                                  : 'text-gray-500 hover:text-[#111113] dark:hover:text-white'
+                              }`}
+                              title="Table View (List)"
+                            >
+                              <i className="fa-solid fa-list text-xs"></i> Table View
+                            </button>
+                            <button 
+                              onClick={() => setLeaderboardView('grid')}
+                              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+                                leaderboardView === 'grid'
+                                  ? 'bg-[#111113] dark:bg-white text-white dark:text-[#111113] shadow-sm'
+                                  : 'text-gray-500 hover:text-[#111113] dark:hover:text-white'
+                              }`}
+                              title="Gallery View (Grid)"
+                            >
+                              <i className="fa-solid fa-border-all text-xs"></i> Gallery View
+                            </button>
+                          </div>
+
+                        </div>
+                      </div>
+
+                      {/* STATE A: TABLE VIEW (LIST) */}
+                      {leaderboardView === 'list' ? (
                         <div className="overflow-x-auto">
                           <table className="w-full text-left text-xs">
                             <thead>
                               <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-black uppercase">
-                                <th className="py-3 px-2">Kreativa</th>
-                                <th className="py-3 px-2">Platforma</th>
-                                <th className="py-3 px-2">Tip Objave</th>
-                                <th className="py-3 px-2">Reach</th>
-                                <th className="py-3 px-2">ERR %</th>
-                                <th className="py-3 px-2">Core Action</th>
+                                <th className="py-3 px-3">Kreativa</th>
+                                <th className="py-3 px-3">Platforma</th>
+                                <th className="py-3 px-3">Tekst Objave</th>
+                                <th className="py-3 px-3">Tip Objave</th>
+                                <th className="py-3 px-3">Datum</th>
+                                <th className="py-3 px-3">Reach</th>
+                                <th className="py-3 px-3">ERR %</th>
+                                <th className="py-3 px-3">Core Action</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
                               {organicData.posts.map(post => (
                                 <tr key={post.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                  <td className="py-3 px-2 flex items-center gap-3">
-                                    <img src={post.thumb} className="w-9 h-9 rounded-xl object-cover shadow-xs" />
-                                    <span className="text-[#111113] dark:text-white font-black truncate max-w-[160px]">{post.caption}</span>
+                                  <td className="py-3.5 px-3">
+                                    <img src={post.thumb} className="w-11 h-11 rounded-xl object-cover shadow-xs border border-gray-200 dark:border-gray-700" />
                                   </td>
-                                  <td className="py-3 px-2">
-                                    <span className="flex items-center gap-1.5 font-bold">
-                                      <i className={post.icon}></i>
-                                      <span className="capitalize text-[11px]">{post.platform}</span>
+                                  <td className="py-3.5 px-3">
+                                    <span className="flex items-center gap-1.5">
+                                      <i className={`${post.icon} text-base`}></i>
+                                      <span className="capitalize font-black text-[11px]">{post.platform}</span>
                                     </span>
                                   </td>
-                                  <td className="py-3 px-2">
+                                  <td className="py-3.5 px-3 max-w-[260px]">
+                                    <span className="text-[#111113] dark:text-white font-black truncate block">{post.caption}</span>
+                                  </td>
+                                  <td className="py-3.5 px-3">
                                     <span className="px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 text-[10px] font-black">{post.type}</span>
                                   </td>
-                                  <td className="py-3 px-2 text-[#111113] dark:text-white">{post.reach.toLocaleString()}</td>
-                                  <td className="py-3 px-2 text-zorange font-black">{post.err}</td>
-                                  <td className="py-3 px-2">
+                                  <td className="py-3.5 px-3 text-gray-400">{post.datePublished || '22. Aug 2026'}</td>
+                                  <td className="py-3.5 px-3 text-[#111113] dark:text-white">{post.reach.toLocaleString()}</td>
+                                  <td className="py-3.5 px-3 text-zorange font-black">{post.err}</td>
+                                  <td className="py-3.5 px-3">
                                     <span className="text-gray-700 dark:text-gray-300">{post.coreActionValue} {post.coreActionLabel}</span>
                                   </td>
                                 </tr>
@@ -1009,7 +1108,50 @@
                             </tbody>
                           </table>
                         </div>
-                      </div>
+                      ) : (
+                        /* STATE B: GALLERY VIEW (GRID OF CARDS) */
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                          {organicData.posts.map(post => (
+                            <div 
+                              key={post.id}
+                              className="relative rounded-2xl overflow-hidden shadow-md group border border-gray-200 dark:border-gray-800 bg-black aspect-square flex flex-col justify-between p-4 transform hover:-translate-y-1 transition-transform"
+                            >
+                              <img src={post.thumb} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+
+                              <div className="relative z-10 flex justify-between items-start">
+                                <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[10px] font-black uppercase border border-white/20">
+                                  {post.type}
+                                </span>
+                                <div className="w-8 h-8 rounded-full bg-white/90 dark:bg-black/90 backdrop-blur-md flex items-center justify-center shadow-md">
+                                  <i className={`${post.icon} text-sm`}></i>
+                                </div>
+                              </div>
+
+                              <div className="relative z-10 space-y-2 text-white">
+                                <p className="text-xs font-black truncate drop-shadow-sm">{post.caption}</p>
+                                
+                                <div className="grid grid-cols-3 gap-1 pt-2 border-t border-white/20 text-[10px]">
+                                  <div>
+                                    <span className="text-gray-300 font-extrabold uppercase block">Reach</span>
+                                    <span className="font-black text-sm">{post.reach.toLocaleString()}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-300 font-extrabold uppercase block">ERR</span>
+                                    <span className="font-black text-sm text-zorange">{post.err}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-300 font-extrabold uppercase block">{post.coreActionLabel}</span>
+                                    <span className="font-black text-sm">{post.coreActionValue}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
                     </div>
 
                   </div>
@@ -1203,7 +1345,7 @@
                       <div className="flex justify-between items-center mb-4">
                         <div>
                           <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider">Top Search Terms & AI Negative Keywords</h4>
-                          <p className="text-xs text-gray-500 font-semibold">Identificirajte irerelevantne termine za ugradnju negativnih ključnih riječi</p>
+                          <p className="text-xs text-gray-500 font-semibold">Identificirajte irelevantne termine za ugradnju negativnih ključnih riječi</p>
                         </div>
                         <span className="text-xs font-bold text-gray-400">Negativnih ključnih riječi: {negativeKeywords.length}</span>
                       </div>
