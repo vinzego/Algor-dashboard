@@ -114,6 +114,14 @@
       const [isLoading, setIsLoading] = useState(false);
       const [darkMode, setDarkMode] = useState(false);
 
+      // Dynamic Time-Based Greeting for Vinko
+      const greeting = useMemo(() => {
+        const hour = new Date().getHours();
+        if (hour >= 5 && hour < 12) return 'Dobro jutro, Vinko';
+        if (hour >= 12 && hour < 18) return 'Dobar dan, Vinko';
+        return 'Dobra večer, Vinko';
+      }, []);
+
       // Leaderboard view toggle & CUSTOM VISUAL CALENDAR STATES
       const [leaderboardView, setLeaderboardView] = useState('list'); // 'list' (Table) | 'grid' (Gallery)
       const [calendarStartDay, setCalendarStartDay] = useState(1);
@@ -915,7 +923,7 @@
                       <span className="text-xs text-gray-400 font-bold">Ukupno klijenata: {clientsList.length}</span>
                     </div>
                     <h2 className="text-3xl font-black tracking-tight text-[#111113] dark:text-white">
-                      Marketing Sustavi Klijenata
+                      {greeting} 👋
                     </h2>
                     <p className="text-xs text-gray-500 font-semibold mt-1">
                       Upravljajte marketing kampanjama, budžetima i AI optimizacijama vaših klijenata.
@@ -1791,7 +1799,7 @@
                         <EChartComponent option={googleAdsData.biddingHealthOption} style={{ height: '290px', width: '100%' }} />
                       </div>
 
-                      {/* 4. [NEW SCORECARD] "PMax Asset Quality Scorecard" (Replacing the stacked bar chart) */}
+                      {/* 4. [SCORECARD] "PMax Asset Quality Scorecard" */}
                       <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs flex flex-col justify-between h-[360px]">
                         <div className="flex justify-between items-center mb-3">
                           <div>
