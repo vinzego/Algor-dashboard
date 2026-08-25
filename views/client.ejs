@@ -749,26 +749,177 @@
 
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-          <div class="lg:col-span-8 z-card-white rounded-[2rem] p-7">
-            <h4 class="text-sm font-black uppercase text-[#111113] mb-3">Učinkovitost Oglasa po Danima</h4>
-            <div id="meta-chart-efficiency" class="w-full" style="height: 320px;"></div>
-          </div>
-          <div class="lg:col-span-4 z-card-white rounded-[2rem] p-7">
-            <h4 class="text-sm font-black uppercase text-[#111113] mb-3">Potrošnja po Platformama</h4>
-            <div id="meta-chart-platforms" class="w-full" style="height: 320px;"></div>
-          </div>
-        </div>
+        <!-- STRATEGIC META ADS DECISION CHARTS (8 KLJUČNIH MARKETINŠKIH GRAFOVA) -->
+        <div class="mb-4 mt-6">
+          <h3 class="text-xl font-black text-[#111113] uppercase tracking-wider flex items-center gap-2 mb-1">
+            <i class="fa-brands fa-meta text-zorange"></i> Meta Ads Strateške Odluke & Analitika
+          </h3>
+          <p class="text-xs text-gray-500 font-bold mb-6">Financijski kompas, frekvencija prikaza, hook rate i konverzijski tok vaših Meta oglašivačkih kampanja</p>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-          <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7">
-            <h4 class="text-sm font-black uppercase text-[#111113] mb-3">Demografija Publike</h4>
-            <div id="meta-chart-audience" class="w-full" style="height: 320px;"></div>
+          <!-- GRID ROW 1: ROAS vs CPA & CTR (Link vs All) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+            <!-- 1. ROAS / CPA Chart -->
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
+                    <i class="fa-solid fa-chart-line text-zorange"></i> 1. ROAS & Cost per Result (CPA)
+                  </h4>
+                  <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-black text-[10px] uppercase">
+                    Financijski Kompas 💎
+                  </span>
+                </div>
+                <p class="text-xs text-gray-500 font-medium mb-3">Profitabilnost oglasa: ROAS (povrat na uloženo) u odnosu na trošak po konverziji (CPA).</p>
+                <div id="meta-chart-roas-cpa" class="w-full h-[240px]"></div>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+                💡 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.roasCpa.decisionNote %>
+              </div>
+            </div>
+
+            <!-- 2. CTR (Link) vs CTR (All) Chart -->
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
+                    <i class="fa-solid fa-arrow-pointer text-zorange"></i> 2. CTR (Link) vs CTR (All)
+                  </h4>
+                  <span class="px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 font-black text-[10px] uppercase">
+                    Kvaliteta Kreative 🎯
+                  </span>
+                </div>
+                <p class="text-xs text-gray-500 font-medium mb-3">Relevantnost poruke: Odvajanje klika na web link od općih lajkova i komentara.</p>
+                <div id="meta-chart-ctr-link-all" class="w-full h-[240px]"></div>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+                🎯 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.ctrLinkAll.decisionNote %>
+              </div>
+            </div>
           </div>
-          <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7">
-            <h4 class="text-sm font-black uppercase text-[#111113] mb-3">Angažman po Vrsti Objava</h4>
-            <div id="meta-chart-posts" class="w-full" style="height: 320px;"></div>
+
+          <!-- GRID ROW 2: CPC & CPM & FREQUENCY -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+            <!-- 3. CPC & CPM Chart -->
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
+                    <i class="fa-solid fa-coins text-zorange"></i> 3. CPC & CPM (Aukcijski Trošak)
+                  </h4>
+                  <span class="px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 font-black text-[10px] uppercase">
+                    Aukcijski Pritisak 💰
+                  </span>
+                </div>
+                <p class="text-xs text-gray-500 font-medium mb-3">Trošak po kliku (CPC) i trošak na 1.000 impresija (CPM) na Meta aukcijama.</p>
+                <div id="meta-chart-cpc-cpm" class="w-full h-[240px]"></div>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+                💰 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.cpcCpm.decisionNote %>
+              </div>
+            </div>
+
+            <!-- 4. Frequency (Frekvencija) Chart -->
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
+                    <i class="fa-solid fa-rotate-right text-zorange"></i> 4. Frekvencija Prikaza (Ad Fatigue)
+                  </h4>
+                  <span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 font-black text-[10px] uppercase">
+                    Zasićenost Publike ⚠️
+                  </span>
+                </div>
+                <p class="text-xs text-gray-500 font-medium mb-3">Prosječan broj prikazivanja oglasa istoj osobi (Signal za zamjenu na ~3-4x).</p>
+                <div id="meta-chart-frequency" class="w-full h-[240px]"></div>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+                ⚠️ <strong>Odluka:</strong> <%= client.metaDecisionMetrics.frequency.decisionNote %>
+              </div>
+            </div>
           </div>
+
+          <!-- GRID ROW 3: HOOK RATE & HOLD RATE & LANDING PAGE VIEWS VS LINK CLICKS -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+            <!-- 5. Hook Rate & Hold Rate Chart -->
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
+                    <i class="fa-solid fa-film text-zorange"></i> 5. Hook Rate & Hold Rate (Video)
+                  </h4>
+                  <span class="px-2.5 py-1 rounded-full bg-rose-100 text-rose-800 font-black text-[10px] uppercase">
+                    Video Tok 🎬
+                  </span>
+                </div>
+                <p class="text-xs text-gray-500 font-medium mb-3">Hook (prve 3 sec) vs Hold (ThruPlay zadržavanje pažnje do poruke).</p>
+                <div id="meta-chart-hook-hold" class="w-full h-[240px]"></div>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+                🎬 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.hookHoldRate.decisionNote %>
+              </div>
+            </div>
+
+            <!-- 6. Landing Page Views vs Link Clicks Chart -->
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
+                    <i class="fa-solid fa-laptop-code text-zorange"></i> 6. Landing Page Views vs Link Clicks
+                  </h4>
+                  <span class="px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800 font-black text-[10px] uppercase">
+                    Tehničko Učitavanje ⚡
+                  </span>
+                </div>
+                <p class="text-xs text-gray-500 font-medium mb-3">Stopa napuštanja prije učitavanja (Gubitak > 20-25% znači sporo web mjesto).</p>
+                <div id="meta-chart-landing-clicks" class="w-full h-[240px]"></div>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+                ⚡ <strong>Odluka:</strong> <%= client.metaDecisionMetrics.landingVsClicks.decisionNote %>
+              </div>
+            </div>
+          </div>
+
+          <!-- GRID ROW 4: CONVERSION RATE & CAC -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+            <!-- 7. Conversion Rate (CR) Chart -->
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
+                    <i class="fa-solid fa-bullseye text-zorange"></i> 7. Conversion Rate (CR %)
+                  </h4>
+                  <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-black text-[10px] uppercase">
+                    Efikasnost Stranice 🛒
+                  </span>
+                </div>
+                <p class="text-xs text-gray-500 font-medium mb-3">Postotak posjetitelja koji dovrše kupnju, upit ili prijavu na stranici.</p>
+                <div id="meta-chart-conversion-rate" class="w-full h-[240px]"></div>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+                🛒 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.conversionRate.decisionNote %>
+              </div>
+            </div>
+
+            <!-- 8. CAC (Customer Acquisition Cost) Chart -->
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
+                    <i class="fa-solid fa-user-plus text-zorange"></i> 8. Customer Acquisition Cost (CAC)
+                  </h4>
+                  <span class="px-2.5 py-1 rounded-full bg-teal-100 text-teal-800 font-black text-[10px] uppercase">
+                    Trošak Novog Klijenta 💵
+                  </span>
+                </div>
+                <p class="text-xs text-gray-500 font-medium mb-3">Ukupni trošak oglašavanja podijeljen s brojem novih kupaca/klijenata.</p>
+                <div id="meta-chart-cac" class="w-full h-[240px]"></div>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+                💵 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.cacLtv.decisionNote %>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -1258,52 +1409,147 @@
         });
       }
 
-      const metaEffElem = document.getElementById('meta-chart-efficiency');
-      if (metaEffElem) {
-        efficiencyChart = echarts.init(metaEffElem);
-        efficiencyChart.setOption({
+      /* ----------------------------------------------------
+         STRATEGIC META DECISION CHARTS ECHARTS SETUP
+         ---------------------------------------------------- */
+      const mDecData = <%- JSON.stringify(client.metaDecisionMetrics) %>;
+
+      // 1. ROAS / CPA
+      const mRoasElem = document.getElementById('meta-chart-roas-cpa');
+      if (mRoasElem) {
+        chartMetaRoasCpa = echarts.init(mRoasElem);
+        chartMetaRoasCpa.setOption({
           tooltip: { trigger: 'axis' },
-          legend: { data: ['Dnevni trošak', 'Konverzije'], textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 12 } },
-          grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
-          xAxis: { type: 'category', data: chartData.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 } },
-          yAxis: [{ type: 'value' }, { type: 'value' }],
+          legend: { data: ['ROAS (Povrat x)', 'CPA ($ Trošak)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
+          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          xAxis: { type: 'category', data: mDecData.roasCpa.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+          yAxis: [
+            { type: 'value', name: 'ROAS', axisLabel: { fontFamily: 'Urbanist', color: '#111113', fontSize: 10, formatter: '{value}x' } },
+            { type: 'value', name: 'CPA', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10, formatter: '${value}' } }
+          ],
           series: [
-            { name: 'Dnevni trošak', type: 'line', data: chartData.spendDaily, smooth: true, itemStyle: { color: '#111113' } },
-            { name: 'Konverzije', type: 'line', yAxisIndex: 1, data: chartData.conversionsDaily, smooth: true, itemStyle: { color: '#FF5F00' } }
+            { name: 'ROAS (Povrat x)', type: 'line', data: mDecData.roasCpa.roas, smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } },
+            { name: 'CPA ($ Trošak)', type: 'line', yAxisIndex: 1, data: mDecData.roasCpa.cpa, smooth: true, lineStyle: { width: 2, color: '#111113' }, itemStyle: { color: '#111113' } }
           ]
         });
       }
 
-      const metaPlatElem = document.getElementById('meta-chart-platforms');
-      if (metaPlatElem) {
-        platformsChart = echarts.init(metaPlatElem);
-        platformsChart.setOption({
-          tooltip: { trigger: 'item' },
-          series: [{ type: 'pie', radius: ['45%', '70%'], data: chartData.platforms, color: ['#1877F2', '#E1306C', '#111113'] }]
-        });
-      }
-
-      const metaAudElem = document.getElementById('meta-chart-audience');
-      if (metaAudElem) {
-        audienceChart = echarts.init(metaAudElem);
-        audienceChart.setOption({
+      // 2. CTR (Link) vs CTR (All)
+      const mCtrElem = document.getElementById('meta-chart-ctr-link-all');
+      if (mCtrElem) {
+        chartMetaCtrLinkAll = echarts.init(mCtrElem);
+        chartMetaCtrLinkAll.setOption({
           tooltip: { trigger: 'axis' },
-          xAxis: { type: 'value' },
-          yAxis: { type: 'category', data: [...chartData.audienceCategories].reverse() },
-          series: [{ type: 'bar', data: [...chartData.audienceValues].reverse(), itemStyle: { color: '#FF5F00', borderRadius: [0, 5, 5, 0] } }]
-        });
-      }
-
-      const metaPostElem = document.getElementById('meta-chart-posts');
-      if (metaPostElem) {
-        postsChart = echarts.init(metaPostElem);
-        postsChart.setOption({
-          tooltip: { trigger: 'axis' },
-          xAxis: { type: 'value' },
-          yAxis: { type: 'category', data: [...chartData.topPostsTitles].reverse() },
+          legend: { data: ['CTR Link (%)', 'CTR All (Opći %)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
+          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          xAxis: { type: 'category', data: mDecData.ctrLinkAll.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+          yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10, formatter: '{value}%' } },
           series: [
-            { name: 'Lajkovi', type: 'bar', stack: 'engagement', data: [...chartData.topPostsLikes].reverse(), itemStyle: { color: '#FF5F00' } },
-            { name: 'Komentari', type: 'bar', stack: 'engagement', data: [...chartData.topPostsComments].reverse(), itemStyle: { color: '#111113' } }
+            { name: 'CTR Link (%)', type: 'line', data: mDecData.ctrLinkAll.ctrLink, smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } },
+            { name: 'CTR All (Opći %)', type: 'line', data: mDecData.ctrLinkAll.ctrAll, smooth: true, lineStyle: { width: 2, color: '#111113', type: 'dashed' }, itemStyle: { color: '#111113' } }
+          ]
+        });
+      }
+
+      // 3. CPC & CPM
+      const mCpcElem = document.getElementById('meta-chart-cpc-cpm');
+      if (mCpcElem) {
+        chartMetaCpcCpm = echarts.init(mCpcElem);
+        chartMetaCpcCpm.setOption({
+          tooltip: { trigger: 'axis' },
+          legend: { data: ['CPC ($ Klik)', 'CPM ($ 1k Impresija)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
+          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          xAxis: { type: 'category', data: mDecData.cpcCpm.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+          yAxis: [
+            { type: 'value', name: 'CPC', axisLabel: { fontFamily: 'Urbanist', color: '#FF5F00', fontSize: 10, formatter: '${value}' } },
+            { type: 'value', name: 'CPM', axisLabel: { fontFamily: 'Urbanist', color: '#111113', fontSize: 10, formatter: '${value}' } }
+          ],
+          series: [
+            { name: 'CPC ($ Klik)', type: 'line', data: mDecData.cpcCpm.cpc, smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } },
+            { name: 'CPM ($ 1k Impresija)', type: 'line', yAxisIndex: 1, data: mDecData.cpcCpm.cpm, smooth: true, lineStyle: { width: 2, color: '#111113' }, itemStyle: { color: '#111113' } }
+          ]
+        });
+      }
+
+      // 4. Frequency (Frekvencija)
+      const mFreqElem = document.getElementById('meta-chart-frequency');
+      if (mFreqElem) {
+        chartMetaFrequency = echarts.init(mFreqElem);
+        chartMetaFrequency.setOption({
+          tooltip: { trigger: 'axis' },
+          legend: { data: ['Prosječna Frekvencija', 'Kritična Granica Ad Fatigue (3.5x)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
+          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          xAxis: { type: 'category', data: mDecData.frequency.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+          yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10, formatter: '{value}x' } },
+          series: [
+            { name: 'Prosječna Frekvencija', type: 'line', data: mDecData.frequency.frequency, smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } },
+            { name: 'Kritična Granica Ad Fatigue (3.5x)', type: 'line', data: Array(mDecData.frequency.days.length).fill(3.5), lineStyle: { width: 2, type: 'dashed', color: '#EF4444' }, itemStyle: { color: '#EF4444' } }
+          ]
+        });
+      }
+
+      // 5. Hook Rate & Hold Rate
+      const mHookElem = document.getElementById('meta-chart-hook-hold');
+      if (mHookElem) {
+        chartMetaHookHold = echarts.init(mHookElem);
+        chartMetaHookHold.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          legend: { data: ['Hook Rate (3s / Impresije %)', 'Hold Rate (ThruPlay / 3s %)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
+          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          xAxis: { type: 'category', data: mDecData.hookHoldRate.videos, axisLabel: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 10, rotate: 10 } },
+          yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10, formatter: '{value}%' } },
+          series: [
+            { name: 'Hook Rate (3s / Impresije %)', type: 'bar', data: mDecData.hookHoldRate.hookRate, itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } },
+            { name: 'Hold Rate (ThruPlay / 3s %)', type: 'bar', data: mDecData.hookHoldRate.holdRate, itemStyle: { color: '#111113', borderRadius: [4, 4, 0, 0] } }
+          ]
+        });
+      }
+
+      // 6. Landing Page Views vs Link Clicks
+      const mLandElem = document.getElementById('meta-chart-landing-clicks');
+      if (mLandElem) {
+        chartMetaLandingClicks = echarts.init(mLandElem);
+        chartMetaLandingClicks.setOption({
+          tooltip: { trigger: 'axis' },
+          legend: { data: ['Klikovi na Link (Clicks)', 'Otvorene Stranice (Landing Views)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
+          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          xAxis: { type: 'category', data: mDecData.landingVsClicks.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+          yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+          series: [
+            { name: 'Klikovi na Link (Clicks)', type: 'line', data: mDecData.landingVsClicks.linkClicks, smooth: true, lineStyle: { width: 3, color: '#111113' }, itemStyle: { color: '#111113' } },
+            { name: 'Otvorene Stranice (Landing Views)', type: 'line', data: mDecData.landingVsClicks.landingViews, smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
+          ]
+        });
+      }
+
+      // 7. Conversion Rate (CR %)
+      const mCrElem = document.getElementById('meta-chart-conversion-rate');
+      if (mCrElem) {
+        chartMetaConversionRate = echarts.init(mCrElem);
+        chartMetaConversionRate.setOption({
+          tooltip: { trigger: 'axis' },
+          legend: { data: ['Stopa Konverzije (CR %)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
+          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          xAxis: { type: 'category', data: mDecData.conversionRate.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+          yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10, formatter: '{value}%' } },
+          series: [
+            { name: 'Stopa Konverzije (CR %)', type: 'line', data: mDecData.conversionRate.cr, smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
+          ]
+        });
+      }
+
+      // 8. CAC (Customer Acquisition Cost)
+      const mCacElem = document.getElementById('meta-chart-cac');
+      if (mCacElem) {
+        chartMetaCac = echarts.init(mCacElem);
+        chartMetaCac.setOption({
+          tooltip: { trigger: 'axis' },
+          legend: { data: ['Trošak Novog Klijenta (CAC $)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
+          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          xAxis: { type: 'category', data: mDecData.cacLtv.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+          yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10, formatter: '${value}' } },
+          series: [
+            { name: 'Trošak Novog Klijenta (CAC $)', type: 'line', data: mDecData.cacLtv.cac, smooth: true, lineStyle: { width: 3, color: '#059669' }, itemStyle: { color: '#059669' } }
           ]
         });
       }
@@ -1376,11 +1622,18 @@
       if (chartFollowerGrowth) chartFollowerGrowth.resize();
       if (chartProfileVisits) chartProfileVisits.resize();
 
-      if (efficiencyChart) efficiencyChart.resize();
-      if (platformsChart) platformsChart.resize();
-      if (audienceChart) audienceChart.resize();
-      if (postsChart) postsChart.resize();
-      if (reachChart) reachChart.resize();
+      if (metaCardGaugeChart) metaCardGaugeChart.resize();
+      if (metaCardSparkChart) metaCardSparkChart.resize();
+      if (metaCardBarChart) metaCardBarChart.resize();
+
+      if (chartMetaRoasCpa) chartMetaRoasCpa.resize();
+      if (chartMetaCtrLinkAll) chartMetaCtrLinkAll.resize();
+      if (chartMetaCpcCpm) chartMetaCpcCpm.resize();
+      if (chartMetaFrequency) chartMetaFrequency.resize();
+      if (chartMetaHookHold) chartMetaHookHold.resize();
+      if (chartMetaLandingClicks) chartMetaLandingClicks.resize();
+      if (chartMetaConversionRate) chartMetaConversionRate.resize();
+      if (chartMetaCac) chartMetaCac.resize();
 
       if (googleEfficiencyChart) googleEfficiencyChart.resize();
       if (googleNetworksChart) googleNetworksChart.resize();
@@ -1458,10 +1711,14 @@
             if (metaCardSparkChart) metaCardSparkChart.resize();
             if (metaCardBarChart) metaCardBarChart.resize();
 
-            if (efficiencyChart) efficiencyChart.resize();
-            if (platformsChart) platformsChart.resize();
-            if (audienceChart) audienceChart.resize();
-            if (postsChart) postsChart.resize();
+            if (chartMetaRoasCpa) chartMetaRoasCpa.resize();
+            if (chartMetaCtrLinkAll) chartMetaCtrLinkAll.resize();
+            if (chartMetaCpcCpm) chartMetaCpcCpm.resize();
+            if (chartMetaFrequency) chartMetaFrequency.resize();
+            if (chartMetaHookHold) chartMetaHookHold.resize();
+            if (chartMetaLandingClicks) chartMetaLandingClicks.resize();
+            if (chartMetaConversionRate) chartMetaConversionRate.resize();
+            if (chartMetaCac) chartMetaCac.resize();
           }, 50);
         }
       }

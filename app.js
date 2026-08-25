@@ -53,6 +53,57 @@ const clients = [
       resultsValue: '201 Leads',
       organicReach: '45,200'
     },
+    metaDecisionMetrics: {
+      roasCpa: {
+        days: daysList,
+        roas: [3.8, 4.1, 3.9, 4.5, 4.8, 4.2, 3.9, 4.0, 4.4, 4.6, 5.1, 4.3, 4.0, 4.2, 4.5, 4.1, 3.9, 4.2, 4.6, 4.4, 4.2, 4.5, 4.8, 4.7, 4.6],
+        cpa: [18.5, 17.2, 16.8, 15.9, 16.4, 15.1, 14.8, 14.2, 14.5, 13.9, 14.1, 14.2, 14.0, 13.8, 13.5, 14.1, 14.5, 13.9, 13.4, 13.8, 14.0, 13.6, 13.2, 13.5, 13.4],
+        targetRoas: 3.5,
+        decisionNote: 'ROAS je na 4.6x (iznad cilja 3.5x), a CPA je pao na $13.4. Preporuka: Povećati proračun za +15% na retargeting oglasima.'
+      },
+      ctrLinkAll: {
+        days: daysList,
+        ctrLink: [2.1, 2.4, 2.3, 2.8, 3.1, 2.7, 2.5, 2.6, 2.9, 3.0, 3.2, 2.8, 2.6, 2.7, 2.9, 2.6, 2.4, 2.7, 3.0, 2.8, 2.7, 2.9, 3.1, 3.0, 2.9],
+        ctrAll: [3.5, 3.8, 3.7, 4.2, 4.5, 4.1, 3.9, 4.0, 4.3, 4.5, 4.7, 4.3, 4.0, 4.1, 4.3, 4.0, 3.8, 4.1, 4.4, 4.2, 4.1, 4.3, 4.6, 4.5, 4.4],
+        decisionNote: 'CTR (Link) iznosi 2.9% što pokazuje iznimno visoku namjeru klika i dobru usklađenost teksta s publikom.'
+      },
+      cpcCpm: {
+        days: daysList,
+        cpc: [0.85, 0.78, 0.80, 0.72, 0.68, 0.70, 0.66, 0.65, 0.63, 0.60, 0.58, 0.62, 0.64, 0.62, 0.60, 0.65, 0.68, 0.64, 0.60, 0.62, 0.63, 0.59, 0.57, 0.58, 0.59],
+        cpm: [10.2, 9.8, 9.5, 9.1, 8.8, 9.0, 8.6, 8.4, 8.2, 7.9, 7.8, 8.2, 8.5, 8.2, 8.0, 8.5, 8.8, 8.4, 8.0, 8.2, 8.3, 7.9, 7.7, 7.8, 7.9],
+        decisionNote: 'CPM ($7.9) i CPC ($0.59) su na najnižim razinama ovog mjeseca, što potvrđuje visoku ocjenu kvalitete oglasa na Meta aukcijama.'
+      },
+      frequency: {
+        days: daysList,
+        frequency: [1.2, 1.4, 1.5, 1.7, 1.9, 2.1, 2.2, 2.4, 2.5, 2.6, 2.8, 2.7, 2.5, 2.6, 2.7, 2.5, 2.3, 2.5, 2.6, 2.5, 2.4, 2.6, 2.7, 2.8, 2.7],
+        threshold: 3.5,
+        decisionNote: 'Frekvencija je 2.7x (sigurno ispod praga ad fatigue od 3.5x). Nema zasićenosti publike – nije potrebna hitna zamjena vizuala.'
+      },
+      hookHoldRate: {
+        videos: ['Video 1 (Ljetna Akcija)', 'Video 2 (Vodič)', 'Video 3 (Reels Natječaj)', 'Video 4 (Testimonial)'],
+        hookRate: [48, 42, 55, 38],
+        holdRate: [32, 28, 41, 25],
+        decisionNote: 'Video 3 ima najveći Hook Rate (55%) i Hold Rate (41%). Preporuka: Replicirati strukturu prvih 3s na ostale video snimke.'
+      },
+      landingVsClicks: {
+        days: daysList,
+        linkClicks: [45, 52, 48, 60, 68, 55, 50, 58, 65, 70, 75, 62, 58, 60, 65, 55, 50, 58, 64, 60, 56, 62, 68, 72, 65],
+        landingViews: [38, 44, 40, 51, 58, 46, 42, 49, 55, 59, 64, 52, 48, 50, 55, 46, 42, 49, 54, 50, 47, 52, 58, 61, 55],
+        dropOffRate: '15.4%',
+        decisionNote: 'Gubitak između klika i učitavanja je 15.4% (odlično, znatno ispod kritične granice od 20-25%). Stranica se učitava za 1.1 sekundu.'
+      },
+      conversionRate: {
+        days: daysList,
+        cr: [3.2, 3.5, 3.4, 4.0, 4.5, 4.2, 3.9, 4.1, 4.6, 4.8, 5.2, 4.4, 4.1, 4.3, 4.6, 4.0, 3.8, 4.2, 4.7, 4.4, 4.2, 4.5, 4.9, 4.8, 4.7],
+        decisionNote: 'Stopa konverzije web stranice je 4.7% (prosjek industrije je 2.5%). Odredišna stranica iznimno učinkovito pretvara posjetitelje u kupce.'
+      },
+      cacLtv: {
+        days: daysList,
+        cac: [38.5, 35.2, 36.0, 32.4, 30.1, 31.5, 29.8, 28.5, 27.2, 26.0, 25.4, 27.8, 28.2, 27.5, 26.8, 28.4, 29.5, 27.9, 26.2, 27.4, 28.0, 26.5, 25.8, 26.1, 25.9],
+        ltv: '$180.00',
+        decisionNote: 'Trošak stjecanja novog kupca (CAC) pao je na $25.9 uz prosječni LTV od $180. Izvrstan omjer CAC:LTV od 1:6.9.'
+      }
+    },
     googleStats: {
       totalSpend: '$550',
       monthlyBudgetLimit: '$1,000',
