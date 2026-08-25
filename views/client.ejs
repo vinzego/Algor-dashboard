@@ -726,7 +726,7 @@
         };
       }, [mult, darkMode]);
 
-      // TAB 3: Google Ads & PMax Data (FULLY ENHANCED)
+      // TAB 3: Google Ads & PMax Data
       const googleAdsData = useMemo(() => {
         // Chart 1: Traffic vs Cost (Clicks vs CPC)
         const trafficCostOption = {
@@ -762,7 +762,7 @@
           }]
         };
 
-        // NEW Chart 3: Bidding Health: Actual vs. Target ROAS (Line Chart with Reference Line)
+        // Chart 3: Bidding Health: Actual vs. Target ROAS (Line Chart with Reference Line)
         const biddingHealthOption = {
           tooltip: { trigger: 'axis' },
           legend: { data: ['Actual ROAS (x)', 'Target ROAS (x)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
@@ -787,38 +787,6 @@
           ]
         };
 
-        // NEW Chart 4: PMax Asset Performance Rating (Horizontal Stacked Bar Chart)
-        const pmaxAssetsOption = {
-          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-          legend: { data: ['Best', 'Good', 'Low'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
-          grid: { top: 20, bottom: 40, left: 20, right: 25, containLabel: true },
-          xAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
-          yAxis: { type: 'category', data: ['Headlines', 'Descriptions', 'Images', 'Videos'], axisLabel: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
-          series: [
-            {
-              name: 'Best',
-              type: 'bar',
-              stack: 'total',
-              data: [8, 6, 12, 4],
-              itemStyle: { color: '#059669', borderRadius: [4, 0, 0, 4] }
-            },
-            {
-              name: 'Good',
-              type: 'bar',
-              stack: 'total',
-              data: [5, 4, 6, 3],
-              itemStyle: { color: '#1877F2' }
-            },
-            {
-              name: 'Low',
-              type: 'bar',
-              stack: 'total',
-              data: [2, 1, 1, 1],
-              itemStyle: { color: '#EF4444', borderRadius: [0, 4, 4, 0] }
-            }
-          ]
-        };
-
         const searchTerms = [
           { keyword: 'digitalna agencija zagreb', clicks: 142, conversions: 18, cost: 124.50, suggestedNegative: null },
           { keyword: 'izrada web stranica cijena', clicks: 98, conversions: 12, cost: 89.20, suggestedNegative: null },
@@ -836,7 +804,6 @@
           trafficCostOption,
           campaignBreakdownOption,
           biddingHealthOption,
-          pmaxAssetsOption,
           searchTerms
         };
       }, [mult, darkMode]);
@@ -1725,7 +1692,7 @@
                   </div>
                 ) : (
                   /* ========================================================================= */
-                  /* TAB 3: GOOGLE ADS & PMAX (FULLY IMPLEMENTED ACCORDING TO USER SPECS) */
+                  /* TAB 3: GOOGLE ADS & PMAX */
                   /* ========================================================================= */
                   <div className="space-y-6">
                     
@@ -1815,7 +1782,7 @@
                         <EChartComponent option={googleAdsData.campaignBreakdownOption} style={{ height: '290px', width: '100%' }} />
                       </div>
 
-                      {/* [NEW] Chart 3: Bidding Health: Actual vs. Target ROAS (Line Chart with Reference Line) */}
+                      {/* Chart 3: Bidding Health: Actual vs. Target ROAS (Line Chart with Reference Line) */}
                       <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
                         <div className="flex justify-between items-center mb-3">
                           <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider">Bidding Health: Actual vs. Target ROAS</h4>
@@ -1824,13 +1791,65 @@
                         <EChartComponent option={googleAdsData.biddingHealthOption} style={{ height: '290px', width: '100%' }} />
                       </div>
 
-                      {/* [NEW] Chart 4: PMax Asset Performance Rating (Stacked Bar Chart) */}
-                      <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                      {/* 4. [NEW SCORECARD] "PMax Asset Quality Scorecard" (Replacing the stacked bar chart) */}
+                      <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs flex flex-col justify-between h-[360px]">
                         <div className="flex justify-between items-center mb-3">
-                          <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider">PMax Asset Performance Rating</h4>
-                          <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-black">Asset Quality Rating</span>
+                          <div>
+                            <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider flex items-center gap-2">
+                              <i className="fa-solid fa-list-check text-zorange"></i> PMax Asset Quality Scorecard
+                            </h4>
+                            <p className="text-[11px] text-gray-400 font-bold mt-0.5">Ocjena kvalitete vizualnih i tekstualnih elemenata</p>
+                          </div>
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-black">
+                            ● 4 Asset Skupine
+                          </span>
                         </div>
-                        <EChartComponent option={googleAdsData.pmaxAssetsOption} style={{ height: '290px', width: '100%' }} />
+
+                        <div className="space-y-3 my-auto">
+                          {[
+                            { type: 'Images', icon: 'fa-regular fa-image text-purple-500', best: 12, good: 6, low: 1 },
+                            { type: 'Videos', icon: 'fa-solid fa-video text-rose-500', best: 4, good: 3, low: 2 },
+                            { type: 'Headlines', icon: 'fa-solid fa-heading text-blue-500', best: 8, good: 5, low: 0 },
+                            { type: 'Descriptions', icon: 'fa-solid fa-align-left text-amber-500', best: 6, good: 4, low: 0 }
+                          ].map((item, idx) => (
+                            <div 
+                              key={idx} 
+                              className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-xs shadow-2xs">
+                                  <i className={item.icon}></i>
+                                </div>
+                                <span className="text-xs font-black text-[#111113] dark:text-white tracking-tight">
+                                  {item.type}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-2 flex-wrap">
+                                {/* Badge 1: Solid Green background with white text */}
+                                <span className="px-2.5 py-1 rounded-full bg-emerald-600 text-white text-[11px] font-black shadow-2xs flex items-center gap-1">
+                                  <i className="fa-solid fa-circle-check text-[9px]"></i> {item.best} Best
+                                </span>
+
+                                {/* Badge 2: Light Blue background with dark blue text */}
+                                <span className="px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 text-[11px] font-black border border-blue-200 dark:border-blue-900 flex items-center gap-1">
+                                  <i className="fa-solid fa-thumbs-up text-[9px]"></i> {item.good} Good
+                                </span>
+
+                                {/* Badge 3: Soft Red/Rose background with bold red text (or grayed out if 0) */}
+                                {item.low > 0 ? (
+                                  <span className="px-2.5 py-1 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 text-[11px] font-black border border-rose-200 dark:border-rose-900 flex items-center gap-1 animate-pulse">
+                                    <i className="fa-solid fa-triangle-exclamation text-[9px]"></i> {item.low} Low
+                                  </span>
+                                ) : (
+                                  <span className="px-2.5 py-1 rounded-full bg-gray-100 text-gray-400 dark:bg-gray-800/80 dark:text-gray-500 text-[11px] font-bold border border-gray-200/50 dark:border-gray-800 flex items-center gap-1 opacity-60">
+                                    0 Low
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
 
                     </div>
