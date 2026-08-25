@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Algor Marketing Dashboard</title>
+  <!-- Tailwind Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#122022',
+              green: '#DAF4AA',
+              cyan: '#96D8D0',
+              pink: '#F1B4B9'
+            }
+          },
+          fontFamily: {
+            sans: ['Urbanist', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css">
+  <!-- FontAwesome Icons for nice details -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="min-h-screen relative pb-16">
+
+  <!-- Background Decorative Glowing Blobs -->
+  <div class="bg-glow-green top-[-100px] left-[-100px]"></div>
+  <div class="bg-glow-pink bottom-[-100px] right-[-100px]"></div>
+
+  <!-- Container for centering and structure -->
+  <div class="w-full px-6 sm:px-8 lg:px-12">
+    
+    <!-- Floating Pill Navbar -->
+    <header class="pt-6">
+      <nav class="glass-navbar rounded-full px-6 py-3.5 flex items-center justify-between shadow-lg">
+        <!-- Logo -->
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-brand-cyan to-brand-green flex items-center justify-center">
+            <span class="text-brand-dark font-black text-sm">A</span>
+          </div>
+          <span class="text-xl font-bold tracking-tight text-brand-dark">Algor<span class="text-brand-cyan">.</span></span>
+        </div>
+        
+        <!-- Navigation Links -->
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#" class="text-sm font-semibold text-brand-dark border-b-2 border-brand-green pb-0.5 transition-colors">Nadzorna ploča</a>
+          <a href="#" class="text-sm font-medium text-brand-dark/60 hover:text-brand-dark transition-colors">Klijenti</a>
+          <a href="#" class="text-sm font-medium text-brand-dark/60 hover:text-brand-dark transition-colors">Izvještaji</a>
+          <a href="#" class="text-sm font-medium text-brand-dark/60 hover:text-brand-dark transition-colors">Postavke</a>
+        </div>
+        
+        <!-- User Info / Profile -->
+        <div class="flex items-center gap-3">
+          <div class="hidden sm:block text-right">
+            <p class="text-xs font-bold text-brand-dark">Vinko</p>
+            <p class="text-[10px] text-brand-dark/50">Administrator</p>
+          </div>
+          <div class="w-9 h-9 rounded-full bg-brand-dark/5 flex items-center justify-center border border-brand-dark/10">
+            <i class="fa-solid fa-user text-brand-dark/80 text-sm"></i>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Dashboard Section -->
+    <main class="mt-12">
+      <!-- Top Action Bar (without greeting) -->
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-sm uppercase tracking-wider text-brand-dark/50 font-bold">Klijenti i sustavi</h2>
+        <div class="flex gap-3 items-center">
+          <div class="glass-panel px-4 py-1.5 rounded-full flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs text-brand-dark/80 font-bold">Svi sustavi aktivni</span>
+          </div>
+          <button onclick="openModal()" class="glass-panel px-4 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-brand-dark hover:bg-brand-dark hover:text-white transition-all duration-300 shadow-sm border border-brand-dark/10">
+            <i class="fa-solid fa-plus text-[10px]"></i> Dodaj klijenta
+          </button>
+        </div>
+      </div>
+
+      <!-- Clients Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <% clients.forEach(client => { %>
+          <!-- Client Card -->
+          <a href="/client/<%= client.id %>" class="glass-panel glass-panel-hover rounded-[2rem] p-7 flex flex-col justify-between h-[420px] relative overflow-hidden group block shadow-sm">
+            
+            <!-- Card Header -->
+            <div>
+              <div class="flex justify-between items-start mb-4">
+                <!-- Client Initials Icon -->
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg border <%= client.accentClass %> <%= client.bgAccentClass %> transition-all duration-300 group-hover:scale-110 shadow-sm">
+                  <%= client.logo %>
+                </div>
+                
+                <!-- Package & Status Badges -->
+                <div class="flex flex-col items-end gap-1.5">
+                  <span class="px-2.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border shadow-sm
+                    <%= client.package === 'Ultra' ? 'bg-gradient-to-tr from-brand-pink/20 to-brand-cyan/20 border-brand-pink/40 text-brand-dark' : '' %>
+                    <%= client.package === 'Pro' ? 'bg-brand-cyan/15 text-brand-dark border-brand-cyan/35' : '' %>
+                    <%= client.package === 'Start' ? 'bg-brand-dark/5 text-brand-dark/50 border-brand-dark/10' : '' %>">
+                    <%= client.package %>
+                  </span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider <%= client.status === 'Active' ? 'bg-emerald-500/10 text-emerald-800' : 'bg-brand-dark/5 text-brand-dark/30' %>">
+                    <%= client.status === 'Active' ? 'Aktivno' : 'Neaktivno' %>
+                  </span>
+                </div>
+              </div>
+              
+              <h2 class="text-2xl font-bold text-brand-dark group-hover:text-brand-dark transition-colors duration-300"><%= client.name %></h2>
+              
+              <!-- Monthly Posts Tracker -->
+              <div class="mt-3.5 bg-brand-dark/5 rounded-2xl p-3 border border-brand-dark/5">
+                <div class="flex justify-between items-center text-[9px] text-brand-dark/50 font-bold mb-1">
+                  <span>Objave u tekućem mjesecu:</span>
+                  <span><%= client.publishedPosts %> / <%= client.maxPosts %></span>
+                </div>
+                <div class="w-full bg-brand-dark/10 rounded-full h-1 overflow-hidden">
+                  <% const pct = Math.min((client.publishedPosts / client.maxPosts) * 100, 100); %>
+                  <div class="bg-brand-dark h-1 rounded-full" style="width: <%= pct %>%; background-color: <%= client.accentColor === '#DAF4AA' ? '#689F38' : (client.accentColor === '#FFFFFF' ? '#122022' : client.accentColor) %>"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats Middle Section -->
+            <div class="grid grid-cols-2 gap-y-3.5 py-3 border-y border-brand-dark/5 my-3.5">
+              <div>
+                <p class="text-[10px] uppercase tracking-wider text-brand-dark/40 font-bold">Doseg (Reach)</p>
+                <p class="text-lg font-extrabold text-brand-dark mt-0.5"><%= client.stats.reach %></p>
+              </div>
+              <div>
+                <p class="text-[10px] uppercase tracking-wider text-brand-dark/40 font-bold">Prikazi</p>
+                <p class="text-lg font-extrabold text-brand-dark mt-0.5"><%= client.stats.impressions %></p>
+              </div>
+              <div>
+                <p class="text-[10px] uppercase tracking-wider text-brand-dark/40 font-bold">CTR</p>
+                <p class="text-lg font-extrabold text-brand-dark mt-0.5"><%= client.stats.ctr %></p>
+              </div>
+              <div>
+                <p class="text-[10px] uppercase tracking-wider text-brand-dark/40 font-bold">Budžet</p>
+                <p class="text-lg font-extrabold mt-0.5" style="color: <%= client.accentColor === '#DAF4AA' ? '#689F38' : (client.accentColor === '#FFFFFF' ? '#122022' : client.accentColor) %>"><%= client.stats.spend %></p>
+              </div>
+            </div>
+
+            <!-- Card Action Footer -->
+            <div class="flex items-center justify-between">
+              <!-- Icons of active platforms based on package -->
+              <div class="flex items-center gap-1.5">
+                <span class="w-6 h-6 rounded bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-[10px] text-brand-dark/60 shadow-sm" title="Meta Ads"><i class="fa-brands fa-facebook-f"></i></span>
+                <% if (client.package === 'Pro' || client.package === 'Ultra') { %>
+                  <span class="w-6 h-6 rounded bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-[10px] text-brand-dark/60 shadow-sm" title="Google Ads"><i class="fa-brands fa-google"></i></span>
+                <% } %>
+                <% if (client.package === 'Ultra') { %>
+                  <span class="w-6 h-6 rounded bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-[10px] text-brand-dark/60 shadow-sm" title="TikTok Ads"><i class="fa-brands fa-tiktok"></i></span>
+                <% } %>
+              </div>
+              
+              <div class="flex items-center gap-1.5 group-hover:translate-x-1 transition-transform duration-300">
+                <span class="text-xs font-semibold text-brand-dark/60 group-hover:text-brand-dark transition-colors">Detalji</span>
+                <button class="w-8 h-8 rounded-full flex items-center justify-center bg-brand-dark/5 border border-brand-dark/10 text-brand-dark transition-all duration-300 group-hover:border-transparent" style="background-color: <%= client.status === 'Active' ? (client.accentColor === '#DAF4AA' ? '#DAF4AA' : client.accentColor) + '30' : '' %>; color: <%= client.status === 'Active' ? (client.accentColor === '#DAF4AA' ? '#558B2F' : (client.accentColor === '#FFFFFF' ? '#122022' : client.accentColor)) : 'rgba(18, 32, 34, 0.4)' %>">
+                  <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+              </div>
+            </div>
+            
+          </a>
+        <% }) %>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Add Client Modal Dialog Container -->
+  <div id="add-client-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-brand-dark/40 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+    <div class="glass-panel w-full max-w-md p-8 rounded-[2rem] shadow-2xl scale-90 transition-all duration-300 relative border border-brand-dark/15">
+      <!-- Close Button -->
+      <button onclick="closeModal()" class="absolute right-5 top-5 w-8 h-8 rounded-full bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-brand-dark hover:bg-brand-dark hover:text-white transition-all duration-300">
+        <i class="fa-solid fa-xmark text-xs"></i>
+      </button>
+      
+      <div class="flex items-center gap-2.5 mb-6">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-cyan to-brand-green flex items-center justify-center shadow-sm">
+          <i class="fa-solid fa-user-plus text-xs text-brand-dark"></i>
+        </div>
+        <h3 class="text-lg font-black text-brand-dark uppercase tracking-wider">Dodaj novog klijenta</h3>
+      </div>
+      
+      <form action="/api/client/add" method="POST" class="space-y-4 text-xs font-bold text-brand-dark">
+        <!-- Name -->
+        <div class="flex flex-col gap-1">
+          <label for="client-name">Naziv klijenta *</label>
+          <input type="text" id="client-name" name="name" required placeholder="npr. Orion Group" class="w-full bg-brand-dark/5 border border-brand-dark/10 rounded-xl px-4 py-2.5 text-brand-dark placeholder-brand-dark/40 focus:outline-none focus:ring-1 focus:ring-brand-cyan">
+        </div>
+        <!-- Logo Initials -->
+        <div class="flex flex-col gap-1">
+          <label for="client-logo">Inicijali za logotip (max 2 slova)</label>
+          <input type="text" id="client-logo" name="logo" maxlength="2" placeholder="npr. OR" class="w-full bg-brand-dark/5 border border-brand-dark/10 rounded-xl px-4 py-2.5 text-brand-dark placeholder-brand-dark/40 focus:outline-none focus:ring-1 focus:ring-brand-cyan">
+        </div>
+        <!-- Package -->
+        <div class="flex flex-col gap-1">
+          <label for="client-package">Paket suradnje</label>
+          <select id="client-package" name="package" class="w-full bg-white/80 border border-brand-dark/10 rounded-xl px-4 py-2.5 text-brand-dark focus:outline-none focus:ring-1 focus:ring-brand-cyan">
+            <option value="Start">Start Paket (€690)</option>
+            <option value="Pro" selected>Pro Paket (€1,250)</option>
+            <option value="Ultra">Ultra Paket (€2,150)</option>
+          </select>
+        </div>
+        <!-- Budget -->
+        <div class="flex flex-col gap-1">
+          <label for="client-spend">Planirani mjesečni budžet ($)</label>
+          <input type="number" id="client-spend" name="spend" value="1000" class="w-full bg-brand-dark/5 border border-brand-dark/10 rounded-xl px-4 py-2.5 text-brand-dark placeholder-brand-dark/40 focus:outline-none focus:ring-1 focus:ring-brand-cyan">
+        </div>
+        
+        <button type="submit" class="w-full bg-brand-dark text-white rounded-xl py-3 font-black uppercase tracking-wider hover:bg-brand-cyan hover:text-brand-dark transition-all duration-300 shadow-md mt-6">
+          Spremi klijenta
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function openModal() {
+      const modal = document.getElementById('add-client-modal');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      modal.querySelector('.glass-panel').classList.remove('scale-90');
+      modal.querySelector('.glass-panel').classList.add('scale-100');
+    }
+    function closeModal() {
+      const modal = document.getElementById('add-client-modal');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      modal.querySelector('.glass-panel').classList.remove('scale-100');
+      modal.querySelector('.glass-panel').classList.add('scale-90');
+    }
+  </script>
+
+</body>
+</html>

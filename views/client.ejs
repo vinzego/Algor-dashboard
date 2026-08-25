@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= client.name %> - Marketing Dashboard</title>
+  <!-- Tailwind Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#122022',
+              green: '#DAF4AA',
+              cyan: '#96D8D0',
+              pink: '#F1B4B9'
+            }
+          },
+          fontFamily: {
+            sans: ['Urbanist', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Apache ECharts CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+</head>
+<body class="min-h-screen relative pb-16">
+
+  <!-- Background Decorative Glowing Blobs -->
+  <div class="bg-glow-green top-[-100px] left-[-100px]"></div>
+  <div class="bg-glow-pink bottom-[-100px] right-[-100px]"></div>
+
+  <div class="w-full px-6 sm:px-8 lg:px-12">
+    
+    <!-- Floating Pill Navbar with client detail context -->
+    <header class="pt-6">
+      <nav class="glass-navbar rounded-full px-6 py-3 flex items-center justify-between shadow-lg">
+        
+        <!-- Left: Logo & Back Button -->
+        <div class="flex items-center gap-4">
+          <a href="/" class="flex items-center justify-center w-8 h-8 rounded-full bg-brand-dark/5 border border-brand-dark/10 text-brand-dark hover:bg-brand-dark hover:text-white transition-all duration-300">
+            <i class="fa-solid fa-arrow-left text-xs"></i>
+          </a>
+          <div class="hidden sm:flex items-center gap-2 border-l border-brand-dark/15 pl-4">
+            <span class="font-black tracking-wider text-xs px-2 py-0.5 rounded bg-brand-dark text-white"><%= client.logo %></span>
+            <span class="text-sm font-bold text-brand-dark"><%= client.name %></span>
+          </div>
+        </div>
+        
+        <!-- Center: Platform Switcher (Meta / Google / TikTok Options in Navbar) -->
+        <div class="flex items-center bg-brand-dark/5 p-1 rounded-full border border-brand-dark/10">
+          <button id="btn-meta" class="px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 bg-brand-dark text-white shadow-sm" onclick="switchPlatform('meta')">
+            Meta
+          </button>
+          
+          <button id="btn-google" class="px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 text-brand-dark/60 hover:text-brand-dark flex items-center gap-1" onclick="switchPlatform('google')">
+            Google
+            <% if (client.package === 'Start') { %>
+              <i class="fa-solid fa-lock text-[8px] opacity-60"></i>
+            <% } %>
+          </button>
+          
+          <button id="btn-tiktok" class="px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 text-brand-dark/60 hover:text-brand-dark flex items-center gap-1" onclick="switchPlatform('tiktok')">
+            TikTok
+            <% if (client.package === 'Start' || client.package === 'Pro') { %>
+              <i class="fa-solid fa-lock text-[8px] opacity-60"></i>
+            <% } %>
+          </button>
+        </div>
+        
+        <!-- Right: Profile Info -->
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-brand-dark/5 flex items-center justify-center border border-brand-dark/10">
+            <i class="fa-solid fa-user text-brand-dark/80 text-xs"></i>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- 80/20 Layout Split Container -->
+    <div class="flex flex-col lg:flex-row gap-6 mt-12 items-start">
+      
+      <!-- LEFT COLUMN: Client Dashboard (80% of width) -->
+      <main class="flex-1 lg:w-[76%] xl:w-[79%] min-w-0">
+
+        <!-- Package Info Card -->
+        <div class="glass-panel rounded-[2rem] p-6 mb-6 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+          <div class="flex items-center gap-4 shrink-0">
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg border <%= client.accentClass %> <%= client.bgAccentClass %> shadow-sm">
+              <%= client.logo %>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-brand-dark"><%= client.name %></h3>
+              <p class="text-xs text-brand-dark/50 font-semibold mt-0.5">Paket suradnje: 
+                <span class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border shadow-sm
+                  <%= client.package === 'Ultra' ? 'bg-gradient-to-tr from-brand-pink/20 to-brand-cyan/20 border-brand-pink/40 text-brand-dark' : '' %>
+                  <%= client.package === 'Pro' ? 'bg-brand-cyan/15 text-brand-dark border-brand-cyan/35' : '' %>
+                  <%= client.package === 'Start' ? 'bg-brand-dark/5 text-brand-dark/50 border-brand-dark/10' : '' %>">
+                  <%= client.package %>
+                </span>
+              </p>
+            </div>
+          </div>
+          
+          <!-- Mid: Posts published status -->
+          <div class="flex-grow max-w-xs w-full bg-brand-dark/5 rounded-2xl p-3 border border-brand-dark/5 shrink-0">
+            <div class="flex justify-between items-center text-[10px] text-brand-dark/50 font-bold mb-1">
+              <span>Mjesečni plan objava:</span>
+              <span><strong><%= client.publishedPosts %> / <%= client.maxPosts %> objavljeno</strong></span>
+            </div>
+            <div class="w-full bg-brand-dark/10 rounded-full h-1 overflow-hidden">
+              <% const pctVal = Math.min((client.publishedPosts / client.maxPosts) * 100, 100); %>
+              <div class="bg-brand-dark h-1 rounded-full" style="width: <%= pctVal %>%; background-color: <%= client.accentColor === '#DAF4AA' ? '#689F38' : (client.accentColor === '#FFFFFF' ? '#122022' : client.accentColor) %>"></div>
+            </div>
+          </div>
+
+          <!-- Right: Active features log -->
+          <div class="flex items-center gap-4 text-[10px] text-brand-dark/60 font-semibold border-t md:border-t-0 md:border-l border-brand-dark/10 pt-3 md:pt-0 md:pl-6 w-full md:w-auto">
+            <div class="space-y-1">
+              <div><i class="fa-solid fa-camera mr-1"></i> Produkcija: <span class="text-brand-dark font-extrabold"><%= client.package === 'Start' ? 'Snimanje na lokaciji' : (client.package === 'Pro' ? 'Foto + Reels' : 'Ekskluzivna') %></span></div>
+              <div><i class="fa-solid fa-code mr-1"></i> Web landing: <span class="text-brand-dark font-extrabold"><%= client.package === 'Start' ? '1 landing' : (client.package === 'Pro' ? 'Prodajni landing' : 'Kompletan web') %></span></div>
+            </div>
+            <div class="space-y-1">
+              <div><i class="fa-solid fa-robot mr-1"></i> AI automatizacija: <span class="text-brand-dark font-extrabold"><%= client.package === 'Start' ? 'Basic odgovori' : (client.package === 'Pro' ? 'Lead engine' : 'Custom AI CRM') %></span></div>
+              <div><i class="fa-solid fa-file-invoice mr-1"></i> Izvještaji: <span class="text-brand-dark font-extrabold"><%= client.package === 'Start' ? 'Mjesečni' : (client.package === 'Pro' ? 'ROAS/Konv.' : 'CAC/ROI/ROAS') %></span></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Section Breadcrumb & Status Bar -->
+        <div class="flex justify-between items-center mb-6">
+          <div class="flex items-center gap-2">
+            <span class="text-xs uppercase tracking-wider text-brand-dark/45 font-bold">Platforma:</span>
+            <span id="platform-title-badge" class="text-xs uppercase tracking-wider text-brand-dark font-black px-2.5 py-0.5 rounded bg-brand-dark/5 border border-brand-dark/10">Meta Ads</span>
+          </div>
+          <div class="glass-panel px-4 py-1.5 rounded-full flex items-center gap-2 text-xs">
+            <span class="text-brand-dark/50 font-bold">Klijent status:</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase <%= client.status === 'Active' ? 'bg-emerald-100 text-emerald-800' : 'bg-brand-dark/5 text-brand-dark/40' %>">
+              <%= client.status === 'Active' ? 'Aktivno' : 'Neaktivno' %>
+            </span>
+          </div>
+        </div>
+
+        <!-- PLATFORM 1: META STATISTICS SECTION -->
+        <section id="panel-meta" class="transition-all duration-300 opacity-100 scale-100">
+          
+          <!-- Hierarchical 12-column grid of Meta metric cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+            
+            <!-- Card 1: Total Spend -->
+            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-4">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wider text-brand-dark/45 font-bold">Ukupna potrošnja</p>
+                  <h3 class="text-3xl font-black text-brand-dark mt-1.5 tracking-tight"><%= client.metaStats.totalSpend %></h3>
+                </div>
+                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-[#1877F2] text-sm transition-all duration-300 group-hover:scale-110">
+                  <i class="fa-brands fa-facebook-f"></i>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-brand-dark/50 border-t border-brand-dark/5 pt-2.5 mt-1.5">
+                <span>Facebook + Instagram zbirno</span>
+                <span class="font-bold">Meta Ads</span>
+              </div>
+            </div>
+            
+            <!-- Card 2: Cost Per Action (CPA) -->
+            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-4">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wider text-brand-dark/45 font-bold">Cijena po rezultatu (CPA)</p>
+                  <div class="flex items-baseline gap-1.5 mt-1.5">
+                    <h3 class="text-3xl font-black text-brand-dark tracking-tight"><%= client.metaStats.cpa %></h3>
+                    <% if (client.metaStats.cpaTrend.direction === 'down') { %>
+                      <span class="inline-flex items-center gap-0.5 text-[8px] font-black px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        <i class="fa-solid fa-arrow-down"></i> <%= client.metaStats.cpaTrend.value %>
+                      </span>
+                    <% } else { %>
+                      <span class="inline-flex items-center gap-0.5 text-[8px] font-black px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200">
+                        <i class="fa-solid fa-arrow-up"></i> <%= client.metaStats.cpaTrend.value %>
+                      </span>
+                    <% } %>
+                  </div>
+                </div>
+                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-brand-dark text-sm transition-all duration-300 group-hover:scale-110">
+                  <i class="fa-solid fa-bullseye"></i>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-brand-dark/50 border-t border-brand-dark/5 pt-2.5 mt-1.5">
+                <span><%= client.metaStats.resultsType %></span>
+                <span class="font-bold <%= client.metaStats.cpaTrend.direction === 'down' ? 'text-emerald-700' : 'text-rose-700' %>">
+                  <%= client.metaStats.cpaTrend.direction === 'down' ? 'Pad cijene (odlično)' : 'Rast cijene' %>
+                </span>
+              </div>
+            </div>
+            
+            <!-- Card 3: Results / ROAS -->
+            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-2">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wider text-brand-dark/45 font-bold">Rezultati / ROAS</p>
+                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight"><%= client.metaStats.resultsValue %></h3>
+                </div>
+                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-brand-dark text-xs shrink-0">
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-brand-dark/50 border-t border-brand-dark/5 pt-2.5 mt-1.5">
+                <span class="truncate">Tip: <%= client.metaStats.resultsType.split(' ')[0] %></span>
+              </div>
+            </div>
+            
+            <!-- Card 4: Organic Reach -->
+            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-2">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wider text-brand-dark/45 font-bold">Organski doseg</p>
+                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight"><%= client.metaStats.organicReach %></h3>
+                </div>
+                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-brand-dark text-xs shrink-0">
+                  <i class="fa-solid fa-users"></i>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-brand-dark/50 border-t border-brand-dark/5 pt-2.5 mt-1.5">
+                <span>Reach objava</span>
+              </div>
+            </div>
+
+          </div>
+          
+          <!-- Hierarchical Visualizations for Meta -->
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6">
+            <!-- Chart 1: Trend učinkovitosti -->
+            <div class="xl:col-span-8 glass-panel rounded-[1.75rem] p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">Trend učinkovitosti (Trošak vs. Konverzije)</h4>
+                <span class="text-[9px] text-brand-dark/40 font-bold">Ključni graf učinka</span>
+              </div>
+              <div id="meta-chart-efficiency" class="w-full" style="height: 350px;"></div>
+            </div>
+            
+            <!-- Chart 2: Usporedba platformi -->
+            <div class="xl:col-span-4 glass-panel rounded-[1.75rem] p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">Usporedba platformi</h4>
+                <span class="text-[9px] text-brand-dark/40 font-bold">Podjela troška</span>
+              </div>
+              <div id="meta-chart-platforms" class="w-full" style="height: 350px;"></div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6">
+            <!-- Chart 4: Top 5 objava po angažmanu -->
+            <div class="xl:col-span-5 glass-panel rounded-[1.75rem] p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">Top 5 objava po angažmanu</h4>
+                <span class="text-[9px] text-brand-dark/40 font-bold">Engagement ranking</span>
+              </div>
+              <div id="meta-chart-posts" class="w-full" style="height: 330px;"></div>
+            </div>
+
+            <!-- Chart 5: Trend dosega i interakcija -->
+            <div class="xl:col-span-4 glass-panel rounded-[1.75rem] p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">Organski doseg kroz mjesec</h4>
+                <span class="text-[9px] text-brand-dark/40 font-bold">Mjesečni reach</span>
+              </div>
+              <div id="meta-chart-reach" class="w-full" style="height: 330px;"></div>
+            </div>
+
+            <!-- Chart 3: Analiza publike -->
+            <div class="xl:col-span-3 glass-panel rounded-[1.75rem] p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">Analiza publike</h4>
+                <span class="text-[9px] text-brand-dark/40 font-bold">Spol i dob</span>
+              </div>
+              <div id="meta-chart-audience" class="w-full" style="height: 330px;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PLATFORM 2: GOOGLE STATISTICS OVERHAULED & HIERARCHICAL SECTION -->
+        <section id="panel-google" class="hidden transition-all duration-300 opacity-0 scale-95">
+          
+          <!-- KPI Cards Section (Trenutno stanje u brojkama) -->
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+            
+            <!-- KPI 1: Ukupni trošak i preostali budžet -->
+            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-4">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wider text-brand-dark/45 font-bold">Trošak i preostali budžet</p>
+                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight">
+                    <%= client.googleStats.totalSpend %> 
+                    <span class="text-xs font-bold text-brand-dark/40">/ <%= client.googleStats.monthlyBudgetLimit %> limit</span>
+                  </h3>
+                </div>
+                <span class="text-[10px] font-black px-2 py-0.5 rounded bg-brand-dark text-white"><%= client.googleStats.budgetPercent %>%</span>
+              </div>
+              <div class="mt-2.5">
+                <div class="w-full bg-brand-dark/10 rounded-full h-1.5 overflow-hidden">
+                  <div class="bg-brand-dark h-1.5 rounded-full" style="width: <%= client.googleStats.budgetPercent %>%"></div>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-brand-dark/50 border-t border-brand-dark/5 pt-2.5 mt-1">
+                <span>Preostali budžet: <strong><%= client.googleStats.preostaliBudzet %></strong></span>
+                <span class="font-bold">Google Ads</span>
+              </div>
+            </div>
+            
+            <!-- KPI 2: CPA / ROAS (Ostvareno vs. Cilj) -->
+            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-4">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wider text-brand-dark/45 font-bold">CPA (Ostvareno vs. Cilj)</p>
+                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight">
+                    <%= client.googleStats.cpa %> 
+                    <span class="text-xs font-bold text-brand-dark/40">/ <%= client.googleStats.cpaTarget %> cilj</span>
+                  </h3>
+                </div>
+                <% if (client.googleStats.cpaTrend.direction === 'down') { %>
+                  <span class="inline-flex items-center gap-0.5 text-[8px] font-black px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    <i class="fa-solid fa-arrow-down"></i> <%= client.googleStats.cpaTrend.value %>
+                  </span>
+                <% } else { %>
+                  <span class="inline-flex items-center gap-0.5 text-[8px] font-black px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200">
+                    <i class="fa-solid fa-arrow-up"></i> <%= client.googleStats.cpaTrend.value %>
+                  </span>
+                <% } %>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-brand-dark/50 border-t border-brand-dark/5 pt-2.5 mt-1.5">
+                <span>Status:</span>
+                <span class="font-bold <%= client.googleStats.cpaTrend.direction === 'down' ? 'text-emerald-700' : 'text-rose-700' %>">
+                  <%= client.googleStats.cpaTrend.direction === 'down' ? 'Unutar cilja (Odlično)' : 'Iznad cilja' %>
+                </span>
+              </div>
+            </div>
+            
+            <!-- KPI 3: Ukupan broj konverzije i CVR -->
+            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-2">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wider text-brand-dark/45 font-bold">Konverzije & CVR</p>
+                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight"><%= client.googleStats.resultsValue.split(' ')[0] %></h3>
+                </div>
+                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-brand-dark text-xs shrink-0">
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-brand-dark/50 border-t border-brand-dark/5 pt-2.5 mt-1.5">
+                <span>CVR: <strong><%= client.googleStats.cvr %></strong></span>
+              </div>
+            </div>
+            
+            <!-- KPI 4: Udio pojavljivanja (Impression Share) -->
+            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-2">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wider text-brand-dark/45 font-bold">Impression Share</p>
+                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight"><%= client.googleStats.impressionShare %></h3>
+                </div>
+                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-brand-dark text-xs shrink-0">
+                  <i class="fa-solid fa-eye"></i>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-brand-dark/50 border-t border-brand-dark/5 pt-2.5 mt-1.5">
+                <span class="truncate">Izgubljeno: <%= client.googleStats.lostToBudget %></span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Section 2: Financijski grafovi -->
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6">
+            <div class="xl:col-span-7 glass-panel rounded-[1.75rem] p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">Trošak vs. Konverzije (Dnevni trend)</h4>
+                <span class="text-[9px] text-brand-dark/40 font-bold">Financijski učinak</span>
+              </div>
+              <div id="google-chart-efficiency" class="w-full" style="height: 360px;"></div>
+            </div>
+            
+            <div class="xl:col-span-5 glass-panel rounded-[1.75rem] p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">Tempo potrošnje (Budget Pacing)</h4>
+                <span class="text-[9px] text-brand-dark/40 font-bold">Kumulativna idealna vs. stvarna linija</span>
+              </div>
+              <div id="google-chart-pacing" class="w-full" style="height: 360px;"></div>
+            </div>
+          </div>
+
+          <!-- Section 3: Strukturna analitika -->
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6">
+            <div class="xl:col-span-7 glass-panel rounded-[1.75rem] p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">Top 10 kampanja / Asset grupa</h4>
+                <span class="text-[9px] text-brand-dark/40 font-bold">Poredak kampanja po ROAS-u</span>
+              </div>
+              <div id="google-chart-campaigns" class="w-full" style="height: 380px;"></div>
+            </div>
+
+            <div class="xl:col-span-5 glass-panel rounded-[1.75rem] p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">Raspodjela rezultata po mrežama</h4>
+                <span class="text-[9px] text-brand-dark/40 font-bold">Search vs. PMax vs. YouTube vs. Display</span>
+              </div>
+              <div id="google-chart-networks" class="w-full" style="height: 380px;"></div>
+            </div>
+          </div>
+
+          <!-- Section 4: Geografija i Lijevak -->
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6">
+            <div class="xl:col-span-6 glass-panel rounded-[1.75rem] p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">Geografski & Uređajni udjeli</h4>
+                <span class="text-[9px] text-brand-dark/40 font-bold">Usporedba konverzija</span>
+              </div>
+              <div id="google-chart-devices-locations" class="w-full" style="height: 320px;"></div>
+            </div>
+
+            <div class="xl:col-span-6 glass-panel rounded-[1.75rem] p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">Lijevak prodaje (GA4 Funnel)</h4>
+                  <span class="text-[9px] text-brand-dark/40 font-bold">Klik do kupnje</span>
+                </div>
+                <div id="google-chart-funnel" class="w-full" style="height: 300px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 5: Tablice -->
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6 items-stretch">
+            
+            <div class="xl:col-span-6 glass-panel rounded-[1.75rem] p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-3.5">
+                  <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">Ključne riječi i pretrage (Search terms)</h4>
+                  <span class="text-[9px] text-brand-dark/40 font-bold">Top 5 upita</span>
+                </div>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-[11px] text-left border-collapse">
+                    <thead>
+                      <tr class="border-b border-brand-dark/10 text-brand-dark/50 font-bold">
+                        <th class="pb-2">Pojam</th>
+                        <th class="pb-2 text-center">Klikovi</th>
+                        <th class="pb-2 text-center">Konv.</th>
+                        <th class="pb-2 text-right">Trošak</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% client.googleChartData.keywords.forEach(kw => { %>
+                        <tr class="border-b border-brand-dark/5 text-brand-dark/80 hover:bg-brand-dark/5 transition-colors">
+                          <td class="py-2 font-semibold truncate max-w-[150px]" title="<%= kw.term %>"><%= kw.term %></td>
+                          <td class="py-2 text-center"><%= kw.clicks %></td>
+                          <td class="py-2 text-center font-bold text-emerald-800"><%= kw.convs %></td>
+                          <td class="py-2 text-right"><%= kw.cost %></td>
+                        </tr>
+                      <% }) %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="text-[10px] text-brand-dark/50 border-t border-brand-dark/5 pt-2.5 mt-2">
+                Podaci iz Google Search Console i Ads upita.
+              </div>
+            </div>
+            
+            <div class="xl:col-span-6 glass-panel rounded-[1.75rem] p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-3.5">
+                  <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">Statusi i Upozorenja (Alerts)</h4>
+                  <span class="text-[9px] text-brand-dark/40 font-bold">Dijagnostika kampanja</span>
+                </div>
+                <div class="space-y-3">
+                  <% client.googleChartData.alerts.forEach(al => { %>
+                    <div class="p-2.5 rounded-xl border flex flex-col gap-0.5 
+                      <%= al.type === 'warning' ? 'bg-amber-50 border-amber-200 text-amber-900' : '' %>
+                      <%= al.type === 'info' ? 'bg-sky-50 border-sky-200 text-sky-900' : '' %>
+                      <%= al.type === 'danger' ? 'bg-rose-50 border-rose-200 text-rose-900' : '' %>
+                      <%= al.type === 'normal' ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : '' %>">
+                      <div class="flex justify-between items-center text-[10px] font-black uppercase">
+                        <span class="truncate max-w-[200px]" title="<%= al.campaign %>"><%= al.campaign %></span>
+                        <span><%= al.status %></span>
+                      </div>
+                      <span class="text-[9px] font-medium opacity-85"><%= al.alert %></span>
+                    </div>
+                  <% }) %>
+                </div>
+              </div>
+              <div class="text-[10px] text-brand-dark/50 border-t border-brand-dark/5 pt-2.5 mt-2">
+                Pregled ranga kampanja, statusa učenja i rasta CPA.
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- PLATFORM 3: TIKTOK STATISTICS SECTION (ULTRA PACKAGE EXCLUSIVE) -->
+        <section id="panel-tiktok" class="hidden transition-all duration-300 opacity-0 scale-95">
+          <!-- Grid of 4 TikTok metric cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+            
+            <!-- Card 1: Total Spend -->
+            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-4">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wider text-brand-dark/45 font-bold">Ukupna potrošnja</p>
+                  <h3 class="text-3xl font-black text-brand-dark mt-1.5 tracking-tight">$300</h3>
+                </div>
+                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-brand-dark text-sm transition-all duration-300 group-hover:scale-110">
+                  <i class="fa-brands fa-tiktok"></i>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-brand-dark/50 border-t border-brand-dark/5 pt-2.5 mt-1.5">
+                <span>Video i Spark Ads kampanje</span>
+                <span class="font-bold">TikTok Ads</span>
+              </div>
+            </div>
+            
+            <!-- Card 2: Cost Per Conversion (CPA) -->
+            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-4">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wider text-brand-dark/45 font-bold">CPA (Cijena po upitu)</p>
+                  <h3 class="text-3xl font-black text-brand-dark mt-1.5 tracking-tight">$9.50</h3>
+                </div>
+                <span class="inline-flex items-center gap-0.5 text-[8px] font-black px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  <i class="fa-solid fa-arrow-down"></i> 14%
+                </span>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-brand-dark/50 border-t border-brand-dark/5 pt-2.5 mt-1.5">
+                <span>Cilj: $12.00</span>
+                <span class="font-bold text-emerald-700">Optimizirano</span>
+              </div>
+            </div>
+            
+            <!-- Card 3: Total Conversions -->
+            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-2">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wider text-brand-dark/45 font-bold">Konverzije</p>
+                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight">32 Leads</h3>
+                </div>
+                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-brand-dark text-xs shrink-0">
+                  <i class="fa-solid fa-user-check"></i>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-brand-dark/50 border-t border-brand-dark/5 pt-2.5 mt-1.5">
+                <span>Generirano upita</span>
+              </div>
+            </div>
+            
+            <!-- Card 4: CTR -->
+            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-2">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wider text-brand-dark/45 font-bold">Stopa klikanja (CTR)</p>
+                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight">6.2%</h3>
+                </div>
+                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-brand-dark text-xs shrink-0">
+                  <i class="fa-solid fa-arrow-pointer"></i>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-brand-dark/50 border-t border-brand-dark/5 pt-2.5 mt-1.5">
+                <span>Prosjek industrije: 3.5%</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- TikTok Visualizations -->
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6">
+            <!-- TikTok Pacing / Efficiency -->
+            <div class="xl:col-span-7 glass-panel rounded-[1.75rem] p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">TikTok Trend Učinkovitosti</h4>
+                <span class="text-[9px] text-brand-dark/40 font-bold">Dnevni trošak vs. Konverzije</span>
+              </div>
+              <div id="tiktok-chart-efficiency" class="w-full" style="height: 320px;"></div>
+            </div>
+            
+            <!-- TikTok Video views/engagement horizontal bar -->
+            <div class="xl:col-span-5 glass-panel rounded-[1.75rem] p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold text-brand-dark uppercase tracking-wider">Top TikTok Videozapisi</h4>
+                <span class="text-[9px] text-brand-dark/40 font-bold">Klikovi / Pregledi / Dijeljenja</span>
+              </div>
+              <div id="tiktok-chart-videos" class="w-full" style="height: 320px;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PLATFORM LOCKED OVERLAY PANEL -->
+        <section id="panel-locked" class="hidden transition-all duration-300 opacity-0 scale-95">
+          <div class="glass-panel rounded-[2rem] p-12 flex flex-col items-center justify-center min-h-[400px] border-dashed border-2 border-brand-dark/15 text-center">
+            <div class="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-600 text-2xl mb-5 animate-pulse">
+              <i class="fa-solid fa-lock"></i>
+            </div>
+            <h3 class="text-xl font-black text-brand-dark uppercase tracking-wider mb-2">Platforma zaključana</h3>
+            <p id="locked-panel-text" class="text-brand-dark/50 text-xs max-w-md leading-relaxed mb-6">
+              Ova platforma nije uključena u zakupljeni paket suradnje.
+            </p>
+            <button onclick="switchPlatform('meta')" class="bg-brand-dark text-white rounded-full px-6 py-2.5 text-xs font-black uppercase tracking-wider hover:bg-brand-cyan hover:text-brand-dark transition-all duration-300 shadow-md">
+              Povratak na Meta Ads
+            </button>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- RIGHT COLUMN: AI Assistant Sidebar (20% of width) -->
+      <aside class="w-full lg:w-[24%] xl:w-[21%] flex flex-col h-[calc(100vh-140px)] sticky top-28 glass-panel rounded-[2rem] shadow-lg overflow-hidden border border-brand-dark/10">
+        
+        <!-- Chat Header -->
+        <div class="flex items-center justify-between p-4 border-b border-brand-dark/10 bg-white/20">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-brand-cyan to-brand-green flex items-center justify-center shadow-sm">
+              <i class="fa-solid fa-wand-magic-sparkles text-[11px] text-brand-dark"></i>
+            </div>
+            <h4 class="text-xs font-black text-brand-dark uppercase tracking-wider">AI Asistent</h4>
+          </div>
+          <span class="inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+            Online
+          </span>
+        </div>
+
+        <!-- Chat History Log -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 text-xs scrollbar-thin">
+          <!-- Initial Assistant Message -->
+          <div class="flex items-start gap-2.5 max-w-[85%]">
+            <div class="w-7 h-7 rounded-lg bg-brand-dark/5 flex items-center justify-center border border-brand-dark/10 shrink-0">
+              <i class="fa-solid fa-robot text-brand-dark/60 text-xs"></i>
+            </div>
+            <div class="glass-panel p-3 rounded-2xl rounded-tl-none text-brand-dark shadow-sm leading-relaxed">
+              Pozdrav Vinko! Ja sam tvoj marketinški asistent za klijenta **<%= client.name %>**. 
+              Slobodno me pitaj bilo što o CPA troškovima, usporedbi platformi ili publici!
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input Form & Suggestions -->
+        <div class="p-3 border-t border-brand-dark/10 bg-white/10">
+          <!-- Suggestion Chips -->
+          <div id="suggestion-container" class="flex flex-wrap gap-1 mb-2">
+            <button onclick="sendSuggestion('Kako smanjiti CPA?')" class="text-[9px] font-bold text-brand-dark/70 hover:text-brand-dark bg-white/60 hover:bg-white border border-brand-dark/10 px-2 py-1 rounded-full transition-all duration-300 shadow-sm">
+              Kako smanjiti CPA?
+            </button>
+            <button onclick="sendSuggestion('Usporedi Meta i Google')" class="text-[9px] font-bold text-brand-dark/70 hover:text-brand-dark bg-white/60 hover:bg-white border border-brand-dark/10 px-2 py-1 rounded-full transition-all duration-300 shadow-sm">
+              Usporedi platforme
+            </button>
+          </div>
+
+          <!-- Input Area -->
+          <form id="chat-form" onsubmit="handleChatSubmit(event)" class="relative flex items-center">
+            <textarea 
+              id="chat-input" 
+              rows="1" 
+              placeholder="Pitaj me nešto..." 
+              class="w-full bg-white/40 border border-brand-dark/10 rounded-2xl pl-4 pr-10 py-2.5 text-xs text-brand-dark placeholder-brand-dark/45 focus:outline-none focus:ring-1 focus:ring-brand-cyan resize-none overflow-y-hidden h-[38px] transition-all"
+              oninput="adjustInputHeight(this)"
+              onkeydown="handleInputKeydown(event)"
+            ></textarea>
+            <button 
+              type="submit" 
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-brand-dark/50 hover:text-brand-dark transition-colors"
+            >
+              <i class="fa-solid fa-paper-plane text-xs"></i>
+            </button>
+          </form>
+        </div>
+
+      </aside>
+
+    </div>
+
+  </div>
+
+  <!-- Client-side tab switching and ECharts + SSE Chat scripts -->
+  <script>
+    // Load chartData passed from express server
+    const clientPackage = '<%= client.package %>';
+    const chartData = <%- JSON.stringify(client.chartData) %>;
+    const googleChartData = <%- JSON.stringify(client.googleChartData) %>;
+    const clientId = '<%= client.id %>';
+    let conversationHistory = []; // Tracks chat messages for multi-turn context
+    
+    // Meta Charts
+    let efficiencyChart, platformsChart, audienceChart, postsChart, reachChart;
+    // Google Charts
+    let googleEfficiencyChart, googlePacingChart, googleNetworksChart, googleCampaignsChart, googleDevicesLocationsChart, googleFunnelChart;
+    // TikTok Charts (Ultra Package Exclusive)
+    let tiktokEfficiencyChart, tiktokVideosChart;
+
+    // Helper to initialize ECharts
+    document.addEventListener('DOMContentLoaded', () => {
+      initCharts();
+    });
+
+    function initCharts() {
+      /* ----------------------------------------------------
+         META ADS ECHARTS SETUP
+         ---------------------------------------------------- */
+      efficiencyChart = echarts.init(document.getElementById('meta-chart-efficiency'));
+      efficiencyChart.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+        legend: {
+          data: ['Dnevni trošak', 'Konverzije'],
+          textStyle: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 600 }
+        },
+        grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
+        xAxis: {
+          type: 'category',
+          data: chartData.days,
+          axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.1)' } },
+          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 }
+        },
+        yAxis: [
+          {
+            type: 'value',
+            name: 'Trošak ($)',
+            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 },
+            splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.05)' } }
+          },
+          {
+            type: 'value',
+            name: 'Konverzije',
+            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 },
+            splitLine: { show: false }
+          }
+        ],
+        series: [
+          {
+            name: 'Dnevni trošak',
+            type: 'line',
+            data: chartData.spendDaily,
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 5,
+            lineStyle: { width: 2.5 },
+            itemStyle: { color: '#96D8D0' }
+          },
+          {
+            name: 'Konverzije',
+            type: 'line',
+            yAxisIndex: 1,
+            data: chartData.conversionsDaily,
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 5,
+            lineStyle: { width: 2.5 },
+            itemStyle: { color: '#F1B4B9' }
+          }
+        ]
+      });
+
+      platformsChart = echarts.init(document.getElementById('meta-chart-platforms'));
+      platformsChart.setOption({
+        tooltip: { trigger: 'item', formatter: '{b}: ${c} ({d}%)' },
+        legend: {
+          bottom: '0',
+          left: 'center',
+          textStyle: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.7)', fontSize: 10 }
+        },
+        series: [
+          {
+            name: 'Potrošnja',
+            type: 'pie',
+            radius: ['45%', '70%'],
+            avoidLabelOverlap: false,
+            itemStyle: { borderRadius: 10, borderColor: '#ffffff', borderWidth: 2 },
+            label: { show: false, position: 'center' },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: 14,
+                fontWeight: 'bold',
+                fontFamily: 'Urbanist',
+                formatter: '{b}\n{d}%'
+              }
+            },
+            labelLine: { show: false },
+            data: chartData.platforms,
+            color: ['#96D8D0', '#F1B4B9', '#DAF4AA']
+          }
+        ]
+      });
+
+      audienceChart = echarts.init(document.getElementById('meta-chart-audience'));
+      audienceChart.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { left: '3%', right: '5%', bottom: '3%', containLabel: true },
+        xAxis: {
+          type: 'value',
+          splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.05)' } },
+          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 }
+        },
+        yAxis: {
+          type: 'category',
+          data: [...chartData.audienceCategories].reverse(),
+          axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.1)' } },
+          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.8)', fontWeight: 600, fontSize: 10 }
+        },
+        series: [
+          {
+            name: 'Konverzije',
+            type: 'bar',
+            data: [...chartData.audienceValues].reverse(),
+            itemStyle: {
+              borderRadius: [0, 5, 5, 0],
+              color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                { offset: 0, color: '#96D8D0' },
+                { offset: 1, color: '#DAF4AA' }
+              ])
+            }
+          }
+        ]
+      });
+
+      postsChart = echarts.init(document.getElementById('meta-chart-posts'));
+      postsChart.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        legend: {
+          data: ['Lajkovi', 'Komentari', 'Dijeljenja'],
+          bottom: '0',
+          textStyle: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.7)', fontSize: 10 }
+        },
+        grid: { left: '3%', right: '5%', bottom: '10%', containLabel: true },
+        xAxis: {
+          type: 'value',
+          splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.05)' } },
+          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 }
+        },
+        yAxis: {
+          type: 'category',
+          data: [...chartData.topPostsTitles].reverse(),
+          axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.1)' } },
+          axisLabel: { 
+            fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.8)', fontWeight: 600, fontSize: 10,
+            formatter: function(value) { return value.length > 12 ? value.slice(0, 9) + '...' : value; }
+          }
+        },
+        series: [
+          { name: 'Lajkovi', type: 'bar', stack: 'engagement', data: [...chartData.topPostsLikes].reverse(), itemStyle: { color: '#96D8D0' } },
+          { name: 'Komentari', type: 'bar', stack: 'engagement', data: [...chartData.topPostsComments].reverse(), itemStyle: { color: '#F1B4B9' } },
+          { name: 'Dijeljenja', type: 'bar', stack: 'engagement', data: [...chartData.topPostsShares].reverse(), itemStyle: { borderRadius: [0, 3, 3, 0], color: '#DAF4AA' } }
+        ]
+      });
+
+      reachChart = echarts.init(document.getElementById('meta-chart-reach'));
+      reachChart.setOption({
+        tooltip: { trigger: 'axis' },
+        grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: chartData.days,
+          axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.1)' } },
+          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 }
+        },
+        yAxis: {
+          type: 'value',
+          splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.05)' } },
+          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 }
+        },
+        series: [
+          {
+            name: 'Organski doseg',
+            type: 'line',
+            data: chartData.organicReachDaily,
+            smooth: true,
+            symbol: 'none',
+            lineStyle: { width: 2.5 },
+            itemStyle: { color: '#DAF4AA' },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: 'rgba(218, 244, 170, 0.45)' },
+                { offset: 1, color: 'rgba(218, 244, 170, 0.01)' }
+              ])
+            }
+          }
+        ]
+      });
+
+      /* ----------------------------------------------------
+         GOOGLE ADS ECHARTS SETUP
+         ---------------------------------------------------- */
+      if (clientPackage === 'Pro' || clientPackage === 'Ultra') {
+        googleEfficiencyChart = echarts.init(document.getElementById('google-chart-efficiency'));
+        googleEfficiencyChart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+          legend: {
+            data: ['Dnevni trošak ($)', 'Konverzije'],
+            textStyle: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 600 }
+          },
+          grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
+          xAxis: {
+            type: 'category',
+            data: googleChartData.days,
+            axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.1)' } },
+            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 }
+          },
+          yAxis: [
+            {
+              type: 'value',
+              name: 'Trošak ($)',
+              axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 },
+              splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.05)' } }
+            },
+            {
+              type: 'value',
+              name: 'Konverzije',
+              axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 },
+              splitLine: { show: false }
+            }
+          ],
+          series: [
+            {
+              name: 'Dnevni trošak ($)',
+              type: 'line',
+              data: googleChartData.spendDaily,
+              smooth: true,
+              symbol: 'circle',
+              symbolSize: 5,
+              lineStyle: { width: 2.5 },
+              itemStyle: { color: '#96D8D0' }
+            },
+            {
+              name: 'Konverzije',
+              type: 'line',
+              yAxisIndex: 1,
+              data: googleChartData.conversionsDaily,
+              smooth: true,
+              symbol: 'circle',
+              symbolSize: 5,
+              lineStyle: { width: 2.5 },
+              itemStyle: { color: '#F1B4B9' }
+            }
+          ]
+        });
+
+        googlePacingChart = echarts.init(document.getElementById('google-chart-pacing'));
+        googlePacingChart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          legend: {
+            data: ['Idealna putanja', 'Stvarna kumulativna potrošnja'],
+            textStyle: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 600 }
+          },
+          grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
+          xAxis: {
+            type: 'category',
+            data: googleChartData.days,
+            axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.1)' } },
+            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 }
+          },
+          yAxis: {
+            type: 'value',
+            name: 'Budžet ($)',
+            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 },
+            splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.05)' } }
+          },
+          series: [
+            {
+              name: 'Idealna putanja',
+              type: 'line',
+              data: googleChartData.pacingTargetLinear,
+              smooth: false,
+              symbol: 'none',
+              lineStyle: { width: 2, type: 'dashed' },
+              itemStyle: { color: '#64748B' }
+            },
+            {
+              name: 'Stvarna kumulativna potrošnja',
+              type: 'bar',
+              data: googleChartData.pacingActualCumulative,
+              itemStyle: { borderRadius: [4, 4, 0, 0], color: '#96D8D0' }
+            }
+          ]
+        });
+
+        googleNetworksChart = echarts.init(document.getElementById('google-chart-networks'));
+        googleNetworksChart.setOption({
+          tooltip: { trigger: 'item', formatter: '{b}: {c} konverzija ({d}%)' },
+          legend: {
+            bottom: '0',
+            left: 'center',
+            textStyle: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.7)', fontSize: 10 }
+          },
+          series: [
+            {
+              name: 'Mreže',
+              type: 'pie',
+              radius: ['45%', '70%'],
+              avoidLabelOverlap: false,
+              itemStyle: { borderRadius: 10, borderColor: '#ffffff', borderWidth: 2 },
+              label: { show: false, position: 'center' },
+              emphasis: {
+                label: {
+                  show: true,
+                  fontSize: 13,
+                  fontWeight: 'bold',
+                  fontFamily: 'Urbanist',
+                  formatter: '{b}\n{d}%'
+                }
+              },
+              labelLine: { show: false },
+              data: googleChartData.networks,
+              color: ['#96D8D0', '#F1B4B9', '#DAF4AA', '#EA4335']
+            }
+          ]
+        });
+
+        googleCampaignsChart = echarts.init(document.getElementById('google-chart-campaigns'));
+        googleCampaignsChart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          grid: { left: '3%', right: '5%', bottom: '3%', containLabel: true },
+          xAxis: {
+            type: 'value',
+            splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.05)' } },
+            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 }
+          },
+          yAxis: {
+            type: 'category',
+            data: [...googleChartData.top10CampaignsNames].reverse(),
+            axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.1)' } },
+            axisLabel: { 
+              fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.8)', fontWeight: 600, fontSize: 9,
+              formatter: function(value) { return value.length > 15 ? value.slice(0, 12) + '...' : value; }
+            }
+          },
+          series: [
+            {
+              name: 'ROAS / Indeks',
+              type: 'bar',
+              data: [...googleChartData.top10CampaignsValues].reverse(),
+              itemStyle: {
+                borderRadius: [0, 4, 4, 0],
+                color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                  { offset: 0, color: '#96D8D0' },
+                  { offset: 1, color: '#DAF4AA' }
+                ])
+              }
+            }
+          ]
+        });
+
+        googleDevicesLocationsChart = echarts.init(document.getElementById('google-chart-devices-locations'));
+        googleDevicesLocationsChart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          legend: {
+            data: ['Lokacije (Gradovi)', 'Uređaji'],
+            bottom: '0',
+            textStyle: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.7)', fontSize: 10 }
+          },
+          grid: { left: '3%', right: '3%', bottom: '10%', containLabel: true },
+          xAxis: {
+            type: 'category',
+            data: ['Zagreb/Mob.', 'Split/Rač.', 'Rijeka/Tab.', 'Osijek', 'Zadar'],
+            axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.1)' } },
+            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.8)', fontSize: 10 }
+          },
+          yAxis: {
+            type: 'value',
+            splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.05)' } },
+            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 }
+          },
+          series: [
+            {
+              name: 'Lokacije (Gradovi)',
+              type: 'bar',
+              data: googleChartData.locationsValues,
+              itemStyle: { borderRadius: [4, 4, 0, 0], color: '#96D8D0' }
+            },
+            {
+              name: 'Uređaji',
+              type: 'bar',
+              data: [ googleChartData.devicesValues[0], googleChartData.devicesValues[1], googleChartData.devicesValues[2], 0, 0 ],
+              itemStyle: { borderRadius: [4, 4, 0, 0], color: '#F1B4B9' }
+            }
+          ]
+        });
+
+        googleFunnelChart = echarts.init(document.getElementById('google-chart-funnel'));
+        googleFunnelChart.setOption({
+          tooltip: { trigger: 'item', formatter: '{b} : {c} ({d}%)' },
+          legend: { show: false },
+          grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
+          series: [
+            {
+              name: 'Lijevak',
+              type: 'funnel',
+              left: '10%',
+              top: '5%',
+              bottom: '5%',
+              width: '80%',
+              min: 0,
+              max: googleChartData.funnelValues[0],
+              minSize: '10%',
+              maxSize: '100%',
+              sort: 'descending',
+              gap: 2,
+              label: {
+                show: true,
+                position: 'inside',
+                fontFamily: 'Urbanist',
+                fontSize: 9,
+                fontWeight: 'bold',
+                formatter: '{b}: {c}'
+              },
+              labelLine: { show: false },
+              itemStyle: { borderColor: '#fff', borderWidth: 1 },
+              data: [
+                { name: googleChartData.funnelStages[0], value: googleChartData.funnelValues[0] },
+                { name: googleChartData.funnelStages[1], value: googleChartData.funnelValues[1] },
+                { name: googleChartData.funnelStages[2], value: googleChartData.funnelValues[2] },
+                { name: googleChartData.funnelStages[3], value: googleChartData.funnelValues[3] }
+              ],
+              color: ['#96D8D0', '#DAF4AA', '#F1B4B9', '#122022']
+            }
+          ]
+        });
+      }
+
+      /* ----------------------------------------------------
+         TIKTOK ADS ECHARTS SETUP (ULTRA ONLY)
+         ---------------------------------------------------- */
+      if (clientPackage === 'Ultra') {
+        tiktokEfficiencyChart = echarts.init(document.getElementById('tiktok-chart-efficiency'));
+        tiktokEfficiencyChart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+          legend: {
+            data: ['Trošak ($)', 'Konverzije'],
+            textStyle: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 600 }
+          },
+          grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
+          xAxis: {
+            type: 'category',
+            data: chartData.days,
+            axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.1)' } },
+            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 }
+          },
+          yAxis: [
+            {
+              type: 'value',
+              name: 'Trošak ($)',
+              axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 }
+            },
+            {
+              type: 'value',
+              name: 'Konverzije',
+              yAxisIndex: 1,
+              axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.6)', fontSize: 10 }
+            }
+          ],
+          series: [
+            {
+              name: 'Trošak ($)',
+              type: 'line',
+              smooth: true,
+              data: [10, 12, 15, 14, 12, 10, 15, 16, 18, 12, 11, 15, 14, 12, 10, 9, 11, 14, 15, 12, 11, 12, 14, 16, 12],
+              itemStyle: { color: '#122022' }
+            },
+            {
+              name: 'Konverzije',
+              type: 'line',
+              yAxisIndex: 1,
+              smooth: true,
+              data: [1, 2, 2, 1, 1, 1, 2, 2, 3, 1, 1, 2, 2, 1, 1, 0, 1, 2, 2, 1, 1, 1, 2, 2, 1],
+              itemStyle: { color: '#F1B4B9' }
+            }
+          ]
+        });
+
+        tiktokVideosChart = echarts.init(document.getElementById('tiktok-chart-videos'));
+        tiktokVideosChart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          legend: {
+            data: ['Pregledi (*100)', 'Klikovi', 'Dijeljenja'],
+            bottom: '0',
+            textStyle: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.7)', fontSize: 10 }
+          },
+          grid: { left: '3%', right: '5%', bottom: '10%', containLabel: true },
+          xAxis: { type: 'value' },
+          yAxis: {
+            type: 'category',
+            data: ['Video 1', 'Video 2', 'Video 3', 'Video 4', 'Video 5'].reverse(),
+            axisLabel: { fontFamily: 'Urbanist', fontWeight: 600, fontSize: 10 }
+          },
+          series: [
+            { name: 'Pregledi (*100)', type: 'bar', stack: 'views', data: [150, 120, 90, 80, 160].reverse(), itemStyle: { color: '#96D8D0' } },
+            { name: 'Klikovi', type: 'bar', stack: 'views', data: [45, 30, 22, 19, 58].reverse(), itemStyle: { color: '#F1B4B9' } },
+            { name: 'Dijeljenja', type: 'bar', stack: 'views', data: [12, 8, 4, 3, 22].reverse(), itemStyle: { color: '#122022' } }
+          ]
+        });
+      }
+    }
+
+    // Window resize handler
+    window.addEventListener('resize', () => {
+      if (efficiencyChart) efficiencyChart.resize();
+      if (platformsChart) platformsChart.resize();
+      if (audienceChart) audienceChart.resize();
+      if (postsChart) postsChart.resize();
+      if (reachChart) reachChart.resize();
+
+      if (googleEfficiencyChart) googleEfficiencyChart.resize();
+      if (googlePacingChart) googlePacingChart.resize();
+      if (googleNetworksChart) googleNetworksChart.resize();
+      if (googleCampaignsChart) googleCampaignsChart.resize();
+      if (googleDevicesLocationsChart) googleDevicesLocationsChart.resize();
+      if (googleFunnelChart) googleFunnelChart.resize();
+
+      if (tiktokEfficiencyChart) tiktokEfficiencyChart.resize();
+      if (tiktokVideosChart) tiktokVideosChart.resize();
+    });
+
+    // Tab switching logic (Enforces package locks!)
+    function switchPlatform(platform) {
+      const btnMeta = document.getElementById('btn-meta');
+      const btnGoogle = document.getElementById('btn-google');
+      const btnTiktok = document.getElementById('btn-tiktok');
+      
+      const panelMeta = document.getElementById('panel-meta');
+      const panelGoogle = document.getElementById('panel-google');
+      const panelTiktok = document.getElementById('panel-tiktok');
+      const panelLocked = document.getElementById('panel-locked');
+      
+      const platformTitleBadge = document.getElementById('platform-title-badge');
+      const lockedText = document.getElementById('locked-panel-text');
+
+      // Helper reset
+      const panels = [panelMeta, panelGoogle, panelTiktok, panelLocked];
+      panels.forEach(p => {
+        if (p) {
+          p.classList.add('hidden');
+          p.classList.remove('opacity-100', 'scale-100');
+          p.classList.add('opacity-0', 'scale-95');
+        }
+      });
+
+      // Button resets
+      const buttons = [btnMeta, btnGoogle, btnTiktok];
+      buttons.forEach(b => {
+        if (b) b.className = 'px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 text-brand-dark/60 hover:text-brand-dark flex items-center gap-1';
+      });
+      btnMeta.className = 'px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 text-brand-dark/60 hover:text-brand-dark';
+
+      // 1. Meta Ads (always unlocked)
+      if (platform === 'meta') {
+        btnMeta.className = 'px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 bg-brand-dark text-white shadow-sm';
+        platformTitleBadge.textContent = 'Meta Ads';
+        
+        panelMeta.classList.remove('hidden');
+        setTimeout(() => {
+          panelMeta.classList.remove('opacity-0', 'scale-95');
+          panelMeta.classList.add('opacity-100', 'scale-100');
+          if (efficiencyChart) efficiencyChart.resize();
+          if (platformsChart) platformsChart.resize();
+          if (audienceChart) audienceChart.resize();
+          if (postsChart) postsChart.resize();
+          if (reachChart) reachChart.resize();
+        }, 50);
+      }
+      
+      // 2. Google Ads (locked for Start package)
+      else if (platform === 'google') {
+        btnGoogle.className = 'px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 bg-brand-dark text-white shadow-sm flex items-center gap-1';
+        platformTitleBadge.textContent = 'Google Ads';
+
+        if (clientPackage === 'Start') {
+          lockedText.textContent = `Google Ads platforma nije uključena u klijentov Start paket suradnje. Nadogradite klijentov paket na Pro ili Ultra kako biste otključali pretraživačko oglašavanje, pacing proračuna i financijsku analitiku.`;
+          panelLocked.classList.remove('hidden');
+          setTimeout(() => {
+            panelLocked.classList.remove('opacity-0', 'scale-95');
+            panelLocked.classList.add('opacity-100', 'scale-100');
+          }, 50);
+        } else {
+          panelGoogle.classList.remove('hidden');
+          setTimeout(() => {
+            panelGoogle.classList.remove('opacity-0', 'scale-95');
+            panelGoogle.classList.add('opacity-100', 'scale-100');
+            if (googleEfficiencyChart) googleEfficiencyChart.resize();
+            if (googlePacingChart) googlePacingChart.resize();
+            if (googleNetworksChart) googleNetworksChart.resize();
+            if (googleCampaignsChart) googleCampaignsChart.resize();
+            if (googleDevicesLocationsChart) googleDevicesLocationsChart.resize();
+            if (googleFunnelChart) googleFunnelChart.resize();
+          }, 50);
+        }
+      }
+      
+      // 3. TikTok Ads (locked for Start and Pro packages)
+      else if (platform === 'tiktok') {
+        btnTiktok.className = 'px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 bg-brand-dark text-white shadow-sm flex items-center gap-1';
+        platformTitleBadge.textContent = 'TikTok Ads';
+
+        if (clientPackage === 'Start' || clientPackage === 'Pro') {
+          lockedText.textContent = `TikTok Ads platforma nije uključena u klijentov ${clientPackage} paket suradnje. Nadogradite klijentov paket na Ultra kako biste omogućili produkciju Reels/TikTok videozapisa i video oglašavanje.`;
+          panelLocked.classList.remove('hidden');
+          setTimeout(() => {
+            panelLocked.classList.remove('opacity-0', 'scale-95');
+            panelLocked.classList.add('opacity-100', 'scale-100');
+          }, 50);
+        } else {
+          panelTiktok.classList.remove('hidden');
+          setTimeout(() => {
+            panelTiktok.classList.remove('opacity-0', 'scale-95');
+            panelTiktok.classList.add('opacity-100', 'scale-100');
+            if (tiktokEfficiencyChart) tiktokEfficiencyChart.resize();
+            if (tiktokVideosChart) tiktokVideosChart.resize();
+          }, 50);
+        }
+      }
+    }
+
+    /* ----------------------------------------------------
+       AI ASSISTANT CHAT FRONTEND LOGIC (SSE PARSER)
+       ---------------------------------------------------- */
+    function adjustInputHeight(textarea) {
+      textarea.style.height = '38px';
+      const scrollHeight = textarea.scrollHeight;
+      if (scrollHeight > 38) {
+        textarea.style.height = Math.min(scrollHeight, 120) + 'px';
+      }
+    }
+
+    function handleInputKeydown(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        document.getElementById('chat-form').requestSubmit();
+      }
+    }
+
+    function sendSuggestion(text) {
+      const input = document.getElementById('chat-input');
+      input.value = text;
+      adjustInputHeight(input);
+      document.getElementById('chat-form').requestSubmit();
+    }
+
+    async function handleChatSubmit(event) {
+      event.preventDefault();
+      
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+      
+      input.value = '';
+      adjustInputHeight(input);
+      
+      const chatMessages = document.getElementById('chat-messages');
+
+      const userBubble = document.createElement('div');
+      userBubble.className = 'flex items-start gap-2.5 max-w-[85%] ml-auto justify-end';
+      userBubble.innerHTML = `
+        <div class="bg-brand-dark text-white p-3 rounded-2xl rounded-tr-none shadow-sm leading-relaxed">
+          ${escapeHtml(text)}
+        </div>
+      `;
+      chatMessages.appendChild(userBubble);
+      scrollToBottom();
+
+      const assistantBubble = document.createElement('div');
+      assistantBubble.className = 'flex items-start gap-2.5 max-w-[85%]';
+      
+      const uniqueMsgId = 'assistant-msg-' + Date.now();
+      const uniqueThoughtId = 'thought-log-' + Date.now();
+      const uniqueContentId = 'content-log-' + Date.now();
+      
+      assistantBubble.innerHTML = `
+        <div class="w-7 h-7 rounded-lg bg-brand-dark/5 flex items-center justify-center border border-brand-dark/10 shrink-0">
+          <i class="fa-solid fa-robot text-brand-dark/60 text-xs"></i>
+        </div>
+        <div id="${uniqueMsgId}" class="glass-panel p-3 rounded-2xl rounded-tl-none text-brand-dark shadow-sm leading-relaxed w-full">
+          <div id="${uniqueThoughtId}" class="text-[10px] text-brand-dark/50 border-b border-brand-dark/5 pb-2 mb-2">
+            <span class="inline-flex items-center gap-1.5 font-bold uppercase tracking-wider">
+              <i class="fa-solid fa-circle-notch animate-spin"></i> Razmišljanje...
+            </span>
+            <div class="thought-steps mt-1 font-medium italic space-y-0.5"></div>
+          </div>
+          <div id="${uniqueContentId}" class="prose max-w-none text-xs leading-relaxed space-y-1"></div>
+        </div>
+      `;
+      
+      chatMessages.appendChild(assistantBubble);
+      scrollToBottom();
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            history: conversationHistory,
+            clientId: clientId
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Mrežna greška.');
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        
+        const thoughtBox = assistantBubble.querySelector(`#${uniqueThoughtId}`);
+        const thoughtStepsContainer = thoughtBox.querySelector('.thought-steps');
+        const contentBox = assistantBubble.querySelector(`#${uniqueContentId}`);
+        
+        let finalResponseBuffer = '';
+        let newSuggestions = [];
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const dataStr = line.slice(6).trim();
+              if (dataStr === '[DONE]') break;
+
+              try {
+                const data = JSON.parse(dataStr);
+                
+                if (data.type === 'THOUGHT') {
+                  const step = document.createElement('div');
+                  step.textContent = '• ' + data.content;
+                  thoughtStepsContainer.appendChild(step);
+                  scrollToBottom();
+                } 
+                else if (data.type === 'FINAL_RESPONSE') {
+                  finalResponseBuffer += data.content;
+                  contentBox.innerHTML = renderSimpleMarkdown(finalResponseBuffer);
+                  scrollToBottom();
+                }
+                else if (data.type === 'SUGGESTION') {
+                  newSuggestions.push(data.content);
+                }
+              } catch (e) {
+                // Ignore parsing errors
+              }
+            }
+          }
+        }
+
+        const spinnerIcon = thoughtBox.querySelector('.fa-circle-notch');
+        if (spinnerIcon) {
+          spinnerIcon.className = 'fa-solid fa-circle-check text-emerald-600';
+        }
+
+        updateSuggestions(newSuggestions);
+
+        conversationHistory.push({ role: 'user', content: text });
+        conversationHistory.push({ role: 'model', content: finalResponseBuffer });
+
+      } catch (err) {
+        console.error(err);
+        const contentBox = assistantBubble.querySelector(`#${uniqueContentId}`);
+        contentBox.innerHTML = `<span class="text-rose-600 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Greška.</span>`;
+        const thoughtBox = assistantBubble.querySelector(`#${uniqueThoughtId}`);
+        if (thoughtBox) thoughtBox.classList.add('hidden');
+        scrollToBottom();
+      }
+    }
+
+    function scrollToBottom() {
+      const chatMessages = document.getElementById('chat-messages');
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function updateSuggestions(suggestions) {
+      const container = document.getElementById('suggestion-container');
+      container.innerHTML = '';
+      
+      if (!suggestions || suggestions.length === 0) return;
+      
+      suggestions.forEach(sug => {
+        const btn = document.createElement('button');
+        btn.onclick = () => sendSuggestion(sug);
+        btn.className = 'text-[9px] font-bold text-brand-dark/70 hover:text-brand-dark bg-white/60 hover:bg-white border border-brand-dark/10 px-2 py-1 rounded-full transition-all duration-300 shadow-sm';
+        btn.textContent = sug;
+        container.appendChild(btn);
+      });
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderSimpleMarkdown(md) {
+      let html = md;
+      html = escapeHtml(html);
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/^### (.*?)$/gm, '<h5 class="text-[13px] font-bold text-brand-dark mt-2.5 mb-1">$1</h5>');
+      html = html.replace(/^## (.*?)$/gm, '<h4 class="text-[14px] font-bold text-brand-dark mt-3 mb-1">$1</h4>');
+      html = html.replace(/^- (.*?)$/gm, '<li class="ml-3 list-disc pl-0.5">$1</li>');
+
+      const tableRegex = /\|([\s\S]*?)\|/g;
+      if (html.includes('|')) {
+        const lines = html.split('\n');
+        let inTable = false;
+        let tableRows = '';
+        
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (line.startsWith('|') && line.endsWith('|')) {
+            if (line.includes('---')) continue;
+            inTable = true;
+            const cells = line.split('|').slice(1, -1).map(c => c.trim());
+            const rowTag = tableRows === '' ? 'th' : 'td';
+            const rowContent = cells.map(c => `<${rowTag} class="px-2 py-1 border border-brand-dark/15 text-left font-semibold">${c}</${rowTag}>`).join('');
+            tableRows += `<tr class="border-b border-brand-dark/10">${rowContent}</tr>`;
+          } else {
+            if (inTable) {
+              html = html.replace(/\|[\s\S]*?\|/, `<table class="w-full text-[10px] border border-brand-dark/10 border-collapse my-2">${tableRows}</table>`);
+              inTable = false;
+              tableRows = '';
+            }
+          }
+        }
+        if (inTable) {
+          html = html.replace(/\|[\s\S]*?\|/, `<table class="w-full text-[10px] border border-brand-dark/10 border-collapse my-2">${tableRows}</table>`);
+        }
+      }
+      html = html.replace(/\n\n/g, '<div class="h-2"></div>');
+      return html;
+    }
+  </script>
+</body>
+</html>

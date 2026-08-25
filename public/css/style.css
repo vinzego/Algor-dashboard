@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+  --color-bg-dark: #122022;
+  --color-accent-green: #DAF4AA;
+  --color-accent-cyan: #96D8D0;
+  --color-accent-pink: #F1B4B9;
+  
+  --font-urbanist: 'Urbanist', sans-serif;
+}
+
+body {
+  font-family: var(--font-urbanist);
+  background: linear-gradient(135deg, #F0F4F8 0%, #FFFFFF 50%, #D4E4F5 100%);
+  background-attachment: fixed;
+  color: var(--color-bg-dark);
+  overflow-x: hidden;
+  min-h-screen;
+}
+
+/* Glassmorphism custom classes for light mode */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(18, 32, 34, 0.06);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.03);
+}
+
+.glass-panel-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel-hover:hover {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(18, 32, 34, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -15px rgba(18, 32, 34, 0.08);
+}
+
+.glass-navbar {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(18, 32, 34, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04);
+}
+
+/* Custom scrollbar matching the light theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F0F4F8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(18, 32, 34, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(18, 32, 34, 0.2);
+}
+
+/* Glowing background blobs adapted to light background */
+.bg-glow-green {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(218, 244, 170, 0.25) 0%, rgba(218, 244, 170, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.bg-glow-pink {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(241, 180, 185, 0.2) 0%, rgba(241, 180, 185, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
