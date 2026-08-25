@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= client.name %> - ZELLIFY Marketing Dashboard</title>
+  <title><%= client.name %> - Marketing Analytics Dashboard</title>
+
   <!-- Tailwind Play CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -24,1463 +26,884 @@
       }
     }
   </script>
+  
   <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="/css/style.css">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Apache ECharts CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
-  <!-- Flatpickr Custom Modern Datepicker CDN -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/hr.js"></script>
+
+  <!-- React 18 & ReactDOM UMD CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel Standalone for JSX compilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
-<body class="bg-[#F4F5F7] min-h-screen relative pb-16 text-[#111113]">
+<body class="bg-[#F4F5F7] dark:bg-[#0B0B0C] min-h-screen text-[#111113] dark:text-gray-100 transition-colors duration-200">
+  
+  <!-- React Mount Point -->
+  <div id="react-root"></div>
 
-  <!-- Full-Width Container (100% width, matching ZELLIFY iPad layout) -->
-  <div class="w-full max-w-[1680px] mx-auto px-6 sm:px-8 lg:px-10 py-6">
-    
-    <!-- TOP NAVBAR HEADER (ZELLIFY Style Capsule Header) -->
-    <header class="mb-8">
-      <nav class="bg-white rounded-full px-6 py-3.5 flex items-center justify-between shadow-sm border border-black/5">
-        
-        <!-- Left: Logo & Back Link -->
-        <div class="flex items-center gap-4">
-          <a href="/" class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 border border-black/5 text-[#111113] hover:bg-black hover:text-white transition-all duration-200">
-            <i class="fa-solid fa-arrow-left text-xs"></i>
-          </a>
-          
-          <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-xl bg-zorange flex items-center justify-center text-white font-black text-sm shadow-sm">
-              <i class="fa-solid fa-bolt-lightning"></i>
-            </div>
-            <span class="text-xl font-black tracking-tight text-[#111113]">ZELLIFY<span class="text-zorange">.</span></span>
-          </div>
+  <!-- Client-side React Dashboard Application -->
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    // --- MOCK DATASETS & ACCOUNT DEFINITIONS ---
+    const ACCOUNTS = [
+      { id: 'acme-corp', name: 'Acme Corp', package: 'Enterprise' },
+      { id: 'zellify-tech', name: 'Zellify Tech', package: 'Pro Agency' },
+      { id: 'apex-studio', name: 'Apex Studio', package: 'Growth' },
+      { id: 'luxe-commerce', name: 'Luxe Commerce', package: 'Scale' }
+    ];
+
+    const DATE_RANGES = [
+      { id: '7d', label: 'Zadnjih 7 dana (Last 7 Days)' },
+      { id: '30d', label: 'Zadnjih 30 dana (Last 30 Days)' },
+      { id: 'this_month', label: 'Ovaj Mjesec (This Month)' }
+    ];
+
+    // Helper for generating dynamic daily arrays
+    const getDays = (count = 14) => Array.from({ length: count }, (_, i) => `${i + 1}.08.`);
+
+    // --- REUSABLE ECHARTS REACT COMPONENT ---
+    const EChartComponent = ({ option, style = { width: '100%', height: '280px' } }) => {
+      const chartRef = useRef(null);
+      const instanceRef = useRef(null);
+
+      useEffect(() => {
+        if (!chartRef.current) return;
+        if (!instanceRef.current) {
+          instanceRef.current = echarts.init(chartRef.current);
+        }
+        instanceRef.current.setOption(option, true);
+
+        const handleResize = () => {
+          if (instanceRef.current) instanceRef.current.resize();
+        };
+        window.addEventListener('resize', handleResize);
+        return () => {
+          window.removeEventListener('resize', handleResize);
+        };
+      }, [option]);
+
+      return <div ref={chartRef} style={style} />;
+    };
+
+    // --- SKELETON LOADER COMPONENT ---
+    const SkeletonCard = () => (
+      <div class="z-card-white dark:bg-[#161618] rounded-[2rem] p-6 animate-pulse flex flex-col justify-between h-[270px]">
+        <div class="flex justify-between items-center">
+          <div class="w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+          <div class="w-12 h-4 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
         </div>
-        
-        <!-- Center: Capsule Pill Switcher Navigation (Meta & Meta Ads) -->
-        <div class="z-pill-nav flex items-center gap-1">
-          <button id="btn-tab-meta" class="z-pill-nav-item-active px-5 py-2 text-xs font-black uppercase tracking-wider transition-all duration-200" onclick="switchMainTab('meta')">
-            Meta
-          </button>
-          <button id="btn-tab-meta-ads" class="z-pill-nav-item px-5 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200" onclick="switchMainTab('meta-ads')">
-            Meta Ads
-          </button>
-        </div>
-        
-        <!-- Right Controls: Theme Toggles + Date Filter + Avatar -->
-        <div class="flex items-center gap-3">
-          <!-- Light/Dark Mode Switcher Icons -->
-          <div class="hidden sm:flex items-center gap-1 bg-gray-100 border border-black/5 p-1 rounded-full text-xs font-bold text-gray-600">
-            <button class="w-7 h-7 rounded-full bg-zorange text-white flex items-center justify-center shadow-xs"><i class="fa-solid fa-sun text-xs"></i></button>
-            <button class="w-7 h-7 rounded-full hover:bg-gray-200 flex items-center justify-center"><i class="fa-solid fa-moon text-xs"></i></button>
-          </div>
-
-          <!-- Date Filter Pill Button -->
-          <button class="z-badge-black px-4 py-2 text-xs flex items-center gap-2 hover:bg-gray-800 transition-colors shadow-xs">
-            <i class="fa-solid fa-chart-line text-xs opacity-75"></i>
-            <span>Zadnjih 30 dana</span>
-            <i class="fa-solid fa-chevron-down text-[10px] opacity-75"></i>
-          </button>
-
-          <!-- Notification Bell Icon (Obavijesti & Upozorenja) -->
-          <div class="relative">
-            <button id="btn-notifications" onclick="toggleNotifications()" class="relative w-9 h-9 rounded-full bg-gray-100 hover:bg-black hover:text-white border border-black/5 flex items-center justify-center text-[#111113] transition-all duration-200 shadow-xs" title="Marketinške obavijesti i preporuke">
-              <i class="fa-solid fa-bell text-xs"></i>
-              <!-- Red Alert Badge Count -->
-              <span class="absolute -top-1 -right-1 w-4 h-4 bg-zorange text-white text-[9px] font-black rounded-full flex items-center justify-center border border-white shadow-xs">
-                <%= client.executiveHealthCheck.criticalIssues.length + client.executiveHealthCheck.actionFixes.length %>
-              </span>
-            </button>
-
-            <!-- Notification Dropdown Popover -->
-            <div id="dropdown-notifications" class="hidden absolute right-0 mt-3 w-80 md:w-96 bg-white rounded-[2rem] shadow-2xl border border-black/10 p-5 z-50 transition-all duration-200 text-[#111113]">
-              <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-3">
-                <div class="flex items-center gap-2">
-                  <div class="w-7 h-7 rounded-xl bg-zorange text-white flex items-center justify-center font-black text-xs shadow-xs">
-                    <i class="fa-solid fa-bell"></i>
-                  </div>
-                  <h4 class="text-xs font-black uppercase tracking-wider text-[#111113]">Upozorenja & Preporučeni Popravci</h4>
-                </div>
-                <span class="z-badge-green text-[10px] px-2.5 py-0.5"><%= client.executiveHealthCheck.overallHealth %></span>
-              </div>
-
-              <!-- Scrollable Alert Items List -->
-              <div class="space-y-3 max-h-80 overflow-y-auto pr-1">
-                <!-- Critical Issues (Što ne valja / Potrebno popraviti) -->
-                <div class="space-y-2">
-                  <p class="text-[10px] font-black uppercase tracking-wider text-rose-600 flex items-center gap-1">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Potrebno popraviti u marketingu (<%= client.executiveHealthCheck.criticalIssues.length %>)
-                  </p>
-                  <% client.executiveHealthCheck.criticalIssues.forEach(item => { %>
-                    <div class="bg-rose-50 border border-rose-100 rounded-xl p-3 text-xs font-bold text-rose-950">
-                      <strong class="block text-rose-900 mb-0.5"><%= item.title %></strong>
-                      <p class="text-[11px] font-semibold text-rose-800 leading-tight"><%= item.desc %></p>
-                    </div>
-                  <% }); %>
-                </div>
-
-                <!-- Action Fixes (Preporučene radnje) -->
-                <div class="space-y-2 pt-2 border-t border-gray-100">
-                  <p class="text-[10px] font-black uppercase tracking-wider text-zorange flex items-center gap-1">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Preporučeni brzi popravci (<%= client.executiveHealthCheck.actionFixes.length %>)
-                  </p>
-                  <% client.executiveHealthCheck.actionFixes.forEach(item => { %>
-                    <div class="bg-orange-50 border border-orange-100 rounded-xl p-3 text-xs font-bold text-orange-950">
-                      <strong class="block text-orange-950 mb-0.5"><%= item.title %></strong>
-                      <p class="text-[11px] font-semibold text-gray-600 leading-tight">Utjecaj: <%= item.impact %></p>
-                    </div>
-                  <% }); %>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- User Profile Avatar -->
-          <div class="relative w-9 h-9 rounded-full bg-gray-200 border-2 border-white shadow-xs overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Avatar" class="w-full h-full object-cover" />
-          </div>
-        </div>
-      </nav>
-    </header>
-
-    <!-- SUBHEADER TITLE & CLIENT INFO ROW -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-      <div>
-        <h1 class="text-3xl md:text-4xl font-black text-[#111113] tracking-tight mb-3"><%= client.name %></h1>
-        
-        <!-- Social Platform Switcher Pills (Instagram & Facebook) -->
-        <div class="flex items-center gap-2">
-          <button id="btn-platform-ig" onclick="switchSocialPlatform('instagram')" class="px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-200 bg-[#111113] text-white shadow-xs flex items-center gap-2">
-            <i class="fa-brands fa-instagram text-pink-500 text-sm"></i> Instagram
-          </button>
-          <button id="btn-platform-fb" onclick="switchSocialPlatform('facebook')" class="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 bg-gray-100 text-gray-600 hover:bg-gray-200 shadow-2xs flex items-center gap-2">
-            <i class="fa-brands fa-facebook-f text-blue-600 text-sm"></i> Facebook
-          </button>
-        </div>
+        <div class="w-full h-24 bg-gray-100 dark:bg-gray-800 rounded-2xl my-2"></div>
+        <div class="w-32 h-6 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
       </div>
+    );
 
-      <div class="flex items-center gap-3">
-        <!-- Client Package Badge -->
-        <span class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-white border border-black/10 text-[#111113] shadow-xs">
-          Paket: <%= client.package %> (Nivo Usluge)
-        </span>
-        <!-- Monthly Posts Badge -->
-        <span class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-zorange text-white shadow-xs flex items-center gap-1.5">
-          <i class="fa-solid fa-calendar-check text-xs"></i> Objavljeno <%= client.publishedPosts %> / <%= client.maxPosts %> postova
-        </span>
-      </div>
-    </div>
+    // --- MAIN REACT DASHBOARD APPLICATION ---
+    function DashboardApp() {
+      const [activeView, setActiveView] = useState('instagram'); // 'instagram' | 'meta-ads'
+      const [selectedAccount, setSelectedAccount] = useState('acme-corp');
+      const [dateRange, setDateRange] = useState('30d');
+      const [isLoading, setIsLoading] = useState(false);
+      const [darkMode, setDarkMode] = useState(false);
 
-    <!-- MAIN DASHBOARD CONTENT AREA (100% Full Width - AI Sidebar Removed) -->
-    <main class="w-full">
+      // Table Sorting state for Instagram Posts & Meta Ads
+      const [postSortKey, setPostSortKey] = useState('reach');
+      const [postSortDir, setPostSortDir] = useState('desc');
 
-      <!-- SECTION 1: 360° OVERVIEW (ZELLIFY UI CARDS MATCHING REFERENCE IMAGE) -->
-      <section id="panel-advanced-analytics" class="transition-all duration-300 opacity-100 scale-100">
-        
-        <!-- ZELLIFY TOP WIDGETS ROW (MATCHING REFERENCE IMAGE CARDS 1 - 4) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          
-          <!-- CARD 1: DARK HERO CARD (Like MFR Gauge Card in Image) -->
-          <div class="z-card-dark rounded-[2rem] p-6 flex flex-col justify-between h-[270px] relative overflow-hidden shadow-xl">
-            <div class="flex justify-between items-center z-10">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white text-xs">
-                  <i class="fa-solid fa-gauge-high"></i>
-                </div>
-                <span class="text-xs font-extrabold uppercase tracking-wider text-white/90">MFR / Blended MER</span>
-              </div>
-              <span class="z-badge-orange text-[10px] px-2.5 py-1 uppercase shadow-xs">+4% Increased</span>
-            </div>
+      const [adSortKey, setAdSortKey] = useState('spend');
+      const [adSortDir, setAdSortDir] = useState('desc');
 
-            <!-- Middle Half-Donut Gauge Meter -->
-            <div class="relative w-full h-[120px] flex items-center justify-center my-1 z-10">
-              <div id="z-chart-mfr-gauge" class="w-full h-full"></div>
-              <div class="absolute bottom-2 text-center">
-                <span class="text-xs font-bold text-white/70 block">Target 3.5x</span>
-                <span class="text-base font-black text-zorange"><%= client.advancedAnalytics.blended.blendedMer %></span>
-              </div>
-            </div>
-
-            <div class="z-10">
-              <span class="text-[10px] uppercase font-bold text-white/60 block">Zbirni Ulazni Proračun</span>
-              <h3 class="text-3xl font-black text-white tracking-tight"><%= client.advancedAnalytics.blended.totalSpend %></h3>
-            </div>
-          </div>
-
-          <!-- CARD 2: WHITE LINE SPARKLINE CARD (Ukupan broj pratitelja na IG i FB) -->
-          <div class="z-card-white z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[270px]">
-            <div class="flex justify-between items-start">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-zorange text-xs">
-                  <i class="fa-solid fa-users"></i>
-                </div>
-                <div>
-                  <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500 block">Ukupno Pratitelja</span>
-                  <span class="text-[10px] text-gray-400 font-bold flex items-center gap-1">
-                    <i class="fa-brands fa-instagram text-pink-600"></i> IG + <i class="fa-brands fa-facebook-f text-blue-600"></i> FB
-                  </span>
-                </div>
-              </div>
-              <span class="z-badge-orange text-[10px] px-2.5 py-0.5 text-white shadow-xs">+5.8%</span>
-            </div>
-
-            <!-- ECharts Sparkline Trend -->
-            <div id="z-chart-revenue-sparkline" class="w-full h-[95px]"></div>
-
-            <div class="flex items-center justify-between border-t border-gray-100 pt-2.5">
-              <div>
-                <h3 class="text-3xl font-black text-[#111113] tracking-tight">24,850</h3>
-                <p class="text-[10px] text-gray-400 font-bold">Rast u tekućem mjesecu</p>
-              </div>
-              <div class="text-right text-[10px] font-bold space-y-0.5">
-                <p class="text-pink-600 flex items-center justify-end gap-1"><i class="fa-brands fa-instagram"></i> 16,200</p>
-                <p class="text-blue-600 flex items-center justify-end gap-1"><i class="fa-brands fa-facebook-f"></i> 8,650</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- CARD 3: NEW USERS / TOP CONTENT LIST CARD (Like New Users Card in Image) -->
-          <div class="z-card-white z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[270px]">
-            <div class="flex justify-between items-center">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[#111113] text-xs">
-                  <i class="fa-solid fa-users"></i>
-                </div>
-                <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500">Top Aktivni Postovi</span>
-              </div>
-              <button class="text-gray-400 hover:text-black transition-colors"><i class="fa-solid fa-ellipsis"></i></button>
-            </div>
-
-            <!-- List of Users/Posts -->
-            <div class="space-y-2.5 my-2">
-              <div class="flex items-center justify-between text-xs font-bold">
-                <div class="flex items-center gap-2.5">
-                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&fit=crop" class="w-7 h-7 rounded-full object-cover" />
-                  <div>
-                    <p class="text-[#111113] font-black leading-tight">Nagradni Natječaj</p>
-                    <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online (42.1k)</p>
-                  </div>
-                </div>
-                <button class="text-gray-400 hover:text-black"><i class="fa-solid fa-ellipsis"></i></button>
-              </div>
-
-              <div class="flex items-center justify-between text-xs font-bold">
-                <div class="flex items-center gap-2.5">
-                  <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=100&fit=crop" class="w-7 h-7 rounded-full object-cover" />
-                  <div>
-                    <p class="text-[#111113] font-black leading-tight">Ljetni Popust 20%</p>
-                    <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online (31.4k)</p>
-                  </div>
-                </div>
-                <button class="text-gray-400 hover:text-black"><i class="fa-solid fa-ellipsis"></i></button>
-              </div>
-
-              <div class="flex items-center justify-between text-xs font-bold">
-                <div class="flex items-center gap-2.5">
-                  <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100&fit=crop" class="w-7 h-7 rounded-full object-cover" />
-                  <div>
-                    <p class="text-[#111113] font-black leading-tight">Digital Marketing Vodič</p>
-                    <p class="text-[10px] text-gray-500 font-semibold">Prije 10 minuta</p>
-                  </div>
-                </div>
-                <button class="text-gray-400 hover:text-black"><i class="fa-solid fa-ellipsis"></i></button>
-              </div>
-            </div>
-
-            <!-- Capsule Search Input -->
-            <div class="bg-gray-100 rounded-full px-3.5 py-1.5 flex items-center gap-2">
-              <i class="fa-solid fa-magnifying-glass text-xs text-gray-400"></i>
-              <input type="text" placeholder="Pretraži objave..." class="bg-transparent text-xs font-medium text-[#111113] placeholder-gray-400 focus:outline-none w-full" />
-            </div>
-          </div>
-
-          <!-- CARD 4: SUBSCRIBERS / CONVERSIONS BAR CHART CARD (Like Subscribers Card in Image) -->
-          <div class="z-card-white z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[270px]">
-            <div class="flex justify-between items-start">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[#111113] text-xs">
-                  <i class="fa-solid fa-[#111113]"></i>
-                  <i class="fa-solid fa-user-check text-xs"></i>
-                </div>
-                <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500">Konverzije & Upiti</span>
-              </div>
-              <span class="text-[10px] font-bold text-gray-400 uppercase">Target 10.000</span>
-            </div>
-
-            <!-- Vertical Bar Chart in Electric Orange -->
-            <div id="z-chart-subscribers-bar" class="w-full h-[100px]"></div>
-
-            <div class="flex items-center justify-between border-t border-gray-100 pt-3">
-              <div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase mb-0.5">Zadnje ažuriranje prije 2 min</p>
-                <h3 class="text-3xl font-black text-[#111113] tracking-tight"><%= client.advancedAnalytics.blended.totalConversions %> Leads</h3>
-              </div>
-              <div class="flex -space-x-2">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&fit=crop" class="w-7 h-7 rounded-full border-2 border-white object-cover" />
-                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=100&fit=crop" class="w-7 h-7 rounded-full border-2 border-white object-cover" />
-                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100&fit=crop" class="w-7 h-7 rounded-full border-2 border-white object-cover" />
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- STRATEGIC CONTENT DECISION CHARTS (STRATEŠKI MARKETINŠKI POKAZATELJI) -->
-        <div class="mb-4 mt-6">
-          <h3 class="text-xl font-black text-[#111113] uppercase tracking-wider flex items-center gap-2 mb-1">
-            <i class="fa-solid fa-chart-line text-zorange"></i> Strateške Marketinške Analize & Odluke
-          </h3>
-          <p class="text-xs text-gray-500 font-bold mb-6">Dubinski uvid u doseg novih korisnika, stope angažmana po dosegu, algoritamske signale i prodajne konverzije</p>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-          <!-- 1. Reach & Impressions / Organic vs Paid Reach -->
-          <div class="lg:col-span-7 z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 flex flex-col justify-between">
-            <div>
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
-                <div>
-                  <h4 id="card1-title" class="text-base font-black text-[#111113] uppercase tracking-wider">Reach & Impressions (Doseg i Impresije)</h4>
-                  <p id="card1-sub" class="text-xs text-gray-500 font-semibold">Novi korisnici u odnosu na postojeću publiku</p>
-                </div>
-                <span id="card1-badge" class="z-badge-orange text-[10px] px-3 py-1 text-white shadow-xs self-start sm:self-auto">72% Novi Doseg</span>
-              </div>
-              <div id="chart-reach-impressions" class="w-full" style="height: 280px;"></div>
-            </div>
-            <div id="card1-note" class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
-              💡 <strong>Odluka:</strong> <%= client.strategicDecisionMetrics.reachImpressions.decisionNote %>
-            </div>
-          </div>
-
-          <!-- 2. Engagement Rate po Dosegu / Page Engaged Users -->
-          <div class="lg:col-span-5 z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 flex flex-col justify-between">
-            <div>
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
-                <div>
-                  <h4 id="card2-title" class="text-base font-black text-[#111113] uppercase tracking-wider">Engagement Rate po Dosegu (ERR %)</h4>
-                  <p id="card2-sub" class="text-xs text-gray-500 font-semibold">Točniji pokazatelj od engagementa po broju pratitelja</p>
-                </div>
-                <span id="card2-badge" class="z-badge-black text-[10px] px-3 py-1 shadow-xs self-start sm:self-auto">ERR: 6.2% Prosjek</span>
-              </div>
-              <div id="chart-err-rate" class="w-full" style="height: 280px;"></div>
-            </div>
-            <div id="card2-note" class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
-              🎯 <strong>Uvid:</strong> <%= client.strategicDecisionMetrics.err.decisionNote %>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-          <!-- 3. Saves & Shares / Share & Comment Ratio -->
-          <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 flex flex-col justify-between">
-            <div>
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
-                <div>
-                  <h4 id="card3-title" class="text-base font-black text-[#111113] uppercase tracking-wider">Saves & Shares (Spremanja i Dijeljenja)</h4>
-                  <p id="card3-sub" class="text-xs text-gray-500 font-semibold">Ključni signali za algoritam i vrijednost sadržaja</p>
-                </div>
-                <span id="card3-badge" class="z-badge-black text-[10px] px-3 py-1 shadow-xs self-start sm:self-auto">Algoritamski Signal</span>
-              </div>
-              <div id="chart-saves-shares" class="w-full" style="height: 280px;"></div>
-            </div>
-            <div id="card3-note" class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
-              📌 <strong>Analiza:</strong> <%= client.strategicDecisionMetrics.savesShares.decisionNote %>
-            </div>
-          </div>
-
-          <!-- 4. Follower Growth Rate / Page Views & CTA Action Clicks -->
-          <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 flex flex-col justify-between">
-            <div>
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
-                <div>
-                  <h4 id="card4-title" class="text-base font-black text-[#111113] uppercase tracking-wider">Follower Growth Rate & Unfollows</h4>
-                  <p id="card4-sub" class="text-xs text-gray-500 font-semibold">Trend rasta i pada baze umjesto fiksnog broja</p>
-                </div>
-                <span id="card4-badge" class="z-badge-green text-[10px] px-3 py-1 shadow-xs self-start sm:self-auto">Neto +1,380 Pratitelja</span>
-              </div>
-              <div id="chart-follower-growth" class="w-full" style="height: 280px;"></div>
-            </div>
-            <div id="card4-note" class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
-              📈 <strong>Trend:</strong> <%= client.strategicDecisionMetrics.followerGrowth.decisionNote %>
-            </div>
-          </div>
-        </div>
-
-        <!-- 5. Profile Visits & Website Taps / Video Performance 3-sec vs 1-min Views -->
-        <div class="z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 mb-8">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
-            <div>
-              <h4 id="card5-title" class="text-base font-black text-[#111113] uppercase tracking-wider">Profile Visits & Website Taps (Prijelaz u Namjeru Kupi)</h4>
-              <p id="card5-sub" class="text-xs text-gray-500 font-semibold">Konverzija iz pasivnog gledatelja u namjeru istraživanja ponude i klika na link</p>
-            </div>
-            <span id="card5-badge" class="z-badge-orange text-[10px] px-3.5 py-1 text-white shadow-xs self-start sm:self-auto">28.5% Click-Through na Bio Link</span>
-          </div>
-          <div id="chart-profile-visits" class="w-full" style="height: 280px;"></div>
-          <div id="card5-note" class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
-            🛒 <strong>Konverzija:</strong> <%= client.strategicDecisionMetrics.profileVisits.decisionNote %>
-          </div>
-        </div>
-
-        <!-- MONTHLY POSTS SECTION (OBJAVE) WITH TABLE & GALLERY VIEWS -->
-        <div class="z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 mb-8">
-          
-          <!-- SECTION TOP ROW: TITLE + PARAGRAPH + VIEW TOGGLE -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4 mb-4">
-            <div>
-              <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-2xl bg-zorange text-white flex items-center justify-center font-black text-sm shadow-xs">
-                  <i class="fa-solid fa-photo-film"></i>
-                </div>
-                <h3 class="text-2xl font-black text-[#111113] uppercase tracking-wider">Objave</h3>
-              </div>
-              <p class="text-xs text-gray-500 font-bold mt-1">Pregled svih objavljenih kreativa s brojem pregleda, lajkova, komentara i dijeljenja</p>
-            </div>
-
-            <!-- View Switcher (Table vs Gallery) -->
-            <div class="bg-gray-100 p-1.5 rounded-full flex items-center gap-1 text-xs font-bold border border-black/5 self-start sm:self-auto">
-              <button onclick="switchPostsView('table')" id="btn-view-table" class="px-4 py-2 rounded-full bg-white text-[#111113] shadow-xs font-black transition-all flex items-center gap-2">
-                <i class="fa-solid fa-list text-xs"></i> <span>Tablica</span>
-              </button>
-              <button onclick="switchPostsView('gallery')" id="btn-view-gallery" class="px-4 py-2 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-2 font-black">
-                <i class="fa-solid fa-border-all text-xs"></i> <span>Galerija</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- SECTION SECOND ROW (BELOW TITLE & PARAGRAPH): PLATFORM & DATE FILTERS BAR -->
-          <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
-            
-            <!-- 1. Platform Filter Pills (Odabir Mreže - Moved directly under title/paragraph) -->
-            <div class="flex items-center gap-2.5 flex-wrap">
-              <span class="text-xs font-black text-[#111113] uppercase tracking-wider flex items-center gap-1.5">
-                <i class="fa-solid fa-filter text-zorange"></i> Odabir Mreže:
-              </span>
-              <div class="bg-white p-1 rounded-full flex items-center gap-1 text-xs font-bold border border-black/5 shadow-2xs">
-                <button onclick="setPlatformFilter('all')" id="post-filter-all" class="px-4 py-2 rounded-full bg-[#111113] text-white shadow-xs font-black transition-all">Sve Mreže</button>
-                <button onclick="setPlatformFilter('instagram')" id="post-filter-instagram" class="px-4 py-2 rounded-full text-gray-700 hover:text-[#111113] transition-all font-black flex items-center gap-1.5">
-                  <i class="fa-brands fa-instagram text-pink-600 text-sm"></i> Instagram
-                </button>
-                <button onclick="setPlatformFilter('facebook')" id="post-filter-facebook" class="px-4 py-2 rounded-full text-gray-700 hover:text-[#111113] transition-all font-black flex items-center gap-1.5">
-                  <i class="fa-brands fa-facebook-f text-blue-600 text-sm"></i> Facebook
-                </button>
-                <button onclick="setPlatformFilter('tiktok')" id="post-filter-tiktok" class="px-4 py-2 rounded-full text-gray-700 hover:text-[#111113] transition-all font-black flex items-center gap-1.5">
-                  <i class="fa-brands fa-tiktok text-black text-sm"></i> TikTok
-                </button>
-              </div>
-            </div>
-
-            <!-- 2. Prominent Large Modern Custom Date Range Picker (Flatpickr ZELLIFY Theme) -->
-            <div class="flex items-center gap-3 flex-wrap">
-              <span class="text-xs font-black text-[#111113] uppercase tracking-wider flex items-center gap-1.5">
-                <i class="fa-solid fa-calendar-days text-zorange"></i> Odabir Datuma:
-              </span>
-              
-              <div class="flex items-center gap-2 flex-wrap">
-                <!-- Flatpickr Range Trigger Input -->
-                <div class="flex items-center gap-2.5 bg-white px-4 py-2 rounded-2xl shadow-xs border border-gray-300 hover:border-zorange transition-colors cursor-pointer group">
-                  <i class="fa-solid fa-calendar text-zorange text-base group-hover:scale-110 transition-transform"></i>
-                  <span class="text-xs font-black text-gray-500 uppercase">Razdoblje:</span>
-                  <input type="text" id="date-range-picker" placeholder="Odaberi datume..." class="text-sm font-black text-[#111113] bg-transparent focus:outline-none cursor-pointer w-56" readonly />
-                  <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
-                </div>
-
-                <!-- Preset Buttons -->
-                <button onclick="setDatePreset('month')" class="px-3.5 py-2 rounded-2xl bg-white text-[#111113] border border-gray-300 hover:bg-zorange hover:text-white hover:border-zorange transition-all text-xs font-black shadow-xs">Tekući Mjesec</button>
-                <button onclick="setDatePreset('7days')" class="px-3.5 py-2 rounded-2xl bg-white text-gray-700 border border-gray-300 hover:bg-black hover:text-white hover:border-black transition-all text-xs font-black shadow-xs">Zadnjih 7 Dana</button>
-                <button onclick="setDatePreset('all')" class="px-3.5 py-2 rounded-2xl bg-white text-gray-500 border border-gray-300 hover:bg-black hover:text-white hover:border-black transition-all text-xs font-bold shadow-xs">Sve Objave</button>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- VIEW 1: TABLE VIEW (DEFAULT) -->
-          <div id="posts-view-table" class="overflow-x-auto transition-all">
-            <table class="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr class="text-gray-500 uppercase tracking-wider font-extrabold text-xs border-b border-gray-200 bg-gray-50/50">
-                  <th class="py-3.5 px-4">Kreativa / Objava</th>
-                  <th class="py-3.5 px-4">Platforma & Datum</th>
-                  <th class="py-3.5 px-4 text-right">👁️ Pregledi</th>
-                  <th class="py-3.5 px-4 text-right">❤️ Lajkovi</th>
-                  <th class="py-3.5 px-4 text-right">💬 Komentari</th>
-                  <th class="py-3.5 px-4 text-right">🔄 Dijeljenja</th>
-                  <th class="py-3.5 px-4 text-right">Stopa Angažmana</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-100 font-bold text-[#111113]">
-                <% client.socialMediaStats.creatives.forEach(post => { %>
-                  <tr class="post-row-item hover:bg-gray-50/80 transition-colors" data-platform="<%= post.platform.toLowerCase() %>" data-date="<%= post.isoDate %>">
-                    <td class="py-4 px-4">
-                      <div class="flex items-center gap-3.5">
-                        <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="w-14 h-14 rounded-2xl object-cover border border-black/10 shadow-xs" />
-                        <div>
-                          <p class="font-black text-base text-[#111113] leading-snug"><%= post.title %></p>
-                          <span class="text-xs text-gray-500 font-extrabold uppercase"><%= post.type %></span>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="py-4 px-4">
-                      <p class="flex items-center gap-1.5 text-sm text-[#111113] font-black">
-                        <i class="<%= post.platformIcon %> text-base"></i> <%= post.platform %>
-                      </p>
-                      <p class="text-xs text-gray-500 font-bold"><%= post.date %></p>
-                    </td>
-                    <td class="py-4 px-4 text-right font-black text-[#111113] text-base"><%= post.impressions %></td>
-                    <td class="py-4 px-4 text-right text-rose-600 font-black text-base"><%= post.likes %></td>
-                    <td class="py-4 px-4 text-right text-blue-600 font-black text-base"><%= post.comments %></td>
-                    <td class="py-4 px-4 text-right text-zorange font-black text-base"><%= post.shares %></td>
-                    <td class="py-4 px-4 text-right font-black text-base"><%= post.engagementRate %></td>
-                  </tr>
-                <% }); %>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- VIEW 2: GALLERY VIEW (4 CARDS PER ROW: grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6) -->
-          <div id="posts-view-gallery" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-all">
-            <% client.socialMediaStats.creatives.forEach(post => { %>
-              <div class="post-card-item z-card-white border border-gray-200/80 rounded-3xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-platform="<%= post.platform.toLowerCase() %>" data-date="<%= post.isoDate %>">
-                <div>
-                  <!-- Image Header with Platform Badge -->
-                  <div class="relative h-48 w-full overflow-hidden bg-gray-100">
-                    <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-xs px-3 py-1 rounded-full text-xs font-black text-[#111113] flex items-center gap-1.5 shadow-sm border border-black/5">
-                      <i class="<%= post.platformIcon %> text-sm"></i> <%= post.platform %>
-                    </div>
-                  </div>
-
-                  <!-- Post Content Details -->
-                  <div class="p-5">
-                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1"><%= post.date %> • <%= post.type %></p>
-                    <h4 class="font-black text-base text-[#111113] leading-snug line-clamp-2"><%= post.title %></h4>
-                  </div>
-                </div>
-
-                <!-- Prominent, High-Contrast Metrics Grid Footer (2x2 Grid with Large Typography) -->
-                <div class="p-3.5 bg-gray-50/90 border-t border-gray-100 grid grid-cols-2 gap-2 text-left">
-                  <div class="bg-white p-2.5 rounded-xl border border-gray-200/80 shadow-2xs">
-                    <span class="text-[11px] text-gray-500 font-extrabold uppercase flex items-center gap-1 mb-0.5">
-                      <i class="fa-solid fa-eye text-gray-400"></i> Pregledi
-                    </span>
-                    <strong class="text-base font-black text-[#111113] block"><%= post.impressions %></strong>
-                  </div>
-                  <div class="bg-white p-2.5 rounded-xl border border-gray-200/80 shadow-2xs">
-                    <span class="text-[11px] text-rose-500 font-extrabold uppercase flex items-center gap-1 mb-0.5">
-                      <i class="fa-solid fa-heart text-rose-500"></i> Lajkovi
-                    </span>
-                    <strong class="text-base font-black text-rose-600 block"><%= post.likes %></strong>
-                  </div>
-                  <div class="bg-white p-2.5 rounded-xl border border-gray-200/80 shadow-2xs">
-                    <span class="text-[11px] text-blue-500 font-extrabold uppercase flex items-center gap-1 mb-0.5">
-                      <i class="fa-solid fa-comment text-blue-500"></i> Komentari
-                    </span>
-                    <strong class="text-base font-black text-blue-600 block"><%= post.comments %></strong>
-                  </div>
-                  <div class="bg-white p-2.5 rounded-xl border border-gray-200/80 shadow-2xs">
-                    <span class="text-[11px] text-zorange font-extrabold uppercase flex items-center gap-1 mb-0.5">
-                      <i class="fa-solid fa-share text-zorange"></i> Dijeljenja
-                    </span>
-                    <strong class="text-base font-black text-zorange block"><%= post.shares %></strong>
-                  </div>
-                </div>
-              </div>
-            <% }); %>
-          </div>
-
-        </div>
-
-      </section>
-
-      <!-- SECTION 2: META ADS TAB (4 HERO CARDS WITH KEY ADVERTISING METRICS) -->
-      <section id="panel-meta-ads" class="hidden">
-        
-        <!-- SECTION TITLE & SUBTITLE -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
-            <h2 class="text-3xl font-black text-[#111113] tracking-tight uppercase">Meta Ads Performance</h2>
-            <p class="text-xs font-bold text-gray-500 mt-1">Pregled glavnih metrika plaćenog oglašavanja na Facebook & Instagram mreži</p>
-          </div>
-          <span class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 shadow-2xs self-start md:self-auto flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Kampanje Aktivne (Meta Pixel Connected)
-          </span>
-        </div>
-
-        <!-- META ADS TOP 4 HERO CARDS -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          
-          <!-- CARD 1: DARK HERO CARD (Potrošnja Meta Ads) -->
-          <div class="z-card-dark rounded-[2rem] p-6 flex flex-col justify-between h-[270px] relative overflow-hidden shadow-xl">
-            <div class="flex justify-between items-center z-10">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white text-xs">
-                  <i class="fa-brands fa-meta"></i>
-                </div>
-                <span class="text-xs font-extrabold uppercase tracking-wider text-white/90">Potrošnja Meta Ads</span>
-              </div>
-              <span class="z-badge-orange text-[10px] px-2.5 py-1 uppercase shadow-xs">+6.2% Optimalno</span>
-            </div>
-
-            <!-- Middle Half-Donut Gauge Meter -->
-            <div class="relative w-full h-[120px] flex items-center justify-center my-1 z-10">
-              <div id="meta-card-gauge-spend" class="w-full h-full"></div>
-              <div class="absolute bottom-2 text-center">
-                <span class="text-xs font-bold text-white/70 block">Budžet: $5,000</span>
-                <span class="text-base font-black text-zorange">82% Iskorišteno</span>
-              </div>
-            </div>
-
-            <div class="z-10">
-              <span class="text-[10px] uppercase font-bold text-white/60 block">Ukupno Uloženo na FB & IG</span>
-              <h3 class="text-3xl font-black text-white tracking-tight"><%= client.metaStats.totalSpend %></h3>
-            </div>
-          </div>
-
-          <!-- CARD 2: WHITE LINE SPARKLINE CARD (Meta CPA - Trošak po konverziji) -->
-          <div class="z-card-white z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[270px]">
-            <div class="flex justify-between items-start">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-zorange text-xs">
-                  <i class="fa-solid fa-chart-line"></i>
-                </div>
-                <div>
-                  <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500 block">Meta CPA</span>
-                  <span class="text-[10px] text-gray-400 font-bold">Trošak po Konverziji</span>
-                </div>
-              </div>
-              <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black shadow-2xs flex items-center gap-1">
-                📉 <%= client.metaStats.cpaTrend.value %>
-              </span>
-            </div>
-
-            <!-- ECharts Sparkline Trend -->
-            <div id="meta-card-sparkline-cpa" class="w-full h-[95px]"></div>
-
-            <div class="flex items-center justify-between border-t border-gray-100 pt-2.5">
-              <div>
-                <h3 class="text-3xl font-black text-[#111113] tracking-tight"><%= client.metaStats.cpa %></h3>
-                <p class="text-[10px] text-emerald-600 font-bold">Ispod ciljanog maks. ($16.00)</p>
-              </div>
-              <div class="text-right text-[10px] font-bold space-y-0.5">
-                <p class="text-pink-600 flex items-center justify-end gap-1"><i class="fa-brands fa-instagram"></i> CPA: $13.80</p>
-                <p class="text-blue-600 flex items-center justify-end gap-1"><i class="fa-brands fa-facebook-f"></i> CPA: $14.90</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- CARD 3: WHITE LIST CARD (Top Meta Kampanje) -->
-          <div class="z-card-white z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[270px]">
-            <div class="flex justify-between items-center">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[#111113] text-xs">
-                  <i class="fa-solid fa-rectangle-ad"></i>
-                </div>
-                <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500">Top Meta Kampanje</span>
-              </div>
-              <button class="text-gray-400 hover:text-black transition-colors"><i class="fa-solid fa-ellipsis"></i></button>
-            </div>
-
-            <!-- List of Campaigns -->
-            <div class="space-y-2.5 my-2">
-              <div class="flex items-center justify-between text-xs font-bold">
-                <div class="flex items-center gap-2.5">
-                  <div class="w-7 h-7 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-black text-xs">IG</div>
-                  <div>
-                    <p class="text-[#111113] font-black leading-tight">Retargeting Proizvodi</p>
-                    <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live (4.8x ROAS)</p>
-                  </div>
-                </div>
-                <span class="text-[10px] font-black text-[#111113]">$1.82k</span>
-              </div>
-
-              <div class="flex items-center justify-between text-xs font-bold">
-                <div class="flex items-center gap-2.5">
-                  <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-xs">FB</div>
-                  <div>
-                    <p class="text-[#111113] font-black leading-tight">Ljetni Popust Video</p>
-                    <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live (3.9x ROAS)</p>
-                  </div>
-                </div>
-                <span class="text-[10px] font-black text-[#111113]">$1.45k</span>
-              </div>
-
-              <div class="flex items-center justify-between text-xs font-bold">
-                <div class="flex items-center gap-2.5">
-                  <div class="w-7 h-7 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-black text-xs">LAL</div>
-                  <div>
-                    <p class="text-[#111113] font-black leading-tight">Lookalike 1% KUPCI</p>
-                    <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live (3.2x ROAS)</p>
-                  </div>
-                </div>
-                <span class="text-[10px] font-black text-[#111113]">$1.18k</span>
-              </div>
-            </div>
-
-            <!-- Capsule Search Input -->
-            <div class="bg-gray-100 rounded-full px-3.5 py-1.5 flex items-center gap-2">
-              <i class="fa-solid fa-magnifying-glass text-xs text-gray-400"></i>
-              <input type="text" placeholder="Pretraži Meta kampanje..." class="bg-transparent text-xs font-medium text-[#111113] placeholder-gray-400 focus:outline-none w-full" />
-            </div>
-          </div>
-
-          <!-- CARD 4: WHITE BAR CHART CARD (Ostvareni Upiti / Leads) -->
-          <div class="z-card-white z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[270px]">
-            <div class="flex justify-between items-start">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[#111113] text-xs">
-                  <i class="fa-solid fa-bullseye text-xs text-zorange"></i>
-                </div>
-                <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500">Ostvareni Upiti</span>
-              </div>
-              <span class="text-[10px] font-bold text-gray-400 uppercase">Target 300 Upita</span>
-            </div>
-
-            <!-- Vertical Bar Chart in Electric Orange -->
-            <div id="meta-card-bar-leads" class="w-full h-[100px]"></div>
-
-            <div class="flex items-center justify-between border-t border-gray-100 pt-3">
-              <div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase mb-0.5">FB & IG Konverzije</p>
-                <h3 class="text-3xl font-black text-[#111113] tracking-tight"><%= client.metaStats.resultsValue %></h3>
-              </div>
-              <div class="flex -space-x-2">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&fit=crop" class="w-7 h-7 rounded-full border-2 border-white object-cover" />
-                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=100&fit=crop" class="w-7 h-7 rounded-full border-2 border-white object-cover" />
-                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100&fit=crop" class="w-7 h-7 rounded-full border-2 border-white object-cover" />
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-    </main>
-
-  </div>
-
-  <!-- Client-side tab switching and ECharts initialization scripts -->
-  <script>
-    const clientPackage = '<%= client.package %>';
-    const chartData = <%- JSON.stringify(client.chartData) %>;
-    const googleChartData = <%- JSON.stringify(client.googleChartData) %>;
-    const clientId = '<%= client.id %>';
-    
-    // ECharts Instances
-    let mfrGaugeChart, revenueSparklineChart, subscribersBarChart, revenueHighlightedChart;
-    let efficiencyChart, platformsChart, audienceChart, postsChart, reachChart;
-    let googleEfficiencyChart, googleNetworksChart;
-    let tiktokEfficiencyChart, tiktokVideosChart;
-    let blendedChart, fatigueChart, daypartingChart, ltvChart;
-    let socialPlatformsChart, socialFormatsChart;
-
-    // Main Tab Switching (Meta vs Meta Ads)
-    function switchMainTab(tab) {
-      const btnMeta = document.getElementById('btn-tab-meta');
-      const btnMetaAds = document.getElementById('btn-tab-meta-ads');
-      const panelMeta = document.getElementById('panel-advanced-analytics');
-      const panelMetaAds = document.getElementById('panel-meta-ads');
-
-      if (tab === 'meta') {
-        if (btnMeta) btnMeta.className = 'z-pill-nav-item-active px-5 py-2 text-xs font-black uppercase tracking-wider transition-all duration-200';
-        if (btnMetaAds) btnMetaAds.className = 'z-pill-nav-item px-5 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200';
-
-        if (panelMeta) panelMeta.classList.remove('hidden');
-        if (panelMetaAds) panelMetaAds.classList.add('hidden');
-      } else if (tab === 'meta-ads') {
-        if (btnMetaAds) btnMetaAds.className = 'z-pill-nav-item-active px-5 py-2 text-xs font-black uppercase tracking-wider transition-all duration-200';
-        if (btnMeta) btnMeta.className = 'z-pill-nav-item px-5 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200';
-
-        if (panelMeta) panelMeta.classList.add('hidden');
-        if (panelMetaAds) {
-          panelMetaAds.classList.remove('hidden');
-          initMetaAdsHeroCharts();
+      // Toggle Dark Mode
+      useEffect(() => {
+        if (darkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
         }
-      }
-    }
+      }, [darkMode]);
 
-    let metaAdsGaugeChart, metaAdsSparkChart, metaAdsBarChart;
-    let metaAdsHeroInitialized = false;
+      // Trigger simulated skeleton loading state when changing date or account
+      const handleAccountChange = (e) => {
+        setIsLoading(true);
+        setSelectedAccount(e.target.value);
+        setTimeout(() => setIsLoading(false), 350);
+      };
 
-    function initMetaAdsHeroCharts() {
-      if (metaAdsHeroInitialized) {
-        setTimeout(() => {
-          if (metaAdsGaugeChart) metaAdsGaugeChart.resize();
-          if (metaAdsSparkChart) metaAdsSparkChart.resize();
-          if (metaAdsBarChart) metaAdsBarChart.resize();
-        }, 50);
-        return;
-      }
-      metaAdsHeroInitialized = true;
+      const handleDateChange = (e) => {
+        setIsLoading(true);
+        setDateRange(e.target.value);
+        setTimeout(() => setIsLoading(false), 350);
+      };
 
-      setTimeout(() => {
-        const metaGaugeElem = document.getElementById('meta-card-gauge-spend');
-        if (metaGaugeElem) {
-          metaAdsGaugeChart = echarts.init(metaGaugeElem);
-          metaAdsGaugeChart.setOption({
-            series: [{
-              type: 'gauge', startAngle: 180, endAngle: 0, min: 0, max: 100,
-              pointer: { show: false },
-              progress: { show: true, roundCap: true, itemStyle: { color: '#FF5F00' } },
-              axisLine: { lineStyle: { width: 14, color: [[1, 'rgba(255, 255, 255, 0.15)']] } },
-              splitLine: { show: false }, axisTick: { show: false }, axisLabel: { show: false },
-              data: [{ value: 82, name: '' }], detail: { show: false }
-            }]
-          });
-        }
+      // Current Account Details
+      const accountObj = useMemo(() => {
+        return ACCOUNTS.find(a => a.id === selectedAccount) || ACCOUNTS[0];
+      }, [selectedAccount]);
 
-        const metaSparkElem = document.getElementById('meta-card-sparkline-cpa');
-        if (metaSparkElem) {
-          metaAdsSparkChart = echarts.init(metaSparkElem);
-          metaAdsSparkChart.setOption({
-            grid: { top: 5, bottom: 5, left: 5, right: 5 },
-            xAxis: { type: 'category', show: false, data: ['1','2','3','4','5','6','7','8','9','10','11','12'] },
-            yAxis: { type: 'value', show: false },
-            series: [{
-              data: [18.5, 17.2, 16.8, 15.9, 16.4, 15.1, 14.8, 14.2, 14.5, 13.9, 14.1, 14.2],
-              type: 'line', smooth: true, showSymbol: false,
-              lineStyle: { width: 3, color: '#FF5F00' },
-              areaStyle: {
-                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                  { offset: 0, color: 'rgba(255, 95, 0, 0.25)' },
-                  { offset: 1, color: 'rgba(255, 95, 0, 0.0)' }
-                ])
-              }
-            }]
-          });
-        }
-
-        const metaBarElem = document.getElementById('meta-card-bar-leads');
-        if (metaBarElem) {
-          metaAdsBarChart = echarts.init(metaBarElem);
-          metaAdsBarChart.setOption({
-            grid: { top: 5, bottom: 5, left: 5, right: 5 },
-            xAxis: { type: 'category', show: false, data: ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'] },
-            yAxis: { type: 'value', show: false },
-            series: [{
-              data: [12, 18, 15, 22, 28, 25, 30, 26, 32, 29, 35, 31, 38, 34, 40],
-              type: 'bar', barWidth: '55%', itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] }
-            }]
-          });
-        }
-      }, 50);
-    }
-
-    function initCharts() {
-      /* ----------------------------------------------------
-         ZELLIFY DASHBOARD ECHARTS SETUP
-         ---------------------------------------------------- */
-
-      // 1. Hero Dark Card Half-Donut Gauge (MFR / MER)
-      const mfrGaugeElem = document.getElementById('z-chart-mfr-gauge');
-      if (mfrGaugeElem) {
-        mfrGaugeChart = echarts.init(mfrGaugeElem);
-        mfrGaugeChart.setOption({
-          series: [{
-            type: 'gauge',
-            startAngle: 180,
-            endAngle: 0,
-            min: 0,
-            max: 100,
-            pointer: { show: false },
-            progress: {
-              show: true,
-              overlap: false,
-              roundCap: true,
-              clip: false,
-              itemStyle: { color: '#FF5F00' }
-            },
-            axisLine: { lineStyle: { width: 14, color: [[1, 'rgba(255, 255, 255, 0.15)']] } },
-            splitLine: { show: false },
-            axisTick: { show: false },
-            axisLabel: { show: false },
-            data: [{ value: 74, name: '' }],
-            detail: { show: false }
-          }]
-        });
-      }
-
-      // 2. Revenue Sparkline Trend (Electric Orange)
-      const revSparkElem = document.getElementById('z-chart-revenue-sparkline');
-      if (revSparkElem) {
-        revenueSparklineChart = echarts.init(revSparkElem);
-        revenueSparklineChart.setOption({
-          grid: { top: 5, bottom: 5, left: 5, right: 5 },
-          xAxis: { type: 'category', show: false, data: ['1','2','3','4','5','6','7','8','9','10','11','12'] },
-          yAxis: { type: 'value', show: false },
-          series: [{
-            data: [120, 140, 110, 180, 160, 210, 190, 240, 220, 270, 250, 310],
-            type: 'line',
-            smooth: true,
-            showSymbol: false,
-            lineStyle: { width: 3, color: '#FF5F00' },
-            areaStyle: {
-              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: 'rgba(255, 95, 0, 0.25)' },
-                { offset: 1, color: 'rgba(255, 95, 0, 0.0)' }
-              ])
-            }
-          }]
-        });
-      }
-
-      // 3. Subscribers Bar Chart
-      const subBarElem = document.getElementById('z-chart-subscribers-bar');
-      if (subBarElem) {
-        subscribersBarChart = echarts.init(subBarElem);
-        subscribersBarChart.setOption({
-          grid: { top: 5, bottom: 5, left: 5, right: 5 },
-          xAxis: { type: 'category', show: false, data: ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'] },
-          yAxis: { type: 'value', show: false },
-          series: [{
-            data: [45, 60, 75, 50, 80, 95, 70, 85, 100, 90, 110, 80, 95, 120, 105],
-            type: 'bar',
-            barWidth: '55%',
-            itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] }
-          }]
-        });
-      }
-
-      // 4. Highlighted Revenue Bar Chart (Matching ZELLIFY bottom left card)
-      const revHighElem = document.getElementById('z-chart-revenue-highlighted');
-      if (revHighElem) {
-        revenueHighlightedChart = echarts.init(revHighElem);
-        revenueHighlightedChart.setOption({
-          tooltip: { trigger: 'axis' },
-          grid: { top: 20, bottom: 25, left: 10, right: 10, containLabel: true },
-          xAxis: {
-            type: 'category',
-            data: ['20 Jul', '21 Jul', '22 Jul', '23 Jul', '24 Jul', '25 Jul'],
-            axisLine: { show: false },
-            axisTick: { show: false },
-            axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 700, fontSize: 11 }
+      // --- PAGE 1: INSTAGRAM ORGANIC DATA ---
+      const instagramData = useMemo(() => {
+        const mult = dateRange === '7d' ? 0.35 : dateRange === 'this_month' ? 0.85 : 1.0;
+        return {
+          reach: Math.round(128450 * mult).toLocaleString(),
+          reachChange: '+14.2%',
+          impressions: Math.round(412900 * mult).toLocaleString(),
+          impressionsChange: '+8.6%',
+          err: '6.4%',
+          errChange: '+1.1%',
+          netFollowers: `+${Math.round(1380 * mult)}`,
+          followersChange: '+24.5%',
+          profileVisits: Math.round(14250 * mult).toLocaleString(),
+          websiteTaps: Math.round(3890 * mult).toLocaleString(),
+          visitsChange: '+18.3%',
+          // Chart 1: Reach vs Impressions
+          reachTrendOption: {
+            tooltip: { trigger: 'axis' },
+            legend: { data: ['Total Reach', 'Total Impressions'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
+            grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+            xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
+            yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
+            series: [
+              { name: 'Total Reach', type: 'line', data: [8200, 9400, 11200, 10800, 12500, 14100, 13800, 15200, 16800, 15900, 17400, 18600].map(v => Math.round(v * mult)), smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, areaStyle: { color: 'rgba(255, 95, 0, 0.15)' }, itemStyle: { color: '#FF5F00' } },
+              { name: 'Total Impressions', type: 'line', data: [24000, 27500, 31000, 29800, 34200, 38900, 37500, 41200, 44800, 42900, 46100, 49500].map(v => Math.round(v * mult)), smooth: true, lineStyle: { width: 3, color: darkMode ? '#E4E4E7' : '#111113' }, itemStyle: { color: darkMode ? '#E4E4E7' : '#111113' } }
+            ]
           },
-          yAxis: { type: 'value', show: false },
-          series: [{
-            type: 'bar',
-            barWidth: '50%',
-            data: [
-              { value: 1200, itemStyle: { color: '#E5E7EB', borderRadius: [12, 12, 12, 12] } },
-              { value: 950, itemStyle: { color: '#E5E7EB', borderRadius: [12, 12, 12, 12] } },
-              { value: 1100, itemStyle: { color: '#E5E7EB', borderRadius: [12, 12, 12, 12] } },
-              { value: 1400, itemStyle: { color: '#E5E7EB', borderRadius: [12, 12, 12, 12] } },
-              { value: 1950, itemStyle: { color: '#FF5F00', borderRadius: [12, 12, 12, 12] } },
-              { value: 1600, itemStyle: { color: '#E5E7EB', borderRadius: [12, 12, 12, 12] } }
-            ]
-          }]
-        });
-      }
-
-    // Strategic Decision Charts
-    let chartReachImpressions, chartErrRate, chartSavesShares, chartFollowerGrowth, chartProfileVisits;
-
-    /* ----------------------------------------------------
-       STRATEGIC DECISION CHARTS ECHARTS SETUP
-       ---------------------------------------------------- */
-    const decData = <%- JSON.stringify(client.strategicDecisionMetrics) %>;
-
-    // 1. Reach & Impressions (New vs Existing Audience)
-    const reachImpElem = document.getElementById('chart-reach-impressions');
-    if (reachImpElem) {
-      chartReachImpressions = echarts.init(reachImpElem);
-      chartReachImpressions.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        legend: { data: ['Novi Korisnici (Doseg)', 'Postojeći Pratitelji'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
-        grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
-        xAxis: { type: 'category', data: decData.reachImpressions.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
-        yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
-        series: [
-          { name: 'Novi Korisnici (Doseg)', type: 'bar', stack: 'total', data: decData.reachImpressions.newAudience, itemStyle: { color: '#FF5F00' } },
-          { name: 'Postojeći Pratitelji', type: 'bar', stack: 'total', data: decData.reachImpressions.existingFollowers, itemStyle: { color: '#111113', borderRadius: [4, 4, 0, 0] } }
-        ]
-      });
-    }
-
-    // 2. Engagement Rate po Dosegu (ERR %)
-    const errElem = document.getElementById('chart-err-rate');
-    if (errElem) {
-      chartErrRate = echarts.init(errElem);
-      chartErrRate.setOption({
-        tooltip: { trigger: 'axis' },
-        legend: { data: ['ERR po Dosegu (%)', 'Prosjek Industrije (2.5%)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
-        grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
-        xAxis: { type: 'category', data: decData.err.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
-        yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10, formatter: '{value}%' } },
-        series: [
-          { name: 'ERR po Dosegu (%)', type: 'line', data: decData.err.errRates, smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } },
-          { name: 'Prosjek Industrije (2.5%)', type: 'line', data: decData.err.industryAvg, lineStyle: { width: 2, type: 'dashed', color: '#6B7280' }, itemStyle: { color: '#6B7280' } }
-        ]
-      });
-    }
-
-    // 3. Saves & Shares (Spremanja i Dijeljenja)
-    const savesElem = document.getElementById('chart-saves-shares');
-    if (savesElem) {
-      chartSavesShares = echarts.init(savesElem);
-      chartSavesShares.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        legend: { data: ['Spremanja (Saves)', 'Dijeljenja (Shares)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
-        grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
-        xAxis: { type: 'category', data: decData.savesShares.posts, axisLabel: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 10, rotate: 10 } },
-        yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
-        series: [
-          { name: 'Spremanja (Saves)', type: 'bar', data: decData.savesShares.saves, itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } },
-          { name: 'Dijeljenja (Shares)', type: 'bar', data: decData.savesShares.shares, itemStyle: { color: '#111113', borderRadius: [4, 4, 0, 0] } }
-        ]
-      });
-    }
-
-    // 4. Follower Growth Rate & Unfollows
-    const followerElem = document.getElementById('chart-follower-growth');
-    if (followerElem) {
-      chartFollowerGrowth = echarts.init(followerElem);
-      chartFollowerGrowth.setOption({
-        tooltip: { trigger: 'axis' },
-        legend: { data: ['Novi Pratitelji', 'Nisu više pratitelji (Unfollows)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
-        grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
-        xAxis: { type: 'category', data: decData.followerGrowth.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
-        yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
-        series: [
-          { name: 'Novi Pratitelji', type: 'bar', data: decData.followerGrowth.newFollowers, itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } },
-          { name: 'Nisu više pratitelji (Unfollows)', type: 'bar', data: decData.followerGrowth.unfollows, itemStyle: { color: '#EF4444', borderRadius: [4, 4, 0, 0] } }
-        ]
-      });
-    }
-
-    // 5. Profile Visits & Website Taps
-    const profVisElem = document.getElementById('chart-profile-visits');
-    if (profVisElem) {
-      chartProfileVisits = echarts.init(profVisElem);
-      chartProfileVisits.setOption({
-        tooltip: { trigger: 'axis' },
-        legend: { data: ['Posjete Profilu', 'Klikovi na Web Link (Bio Taps)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
-        grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
-        xAxis: { type: 'category', data: decData.profileVisits.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
-        yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
-        series: [
-          { name: 'Posjete Profilu', type: 'line', data: decData.profileVisits.visits, smooth: true, lineStyle: { width: 3, color: '#111113' }, itemStyle: { color: '#111113' } },
-          { name: 'Klikovi na Web Link (Bio Taps)', type: 'line', data: decData.profileVisits.websiteTaps, smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
-        ]
-      });
-    }
-
-      /* ----------------------------------------------------
-         SOCIAL MEDIA ECHARTS SETUP
-         ---------------------------------------------------- */
-      const socialData = <%- JSON.stringify(client.socialMediaStats) %>;
-
-      const socialPlatElem = document.getElementById('social-chart-platforms');
-      if (socialPlatElem) {
-        socialPlatformsChart = echarts.init(socialPlatElem);
-        socialPlatformsChart.setOption({
-          tooltip: { trigger: 'item', formatter: '{b}: {c} impresija ({d}%)' },
-          legend: { bottom: '0', left: 'center', textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 12 } },
-          series: [{
-            name: 'Pregledi',
-            type: 'pie',
-            radius: ['45%', '70%'],
-            avoidLabelOverlap: false,
-            itemStyle: { borderRadius: 10, borderColor: '#ffffff', borderWidth: 2 },
-            data: socialData.platformViews,
-            color: ['#E1306C', '#1877F2', '#111113']
-          }]
-        });
-      }
-
-      const socialFormElem = document.getElementById('social-chart-formats');
-      if (socialFormElem) {
-        socialFormatsChart = echarts.init(socialFormElem);
-        socialFormatsChart.setOption({
-          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-          grid: { left: '3%', right: '5%', bottom: '3%', containLabel: true },
-          xAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 } },
-          yAxis: { type: 'category', data: socialData.formatPerformanceNames, axisLabel: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 12 } },
-          series: [{
-            name: 'Prosječni pregledi',
-            type: 'bar',
-            data: socialData.formatPerformanceValues,
-            itemStyle: { borderRadius: [0, 6, 6, 0], color: '#FF5F00' }
-          }]
-        });
-      }
-
-    }
-
-    // Window resize listener
-    window.addEventListener('resize', () => {
-      if (mfrGaugeChart) mfrGaugeChart.resize();
-      if (revenueSparklineChart) revenueSparklineChart.resize();
-      if (subscribersBarChart) subscribersBarChart.resize();
-      if (revenueHighlightedChart) revenueHighlightedChart.resize();
-
-      if (chartReachImpressions) chartReachImpressions.resize();
-      if (chartErrRate) chartErrRate.resize();
-      if (chartSavesShares) chartSavesShares.resize();
-      if (chartFollowerGrowth) chartFollowerGrowth.resize();
-      if (chartProfileVisits) chartProfileVisits.resize();
-    });
-
-    // Instagram vs Facebook Social Platform Switcher
-    let activeSocialPlatform = 'instagram';
-
-    function switchSocialPlatform(platform) {
-      activeSocialPlatform = platform;
-
-      const btnIg = document.getElementById('btn-platform-ig');
-      const btnFb = document.getElementById('btn-platform-fb');
-
-      // Elements to update
-      const c1Title = document.getElementById('card1-title');
-      const c1Sub = document.getElementById('card1-sub');
-      const c1Badge = document.getElementById('card1-badge');
-      const c1Note = document.getElementById('card1-note');
-
-      const c2Title = document.getElementById('card2-title');
-      const c2Sub = document.getElementById('card2-sub');
-      const c2Badge = document.getElementById('card2-badge');
-      const c2Note = document.getElementById('card2-note');
-
-      const c3Title = document.getElementById('card3-title');
-      const c3Sub = document.getElementById('card3-sub');
-      const c3Badge = document.getElementById('card3-badge');
-      const c3Note = document.getElementById('card3-note');
-
-      const c4Title = document.getElementById('card4-title');
-      const c4Sub = document.getElementById('card4-sub');
-      const c4Badge = document.getElementById('card4-badge');
-      const c4Note = document.getElementById('card4-note');
-
-      const c5Title = document.getElementById('card5-title');
-      const c5Sub = document.getElementById('card5-sub');
-      const c5Badge = document.getElementById('card5-badge');
-      const c5Note = document.getElementById('card5-note');
-
-      if (platform === 'instagram') {
-        if (btnIg) btnIg.className = 'px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-200 bg-[#111113] text-white shadow-xs flex items-center gap-2';
-        if (btnFb) btnFb.className = 'px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 bg-gray-100 text-gray-600 hover:bg-gray-200 shadow-2xs flex items-center gap-2';
-
-        if (c1Title) c1Title.innerHTML = 'Reach & Impressions (Doseg i Impresije)';
-        if (c1Sub) c1Sub.innerHTML = 'Novi korisnici u odnosu na postojeću publiku';
-        if (c1Badge) c1Badge.innerHTML = '72% Novi Doseg';
-        if (c1Note) c1Note.innerHTML = '💡 <strong>Odluka:</strong> <%= client.strategicDecisionMetrics.reachImpressions.decisionNote %>';
-
-        if (c2Title) c2Title.innerHTML = 'Engagement Rate po Dosegu (ERR %)';
-        if (c2Sub) c2Sub.innerHTML = 'Točniji pokazatelj od engagementa po broju pratitelja';
-        if (c2Badge) c2Badge.innerHTML = 'ERR: 6.2% Prosjek';
-        if (c2Note) c2Note.innerHTML = '🎯 <strong>Uvid:</strong> <%= client.strategicDecisionMetrics.err.decisionNote %>';
-
-        if (c3Title) c3Title.innerHTML = 'Saves & Shares (Spremanja i Dijeljenja)';
-        if (c3Sub) c3Sub.innerHTML = 'Ključni signali za algoritam i vrijednost sadržaja';
-        if (c3Badge) c3Badge.innerHTML = 'Algoritamski Signal';
-        if (c3Note) c3Note.innerHTML = '📌 <strong>Analiza:</strong> <%= client.strategicDecisionMetrics.savesShares.decisionNote %>';
-
-        if (c4Title) c4Title.innerHTML = 'Follower Growth Rate & Unfollows';
-        if (c4Sub) c4Sub.innerHTML = 'Trend rasta i pada baze umjesto fiksnog broja';
-        if (c4Badge) c4Badge.innerHTML = 'Neto +1,380 Pratitelja';
-        if (c4Note) c4Note.innerHTML = '📈 <strong>Trend:</strong> <%= client.strategicDecisionMetrics.followerGrowth.decisionNote %>';
-
-        if (c5Title) c5Title.innerHTML = 'Profile Visits & Website Taps (Bio Link)';
-        if (c5Sub) c5Sub.innerHTML = 'Konverzija iz pasivnog gledatelja u namjeru istraživanja ponude i klika na link';
-        if (c5Badge) c5Badge.innerHTML = '28.5% Click-Through na Bio Link';
-        if (c5Note) c5Note.innerHTML = '🛒 <strong>Konverzija:</strong> <%= client.strategicDecisionMetrics.profileVisits.decisionNote %>';
-
-        if (chartReachImpressions) {
-          chartReachImpressions.setOption({
-            legend: { data: ['Doseg Novih Korisnika (Non-Followers)', 'Doseg Pratitelja (Followers)'] },
+          // Chart 2: Engagement Breakdown (Saves & Shares vs Likes & Comments)
+          engagementOption: {
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            legend: { data: ['Saves (Core Signal)', 'Shares (Core Signal)', 'Likes', 'Comments'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
+            grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+            xAxis: { type: 'category', data: ['Post #1', 'Post #2', 'Post #3', 'Post #4', 'Post #5', 'Post #6'], axisLabel: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 10 } },
+            yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
             series: [
-              { name: 'Doseg Novih Korisnika (Non-Followers)', type: 'line', data: [1200, 1800, 2400, 3100, 2800, 4200, 4900, 5600, 6100, 5800, 7200, 8100, 9400, 8900, 10200, 11500, 12800, 13400, 14800, 16200, 15900, 17400, 18600, 19200, 21500, 22800, 24100, 23500, 25800, 28400], lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } },
-              { name: 'Doseg Pratitelja (Followers)', type: 'line', data: [800, 950, 1100, 1300, 1250, 1500, 1650, 1800, 1900, 1850, 2100, 2300, 2500, 2400, 2700, 2900, 3100, 3200, 3400, 3700, 3600, 3900, 4100, 4200, 4600, 4800, 5100, 5000, 5400, 5800], lineStyle: { width: 2, color: '#111113' }, itemStyle: { color: '#111113' } }
+              { name: 'Saves (Core Signal)', type: 'bar', stack: 'total', data: [340, 520, 410, 680, 590, 810], itemStyle: { color: '#FF5F00' } },
+              { name: 'Shares (Core Signal)', type: 'bar', stack: 'total', data: [210, 380, 290, 450, 390, 560], itemStyle: { color: darkMode ? '#E4E4E7' : '#111113' } },
+              { name: 'Likes', type: 'bar', stack: 'total', data: [1200, 1850, 1420, 2100, 1950, 2600], itemStyle: { color: '#E1306C' } },
+              { name: 'Comments', type: 'bar', stack: 'total', data: [180, 290, 210, 340, 280, 410], itemStyle: { color: '#1877F2', borderRadius: [4, 4, 0, 0] } }
             ]
-          }, true);
-        }
-
-        if (chartErrRate) {
-          chartErrRate.setOption({
-            legend: { data: ['ERR po Dosegu (%)', 'Prosjek Industrije (2.5%)'] },
+          },
+          // Chart 3: Follower Growth vs Unfollows
+          growthOption: {
+            tooltip: { trigger: 'axis' },
+            legend: { data: ['New Follows (+)', 'Unfollows (-)', 'Net Growth Trend'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
+            grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+            xAxis: { type: 'category', data: getDays(10), axisLabel: { color: '#6B7280', fontSize: 10 } },
+            yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
             series: [
-              { name: 'ERR po Dosegu (%)', type: 'line', data: [4.8, 5.2, 5.0, 5.9, 6.4, 5.8, 6.1, 6.7, 7.2, 6.9, 7.5, 7.1, 7.8, 7.4, 8.1, 7.6, 8.3, 7.9, 8.5, 8.0, 7.8, 8.2, 8.6, 8.1, 8.7, 8.4, 8.9, 8.6, 9.1, 9.4], lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } },
-              { name: 'Prosjek Industrije (2.5%)', type: 'line', data: Array(30).fill(2.5), lineStyle: { width: 2, type: 'dashed', color: '#6B7280' }, itemStyle: { color: '#6B7280' } }
+              { name: 'New Follows (+)', type: 'bar', data: [85, 110, 95, 140, 165, 150, 180, 210, 195, 230], itemStyle: { color: '#059669', borderRadius: [4, 4, 0, 0] } },
+              { name: 'Unfollows (-)', type: 'bar', data: [-18, -24, -20, -32, -28, -25, -30, -35, -29, -38], itemStyle: { color: '#EF4444', borderRadius: [0, 0, 4, 4] } },
+              { name: 'Net Growth Trend', type: 'line', data: [67, 86, 75, 108, 137, 125, 150, 175, 166, 192], smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
             ]
-          }, true);
-        }
+          },
+          // Posts Table Data
+          posts: [
+            { id: 1, thumb: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&fit=crop', caption: 'Ljetni popust 20% na sve usluge! 🚀', type: 'Reel', reach: 42100, likes: 3200, comments: 240, saves: 890, shares: 640 },
+            { id: 2, thumb: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=120&fit=crop', caption: 'Vodič kroz marketing strategiju u 2026. 📊', type: 'Carousel', reach: 31400, likes: 2450, comments: 180, saves: 1120, shares: 480 },
+            { id: 3, thumb: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=120&fit=crop', caption: 'Kako doći do više konverzija uz Meta Ads? 💡', type: 'Reel', reach: 28900, likes: 2100, comments: 165, saves: 740, shares: 390 },
+            { id: 4, thumb: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=120&fit=crop', caption: 'Priča iza našeg najnovijeg projekta 🔥', type: 'Single Image', reach: 19800, likes: 1450, comments: 95, saves: 310, shares: 180 },
+            { id: 5, thumb: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=120&fit=crop', caption: 'Top 5 grešaka u dizajnu oglasa ❌', type: 'Carousel', reach: 24600, likes: 1920, comments: 140, saves: 850, shares: 420 }
+          ]
+        };
+      }, [dateRange, darkMode]);
 
-        if (chartSavesShares) {
-          chartSavesShares.setOption({
-            legend: { data: ['Spremanja (Saves)', 'Dijeljenja (Shares)'] },
-            xAxis: { type: 'category', data: ['Post 1', 'Post 2', 'Post 3', 'Post 4', 'Post 5', 'Post 6'] },
-            series: [
-              { name: 'Spremanja (Saves)', type: 'bar', data: [140, 180, 220, 310, 290, 410], itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } },
-              { name: 'Dijeljenja (Shares)', type: 'bar', data: [90, 120, 160, 240, 210, 320], itemStyle: { color: '#111113', borderRadius: [4, 4, 0, 0] } }
-            ]
-          }, true);
-        }
-
-        if (chartFollowerGrowth) {
-          chartFollowerGrowth.setOption({
-            legend: { data: ['Novi Pratitelji', 'Nisu više pratitelji (Unfollows)'] },
-            xAxis: { type: 'category', data: decData.followerGrowth.days },
-            series: [
-              { name: 'Novi Pratitelji', type: 'bar', data: [45, 52, 68, 74, 82, 91, 105, 112, 98, 125, 134, 142, 118, 156, 168], itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } },
-              { name: 'Nisu više pratitelji (Unfollows)', type: 'bar', data: [8, 12, 10, 14, 11, 15, 18, 14, 16, 12, 19, 15, 17, 13, 21], itemStyle: { color: '#EF4444', borderRadius: [4, 4, 0, 0] } }
-            ]
-          }, true);
-        }
-
-        if (chartProfileVisits) {
-          chartProfileVisits.setOption({
-            legend: { data: ['Posjete Profilu', 'Klikovi na Web Link (Bio Taps)'] },
-            xAxis: { type: 'category', data: decData.profileVisits.days },
-            series: [
-              { name: 'Posjete Profilu', type: 'line', data: [320, 410, 480, 520, 610, 590, 720, 810, 780, 890, 940, 1020, 980, 1120, 1240], smooth: true, lineStyle: { width: 3, color: '#111113' }, itemStyle: { color: '#111113' } },
-              { name: 'Klikovi na Web Link (Bio Taps)', type: 'line', data: [95, 125, 140, 165, 190, 180, 230, 260, 245, 285, 305, 340, 320, 370, 410], smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
-            ]
-          }, true);
-        }
-
-        filterPosts('instagram');
-      } else if (platform === 'facebook') {
-        if (btnFb) btnFb.className = 'px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-200 bg-[#111113] text-white shadow-xs flex items-center gap-2';
-        if (btnIg) btnIg.className = 'px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 bg-gray-100 text-gray-600 hover:bg-gray-200 shadow-2xs flex items-center gap-2';
-
-        if (c1Title) c1Title.innerHTML = '1. Organic vs. Paid Reach (page_impressions)';
-        if (c1Sub) c1Sub.innerHTML = 'Omjer besplatnog organskog dosega (algoritam & dijeljenja) i plaćene distribucije.';
-        if (c1Badge) c1Badge.innerHTML = 'Facebook Reach 🚀';
-        if (c1Note) c1Note.innerHTML = '💡 <strong>Marketinška Odluka:</strong> Ako organski doseg pada, signal je da Facebookov algoritam ne prepoznaje sadržaj kao viralan i da se morate više osloniti na formate koji potiču diskusiju (ili pojačati budžet za distribuciju).';
-
-        if (c2Title) c2Title.innerHTML = '2. Page Engaged Users & Post Reactions';
-        if (c2Sub) c2Sub.innerHTML = 'Dnevni trend jedinstvenih ljudi koji su kliknuli, komentirali, podijelili ili ostavili reakciju.';
-        if (c2Badge) c2Badge.innerHTML = 'Zdravlje Publike ❤️';
-        if (c2Note) c2Note.innerHTML = '🎯 <strong>Marketinška Odluka:</strong> Mjeri stvarno „zdravlje” publike. Ako doseg raste, a broj angažiranih korisnika stagnira, privlačite pogrešnu publiku ili su naslovi/teme nezanimljivi.';
-
-        if (c3Title) c3Title.innerHTML = '3. Share & Comment Ratio (Viralni Pokretač)';
-        if (c3Sub) c3Sub.innerHTML = 'Broj dijeljenja (Shares) i komentara u odnosu na obične lajkove po objavi.';
-        if (c3Badge) c3Badge.innerHTML = 'Boost Signal 🔄';
-        if (c3Note) c3Note.innerHTML = '📌 <strong>Marketinška Odluka:</strong> Na Facebooku su Shares glavni pokretač besplatnog viralnog dosega. Objavu koja ima visok broj dijeljenja odmah pretvorite u plaćeni oglas (Boost) jer dokazano rezonira s publikom.';
-
-        if (c4Title) c4Title.innerHTML = '4. Page Views & CTA Action Clicks';
-        if (c4Sub) c4Sub.innerHTML = 'Posjete Facebook stranici (page_views_total) i klikovi na glavno gumb na profilu (Send Message, Shop Now).';
-        if (c4Badge) c4Badge.innerHTML = 'Prodajni Kanal 🛒';
-        if (c4Note) c4Note.innerHTML = '📈 <strong>Marketinška Odluka:</strong> Pokazuje koliko Facebook stranica služi kao prodajni kanal. Ako imate puno posjeta stranici, a malo klikova na CTA gumb, potrebno je promijeniti CTA ponudu ili doraditi vizualni opis stranice.';
-
-        if (c5Title) c5Title.innerHTML = '5. Video Performance: 3-sec vs. 1-min Views (Lijevak)';
-        if (c5Sub) c5Sub.innerHTML = 'Razlika između korisnika koji su vidjeli samo uvod (3s) i onih koji su odgledali minutu ili cijeli video.';
-        if (c5Badge) c5Badge.innerHTML = 'Video Lijevak 🎬';
-        if (c5Note) c5Note.innerHTML = '🛒 <strong>Marketinška Odluka:</strong> Pomaže u optimizaciji video sadržaja — ako većina odustane u prve 3 sekunde, uvod je prespor; ako ostanu preko 1 minute, publika je spremna za prodajni poziv na akciju na kraju videa.';
-
-        if (chartReachImpressions) {
-          chartReachImpressions.setOption({
-            legend: { data: ['Organski Doseg (page_posts_impressions)', 'Plaćeni Doseg (page_impressions)'] },
-            series: [
-              { name: 'Organski Doseg (page_posts_impressions)', type: 'line', data: [3400, 3100, 3800, 4200, 3900, 4500, 5100, 4800, 5600, 6200, 5900, 6400, 6800, 6500, 7100, 7800, 7500, 8200, 8600, 8300, 8900, 9400, 9100, 9700, 10200, 9900, 10600, 11200, 10800, 11500], lineStyle: { width: 3, color: '#1877F2' }, itemStyle: { color: '#1877F2' } },
-              { name: 'Plaćeni Doseg (page_impressions)', type: 'line', data: [5800, 6200, 7100, 8500, 7900, 9200, 10500, 9800, 11200, 12400, 11800, 13100, 14200, 13600, 15100, 16400, 15800, 17200, 18500, 17900, 19400, 20800, 20200, 21900, 23100, 22500, 24200, 25600, 24900, 26800], lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
-            ]
-          }, true);
-        }
-
-        if (chartErrRate) {
-          chartErrRate.setOption({
-            legend: { data: ['Page Engaged Users (Dnevno)', 'Post Reactions & Comments'] },
-            series: [
-              { name: 'Page Engaged Users (Dnevno)', type: 'line', data: [850, 920, 1150, 1420, 1310, 1680, 1950, 1820, 2150, 2410, 2280, 2640, 2910, 2780, 3120, 3450, 3310, 3680, 3950, 3820, 4150, 4420, 4280, 4650, 4920, 4780, 5150, 5420, 5280, 5650], lineStyle: { width: 3, color: '#111113' }, itemStyle: { color: '#111113' } },
-              { name: 'Post Reactions & Comments', type: 'line', data: [310, 350, 420, 560, 490, 680, 790, 720, 880, 990, 920, 1080, 1210, 1140, 1320, 1480, 1410, 1590, 1720, 1650, 1820, 1980, 1910, 2090, 2220, 2150, 2340, 2480, 2410, 2590], lineStyle: { width: 2, color: '#E1306C' }, itemStyle: { color: '#E1306C' } }
-            ]
-          }, true);
-        }
-
-        if (chartSavesShares) {
-          chartSavesShares.setOption({
-            legend: { data: ['Dijeljenja (Shares)', 'Komentari (Comments)', 'Reakcije (Lajkovi)'] },
-            xAxis: { type: 'category', data: ['FB Post 1', 'FB Post 2', 'FB Post 3', 'FB Post 4', 'FB Post 5', 'FB Post 6'] },
-            series: [
-              { name: 'Dijeljenja (Shares)', type: 'bar', data: [210, 340, 180, 520, 410, 680], itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } },
-              { name: 'Komentari (Comments)', type: 'bar', data: [140, 220, 110, 380, 290, 450], itemStyle: { color: '#1877F2', borderRadius: [4, 4, 0, 0] } },
-              { name: 'Reakcije (Lajkovi)', type: 'bar', data: [450, 680, 320, 980, 850, 1240], itemStyle: { color: '#6B7280', borderRadius: [4, 4, 0, 0] } }
-            ]
-          }, true);
-        }
-
-        if (chartFollowerGrowth) {
-          chartFollowerGrowth.setOption({
-            legend: { data: ['Ukupne Posjete Stranici (page_views_total)', 'CTA Gumb Klikovi (Send Message / Shop)'] },
-            xAxis: { type: 'category', data: decData.followerGrowth.days },
-            series: [
-              { name: 'Ukupne Posjete Stranici (page_views_total)', type: 'line', data: [420, 480, 550, 680, 610, 740, 820, 790, 910, 980, 940, 1050, 1120, 1080, 1210], lineStyle: { width: 3, color: '#111113' }, itemStyle: { color: '#111113' } },
-              { name: 'CTA Gumb Klikovi (Send Message / Shop)', type: 'line', data: [85, 110, 135, 175, 150, 195, 230, 215, 260, 285, 270, 315, 340, 325, 380], lineStyle: { width: 3, color: '#059669' }, itemStyle: { color: '#059669' } }
-            ]
-          }, true);
-        }
-
-        if (chartProfileVisits) {
-          chartProfileVisits.setOption({
-            legend: { data: ['Broj Pregleda Videa (page_video_views)'] },
-            xAxis: { type: 'category', data: ['Uvod (3-sec Views)', 'Zadržavanje (15-sec)', 'Duboki Pregled (1-min Views)', 'Cijeli Video (100% Retencija)'] },
-            series: [
-              { name: 'Broj Pregleda Videa (page_video_views)', type: 'bar', data: [18400, 11200, 6400, 3800], itemStyle: { color: '#FF5F00', borderRadius: [6, 6, 0, 0] } }
-            ]
-          }, true);
-        }
-
-        filterPosts('facebook');
-      }
-    }
-
-    // Active platform filter state
-    let activePlatformFilter = 'all';
-    let pickerInstance = null;
-
-    // Initialize Modern Flatpickr Date Picker (Default: Current Month)
-    function initDateFilter() {
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      const firstDay = `${year}-${month}-01`;
-      const lastDayNum = new Date(year, now.getMonth() + 1, 0).getDate();
-      const lastDay = `${year}-${month}-${String(lastDayNum).padStart(2, '0')}`;
-
-      pickerInstance = flatpickr("#date-range-picker", {
-        mode: "range",
-        dateFormat: "Y-m-d",
-        altInput: true,
-        altFormat: "d.m.Y.",
-        defaultDate: [firstDay, lastDay],
-        locale: flatpickr.l10ns.hr || "hr",
-        onChange: function(selectedDates, dateStr, instance) {
-          applyFilters();
-        }
-      });
-
-      applyFilters();
-    }
-
-    // Set Date Range Presets
-    function setDatePreset(preset) {
-      if (!pickerInstance) return;
-
-      if (preset === 'month') {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const firstDay = `${year}-${month}-01`;
-        const lastDayNum = new Date(year, now.getMonth() + 1, 0).getDate();
-        const lastDay = `${year}-${month}-${String(lastDayNum).padStart(2, '0')}`;
-        pickerInstance.setDate([firstDay, lastDay]);
-      } else if (preset === '7days') {
-        const today = new Date();
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(today.getDate() - 7);
-        pickerInstance.setDate([sevenDaysAgo, today]);
-      } else if (preset === 'all') {
-        pickerInstance.clear();
-      }
-      applyFilters();
-    }
-
-    // Filter Posts by Platform
-    function setPlatformFilter(platform) {
-      activePlatformFilter = platform;
-      const filterBtns = ['all', 'instagram', 'facebook', 'tiktok'];
-      filterBtns.forEach(p => {
-        const btn = document.getElementById(`post-filter-${p}`);
-        if (btn) {
-          if (p === platform) {
-            btn.className = 'px-4 py-2 rounded-full bg-[#111113] text-white shadow-xs font-black transition-all';
-          } else {
-            btn.className = 'px-4 py-2 rounded-full text-gray-700 hover:text-[#111113] transition-all font-black flex items-center gap-1.5';
+      // Sorted Posts Table Data
+      const sortedPosts = useMemo(() => {
+        const list = [...instagramData.posts];
+        list.sort((a, b) => {
+          let valA = a[postSortKey];
+          let valB = b[postSortKey];
+          if (postSortKey === 'err') {
+            valA = ((a.likes + a.comments + a.saves + a.shares) / a.reach) * 100;
+            valB = ((b.likes + b.comments + b.saves + b.shares) / b.reach) * 100;
           }
-        }
-      });
-      applyFilters();
-    }
+          if (valA < valB) return postSortDir === 'asc' ? -1 : 1;
+          if (valA > valB) return postSortDir === 'asc' ? 1 : -1;
+          return 0;
+        });
+        return list;
+      }, [instagramData.posts, postSortKey, postSortDir]);
 
-    // Apply combined Platform & Date filters to Table and Gallery
-    function applyFilters() {
-      let startDateVal = '';
-      let endDateVal = '';
-
-      if (pickerInstance && pickerInstance.selectedDates.length > 0) {
-        const d1 = pickerInstance.selectedDates[0];
-        startDateVal = d1.toISOString().split('T')[0];
-        if (pickerInstance.selectedDates.length > 1) {
-          const d2 = pickerInstance.selectedDates[1];
-          endDateVal = d2.toISOString().split('T')[0];
+      const handlePostSort = (key) => {
+        if (postSortKey === key) {
+          setPostSortDir(postSortDir === 'asc' ? 'desc' : 'asc');
         } else {
-          endDateVal = startDateVal; // single date selected
+          setPostSortKey(key);
+          setPostSortDir('desc');
         }
-      }
+      };
 
-      // Filter Table Rows
-      const tableRows = document.querySelectorAll('.post-row-item');
-      tableRows.forEach(row => {
-        const plat = (row.getAttribute('data-platform') || '').toLowerCase();
-        const postDate = row.getAttribute('data-date') || '';
+      // --- PAGE 2: META ADS PERFORMANCE DATA ---
+      const metaAdsData = useMemo(() => {
+        const mult = dateRange === '7d' ? 0.35 : dateRange === 'this_month' ? 0.85 : 1.0;
+        return {
+          spend: `$${(4850.00 * mult).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+          spendChange: '+5.4%',
+          roas: '4.25x',
+          roasChange: '+0.4x',
+          cpa: `$${(14.20).toFixed(2)}`,
+          cpaChange: '-8.5%', // lower CPA is better
+          conversions: `${Math.round(341 * mult)} Leads`,
+          conversionsChange: '+15.2%',
+          ctr: '2.84%',
+          ctrChange: '+0.3%',
+          // Chart 1: Spend vs ROAS (Dual Y-Axis)
+          spendRoasOption: {
+            tooltip: { trigger: 'axis' },
+            legend: { data: ['Daily Spend ($)', 'Blended ROAS (x)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
+            grid: { top: 30, bottom: 40, left: 10, right: 10, containLabel: true },
+            xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
+            yAxis: [
+              { type: 'value', name: 'Spend ($)', axisLabel: { color: '#6B7280', fontSize: 10, formatter: '${value}' } },
+              { type: 'value', name: 'ROAS (x)', min: 0, max: 6, axisLabel: { color: '#FF5F00', fontSize: 10, formatter: '{value}x' } }
+            ],
+            series: [
+              { name: 'Daily Spend ($)', type: 'bar', data: [210, 240, 280, 310, 290, 340, 420, 390, 450, 480, 460, 520].map(v => Math.round(v * mult)), itemStyle: { color: darkMode ? '#3F3F46' : '#111113', borderRadius: [4, 4, 0, 0] } },
+              { name: 'Blended ROAS (x)', type: 'line', yAxisIndex: 1, data: [4.8, 4.6, 4.3, 3.9, 4.2, 4.5, 3.8, 4.1, 4.4, 4.2, 4.5, 4.3], smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
+            ]
+          },
+          // Chart 2: Creative Health & Ad Fatigue (Frequency vs CTR Link)
+          fatigueOption: {
+            tooltip: { trigger: 'axis' },
+            legend: { data: ['Ad Frequency', 'CTR Link (%)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
+            grid: { top: 30, bottom: 40, left: 10, right: 10, containLabel: true },
+            xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
+            yAxis: [
+              { type: 'value', name: 'Frequency', min: 1, max: 5, axisLabel: { color: '#EF4444', fontSize: 10, formatter: '{value}x' } },
+              { type: 'value', name: 'CTR (%)', min: 0, max: 5, axisLabel: { color: '#059669', fontSize: 10, formatter: '{value}%' } }
+            ],
+            series: [
+              { name: 'Ad Frequency', type: 'line', data: [1.4, 1.7, 2.1, 2.4, 2.8, 3.1, 3.4, 3.7, 4.0, 4.2, 4.5, 4.8], smooth: true, lineStyle: { width: 3, color: '#EF4444' }, itemStyle: { color: '#EF4444' } },
+              { name: 'CTR Link (%)', type: 'line', yAxisIndex: 1, data: [3.8, 3.6, 3.4, 3.1, 2.8, 2.4, 2.1, 1.8, 1.5, 1.3, 1.1, 0.9], smooth: true, lineStyle: { width: 3, color: '#059669' }, itemStyle: { color: '#059669' } }
+            ]
+          },
+          // Chart 3: Funnel Leakage (Link Clicks vs Landing Page Views)
+          funnelOption: {
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            legend: { data: ['Outbound Link Clicks', 'Verified Landing Page Views'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
+            grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+            xAxis: { type: 'category', data: ['Tjedan 1', 'Tjedan 2', 'Tjedan 3', 'Tjedan 4'], axisLabel: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
+            yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
+            series: [
+              { name: 'Outbound Link Clicks', type: 'bar', data: [1240, 1480, 1620, 1850].map(v => Math.round(v * mult)), itemStyle: { color: '#1877F2', borderRadius: [4, 4, 0, 0] } },
+              { name: 'Verified Landing Page Views', type: 'bar', data: [940, 1120, 1210, 1380].map(v => Math.round(v * mult)), itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } }
+            ]
+          },
+          // Chart 4: Video Creative Retention (Hook Rate vs Hold Rate)
+          retentionOption: {
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            legend: { data: ['Hook Rate (3s Views / Impressions %)', 'Hold Rate (ThruPlays / 3s Views %)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
+            grid: { top: 20, bottom: 40, left: 80, right: 20, containLabel: true },
+            xAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10, formatter: '{value}%' } },
+            yAxis: { type: 'category', data: ['Ad 1: Ljetni Popust', 'Ad 2: Vodič Strategija', 'Ad 3: Demo Proizvoda', 'Ad 4: Klijent Review'], axisLabel: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
+            series: [
+              { name: 'Hook Rate (3s Views / Impressions %)', type: 'bar', data: [44.2, 38.5, 51.0, 31.4], itemStyle: { color: '#FF5F00', borderRadius: [0, 4, 4, 0] } },
+              { name: 'Hold Rate (ThruPlays / 3s Views %)', type: 'bar', data: [28.4, 22.1, 35.8, 19.2], itemStyle: { color: darkMode ? '#E4E4E7' : '#111113', borderRadius: [0, 4, 4, 0] } }
+            ]
+          },
+          // Chart 5: Platform & Placement Breakdown
+          placementOption: {
+            tooltip: { trigger: 'item', formatter: '{b}: ${c} ({d}%)' },
+            legend: { bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
+            series: [{
+              name: 'Potrošnja po Plasmanu',
+              type: 'pie',
+              radius: ['45%', '70%'],
+              avoidLabelOverlap: false,
+              itemStyle: { borderRadius: 10, borderColor: darkMode ? '#161618' : '#ffffff', borderWidth: 2 },
+              data: [
+                { value: Math.round(1850 * mult), name: 'Instagram Feed', itemStyle: { color: '#E1306C' } },
+                { value: Math.round(1420 * mult), name: 'Instagram Reels', itemStyle: { color: '#FF5F00' } },
+                { value: Math.round(1120 * mult), name: 'Facebook Feed', itemStyle: { color: '#1877F2' } },
+                { value: Math.round(460 * mult), name: 'Instagram Stories', itemStyle: { color: '#833AB4' } }
+              ]
+            }]
+          },
+          // Ads Table Leaderboard
+          ads: [
+            { id: 1, name: 'Ljetni Popust 20% Video', placement: 'IG Reels', spend: 1420.00, ctr: 3.42, cpa: 12.40, roas: 4.8, hookRate: 44.2, views3s: 14200, impressions: 32100, status: 'Active' },
+            { id: 2, name: 'Retargeting Napuštene Košarice', placement: 'FB Feed', spend: 1180.00, ctr: 2.85, cpa: 14.10, roas: 4.1, hookRate: 38.5, views3s: 9800, impressions: 25400, status: 'Active' },
+            { id: 3, name: 'Lookalike 1% KUPCI Karusel', placement: 'IG Feed', spend: 950.00, ctr: 2.41, cpa: 16.80, roas: 3.5, hookRate: 31.0, views3s: 6400, impressions: 20600, status: 'Active' },
+            { id: 4, name: 'Digital Marketing Vodič Storitve', placement: 'IG Stories', spend: 460.00, ctr: 1.95, cpa: 19.20, roas: 2.8, hookRate: 28.4, views3s: 4100, impressions: 14500, status: 'Paused' }
+          ]
+        };
+      }, [dateRange, darkMode]);
 
-        const matchesPlatform = activePlatformFilter === 'all' || plat.includes(activePlatformFilter);
-        let matchesDate = true;
-        if (startDateVal && postDate < startDateVal) matchesDate = false;
-        if (endDateVal && postDate > endDateVal) matchesDate = false;
+      // Sorted Ads Leaderboard
+      const sortedAds = useMemo(() => {
+        const list = [...metaAdsData.ads];
+        list.sort((a, b) => {
+          let valA = a[adSortKey];
+          let valB = b[adSortKey];
+          if (valA < valB) return adSortDir === 'asc' ? -1 : 1;
+          if (valA > valB) return adSortDir === 'asc' ? 1 : -1;
+          return 0;
+        });
+        return list;
+      }, [metaAdsData.ads, adSortKey, adSortDir]);
 
-        if (matchesPlatform && matchesDate) {
-          row.style.display = '';
+      const handleAdSort = (key) => {
+        if (adSortKey === key) {
+          setAdSortDir(adSortDir === 'asc' ? 'desc' : 'asc');
         } else {
-          row.style.display = 'none';
+          setAdSortKey(key);
+          setAdSortDir('desc');
         }
-      });
+      };
 
-      // Filter Gallery Cards
-      const galleryCards = document.querySelectorAll('.post-card-item');
-      galleryCards.forEach(card => {
-        const plat = (card.getAttribute('data-platform') || '').toLowerCase();
-        const postDate = card.getAttribute('data-date') || '';
+      return (
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          
+          <!-- TOP HEADER WITH CONTROLS & NAVIGATION -->
+          <header class="mb-8">
+            <!-- TOP BAR: BRAND + SELECTORS + THEME TOGGLE -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-gray-200 dark:border-gray-800">
+              
+              <!-- Brand Logo & Tenant Badge -->
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-[#111113] text-white flex items-center justify-center font-black text-lg shadow-md border border-white/10">
+                  <i class="fa-solid fa-bolt-lightning text-zorange"></i>
+                </div>
+                <div>
+                  <h1 class="text-2xl font-black tracking-tight text-[#111113] dark:text-white flex items-center gap-1.5">
+                    ZELLIFY<span class="text-zorange">.</span>
+                    <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange border border-orange-200 dark:border-orange-900">Agency Edition</span>
+                  </h1>
+                  <p class="text-xs text-gray-500 font-semibold">Client Marketing Analytics System</p>
+                </div>
+              </div>
 
-        const matchesPlatform = activePlatformFilter === 'all' || plat.includes(activePlatformFilter);
-        let matchesDate = true;
-        if (startDateVal && postDate < startDateVal) matchesDate = false;
-        if (endDateVal && postDate > endDateVal) matchesDate = false;
+              <!-- Center Capsule Navigation Switcher (Instagram Organic vs Meta Ads Performance) -->
+              <div class="z-pill-nav flex items-center gap-1 self-start lg:self-auto">
+                <button 
+                  onClick={() => setActiveView('instagram')} 
+                  class={`px-5 py-2.5 text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center gap-2 ${
+                    activeView === 'instagram' 
+                      ? 'bg-white text-[#111113] rounded-full shadow-md' 
+                      : 'text-white/80 hover:text-white'
+                  }`}
+                >
+                  <i class="fa-brands fa-instagram text-pink-500 text-sm"></i>
+                  Instagram Organic
+                </button>
+                <button 
+                  onClick={() => setActiveView('meta-ads')} 
+                  class={`px-5 py-2.5 text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center gap-2 ${
+                    activeView === 'meta-ads' 
+                      ? 'bg-white text-[#111113] rounded-full shadow-md' 
+                      : 'text-white/80 hover:text-white'
+                  }`}
+                >
+                  <i class="fa-brands fa-meta text-blue-500 text-sm"></i>
+                  Meta Ads Performance
+                </button>
+              </div>
 
-        if (matchesPlatform && matchesDate) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
+              <!-- Right Dropdowns & Theme Toggle -->
+              <div class="flex items-center gap-3 flex-wrap">
+                <!-- Account Selector -->
+                <div class="relative flex items-center gap-1.5 bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 rounded-full px-4 py-2 shadow-xs text-xs font-bold">
+                  <i class="fa-solid fa-building text-zorange"></i>
+                  <span class="text-gray-400 font-medium">Klijent:</span>
+                  <select 
+                    value={selectedAccount} 
+                    onChange={handleAccountChange} 
+                    class="bg-transparent font-black text-[#111113] dark:text-white focus:outline-none cursor-pointer pr-2"
+                  >
+                    {ACCOUNTS.map(acc => (
+                      <option key={acc.id} value={acc.id} class="bg-white dark:bg-[#161618] text-[#111113] dark:text-white">
+                        {acc.name} ({acc.package})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <!-- Global Date Range Picker -->
+                <div class="relative flex items-center gap-1.5 bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 rounded-full px-4 py-2 shadow-xs text-xs font-bold">
+                  <i class="fa-solid fa-calendar-days text-zorange"></i>
+                  <select 
+                    value={dateRange} 
+                    onChange={handleDateChange} 
+                    class="bg-transparent font-black text-[#111113] dark:text-white focus:outline-none cursor-pointer"
+                  >
+                    {DATE_RANGES.map(d => (
+                      <option key={d.id} value={d.id} class="bg-white dark:bg-[#161618] text-[#111113] dark:text-white">
+                        {d.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <!-- Light / Dark Theme Switcher Button -->
+                <button 
+                  onClick={() => setDarkMode(!darkMode)} 
+                  class="w-9 h-9 rounded-full bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 text-[#111113] dark:text-white flex items-center justify-center shadow-xs hover:border-zorange transition-colors"
+                  title="Promijeni temu"
+                >
+                  <i class={`fa-solid ${darkMode ? 'fa-sun text-amber-400' : 'fa-moon text-indigo-600'} text-sm`}></i>
+                </button>
+              </div>
+
+            </div>
+          </header>
+
+          <!-- MAIN DASHBOARD CONTENT AREA -->
+          <main>
+            {isLoading ? (
+              <!-- SKELETON LOADING STATE -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <SkeletonCard />
+                <SkeletonCard />
+                <SkeletonCard />
+                <SkeletonCard />
+              </div>
+            ) : activeView === 'instagram' ? (
+              <!-- ========================================== -->
+              <!-- PAGE 1: INSTAGRAM ORGANIC VIEW             -->
+              <!-- ========================================== -->
+              <section class="space-y-8">
+                
+                <!-- TOP 5 KPI CARDS ROW -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+                  <!-- CARD 1: Total Reach -->
+                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div class="flex justify-between items-start mb-2">
+                      <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-users"></i>
+                      </div>
+                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                        {instagramData.reachChange}
+                      </span>
+                    </div>
+                    <div>
+                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Total Reach</span>
+                      <h3 class="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.reach}</h3>
+                      <p class="text-[10px] text-gray-400 font-bold mt-1">Jedinstveni računi dosegnuti</p>
+                    </div>
+                  </div>
+
+                  <!-- CARD 2: Total Impressions -->
+                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div class="flex justify-between items-start mb-2">
+                      <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 text-[#111113] dark:text-white flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-eye"></i>
+                      </div>
+                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                        {instagramData.impressionsChange}
+                      </span>
+                    </div>
+                    <div>
+                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Total Impressions</span>
+                      <h3 class="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.impressions}</h3>
+                      <p class="text-[10px] text-gray-400 font-bold mt-1">Ukupan broj prikazivanja</p>
+                    </div>
+                  </div>
+
+                  <!-- CARD 3: Avg. ERR % -->
+                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div class="flex justify-between items-start mb-2">
+                      <div class="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-950/60 text-pink-600 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-fire"></i>
+                      </div>
+                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                        {instagramData.errChange}
+                      </span>
+                    </div>
+                    <div>
+                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Avg. ERR %</span>
+                      <h3 class="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.err}</h3>
+                      <p class="text-[10px] text-gray-400 font-bold mt-1">Interakcije / Doseg * 100</p>
+                    </div>
+                  </div>
+
+                  <!-- CARD 4: Net Follower Growth -->
+                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div class="flex justify-between items-start mb-2">
+                      <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-user-plus"></i>
+                      </div>
+                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                        {instagramData.followersChange}
+                      </span>
+                    </div>
+                    <div>
+                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Net Follower Growth</span>
+                      <h3 class="text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">{instagramData.netFollowers}</h3>
+                      <p class="text-[10px] text-gray-400 font-bold mt-1">Novi pratitelji u razdoblju</p>
+                    </div>
+                  </div>
+
+                  <!-- CARD 5: Profile Visits & Bio Taps -->
+                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div class="flex justify-between items-start mb-2">
+                      <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-link"></i>
+                      </div>
+                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                        {instagramData.visitsChange}
+                      </span>
+                    </div>
+                    <div>
+                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Visits / Bio Link</span>
+                      <h3 class="text-xl lg:text-2xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.profileVisits}</h3>
+                      <p class="text-[10px] text-zorange font-bold mt-1">Bio Link Taps: {instagramData.websiteTaps}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CHARTS ROW 1: REACH TREND & ENGAGEMENT BREAKDOWN -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  <!-- CHART 1: Reach & Impressions Trend -->
+                  <div class="lg:col-span-7 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                      <div>
+                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Reach & Impressions Trend</h4>
+                        <p class="text-xs text-gray-500 font-semibold">Dnevni omjer dosegnutih jedinstvenih korisnika i ukupnih impresija</p>
+                      </div>
+                      <span class="z-badge-orange text-[10px] px-3 py-1 text-white shadow-xs">Daily Live Data</span>
+                    </div>
+                    <EChartComponent option={instagramData.reachTrendOption} style={{ height: '300px', width: '100%' }} />
+                  </div>
+
+                  <!-- CHART 2: Engagement Breakdown (Saves & Shares vs Likes & Comments) -->
+                  <div class="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                      <div>
+                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Engagement Breakdown</h4>
+                        <p class="text-xs text-gray-500 font-semibold">Saves & Shares (Core Signal) vs. Likes & Comments</p>
+                      </div>
+                      <span class="z-badge-black text-[10px] px-3 py-1 shadow-xs">Stacked Bar</span>
+                    </div>
+                    <EChartComponent option={instagramData.engagementOption} style={{ height: '300px', width: '100%' }} />
+                  </div>
+                </div>
+
+                <!-- CHARTS ROW 2: FOLLOWER GROWTH & TOP PERFORMING POSTS TABLE -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  <!-- CHART 3: Follower Growth vs. Unfollows -->
+                  <div class="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                      <div>
+                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Followers vs. Unfollows</h4>
+                        <p class="text-xs text-gray-500 font-semibold">Novi pratitelji (+), unfollows (-) i neto trend rasta</p>
+                      </div>
+                      <span class="z-badge-green text-[10px] px-3 py-1 shadow-xs">Growth Rate</span>
+                    </div>
+                    <EChartComponent option={instagramData.growthOption} style={{ height: '300px', width: '100%' }} />
+                  </div>
+
+                  <!-- TABLE 4: Top Performing Posts / Reels -->
+                  <div class="lg:col-span-7 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs overflow-hidden">
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                      <div>
+                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Top Performing Posts & Reels</h4>
+                        <p class="text-xs text-gray-500 font-semibold">Kliknite na zaglavlja stupaca za razvrstavanje (sorting)</p>
+                      </div>
+                      <span class="text-xs font-bold text-gray-400">{sortedPosts.length} Objava</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                      <table class="w-full text-left text-xs">
+                        <thead>
+                          <tr class="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-extrabold uppercase tracking-wider">
+                            <th class="py-3 px-2">Kreativa</th>
+                            <th class="py-3 px-2">Tip</th>
+                            <th onClick={() => handlePostSort('reach')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                              Reach {postSortKey === 'reach' && (postSortDir === 'asc' ? '↑' : '↓')}
+                            </th>
+                            <th onClick={() => handlePostSort('err')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                              ERR % {postSortKey === 'err' && (postSortDir === 'asc' ? '↑' : '↓')}
+                            </th>
+                            <th onClick={() => handlePostSort('saves')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                              Saves {postSortKey === 'saves' && (postSortDir === 'asc' ? '↑' : '↓')}
+                            </th>
+                            <th onClick={() => handlePostSort('shares')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                              Shares {postSortKey === 'shares' && (postSortDir === 'asc' ? '↑' : '↓')}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
+                          {sortedPosts.map(post => {
+                            const errVal = (((post.likes + post.comments + post.saves + post.shares) / post.reach) * 100).toFixed(1);
+                            return (
+                              <tr key={post.id} class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                <td class="py-3 px-2 flex items-center gap-3">
+                                  <img src={post.thumb} class="w-10 h-10 rounded-xl object-cover shadow-xs" />
+                                  <span class="truncate max-w-[180px] text-[#111113] dark:text-white font-black">{post.caption}</span>
+                                </td>
+                                <td class="py-3 px-2">
+                                  <span class={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${
+                                    post.type === 'Reel' 
+                                      ? 'bg-pink-100 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300' 
+                                      : post.type === 'Carousel'
+                                      ? 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300'
+                                      : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                                  }`}>
+                                    {post.type}
+                                  </span>
+                                </td>
+                                <td class="py-3 px-2 text-[#111113] dark:text-white">{post.reach.toLocaleString()}</td>
+                                <td class="py-3 px-2 text-zorange font-black">{errVal}%</td>
+                                <td class="py-3 px-2 text-gray-700 dark:text-gray-300">{post.saves}</td>
+                                <td class="py-3 px-2 text-gray-700 dark:text-gray-300">{post.shares}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+              </section>
+            ) : (
+              <!-- ========================================== -->
+              <!-- PAGE 2: META ADS PERFORMANCE VIEW          -->
+              <!-- ========================================== -->
+              <section class="space-y-8">
+                
+                <!-- TOP 5 KPI CARDS ROW -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+                  <!-- CARD 1: Total Ad Spend -->
+                  <div class="z-card-dark rounded-[2rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-2">
+                      <div class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-xs">
+                        <i class="fa-brands fa-meta"></i>
+                      </div>
+                      <span class="z-badge-orange text-[10px] px-2.5 py-0.5 uppercase shadow-xs">
+                        {metaAdsData.spendChange}
+                      </span>
+                    </div>
+                    <div>
+                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-white/70 block mb-1">Total Ad Spend</span>
+                      <h3 class="text-2xl lg:text-3xl font-black text-white tracking-tight">{metaAdsData.spend}</h3>
+                      <p class="text-[10px] text-white/60 font-bold mt-1">FB + IG Kombinirano</p>
+                    </div>
+                  </div>
+
+                  <!-- CARD 2: Blended ROAS -->
+                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div class="flex justify-between items-start mb-2">
+                      <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-chart-line"></i>
+                      </div>
+                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                        {metaAdsData.roasChange}
+                      </span>
+                    </div>
+                    <div>
+                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Blended ROAS</span>
+                      <h3 class="text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">{metaAdsData.roas}</h3>
+                      <p class="text-[10px] text-gray-400 font-bold mt-1">Return on Ad Spend</p>
+                    </div>
+                  </div>
+
+                  <!-- CARD 3: Cost Per Result (CPA) -->
+                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div class="flex justify-between items-start mb-2">
+                      <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                      </div>
+                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                        {metaAdsData.cpaChange}
+                      </span>
+                    </div>
+                    <div>
+                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Meta CPA</span>
+                      <h3 class="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{metaAdsData.cpa}</h3>
+                      <p class="text-[10px] text-gray-400 font-bold mt-1">Cost Per Lead / Purchase</p>
+                    </div>
+                  </div>
+
+                  <!-- CARD 4: Total Conversions -->
+                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div class="flex justify-between items-start mb-2">
+                      <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-bullseye"></i>
+                      </div>
+                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                        {metaAdsData.conversionsChange}
+                      </span>
+                    </div>
+                    <div>
+                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Total Conversions</span>
+                      <h3 class="text-xl lg:text-2xl font-black text-[#111113] dark:text-white tracking-tight">{metaAdsData.conversions}</h3>
+                      <p class="text-[10px] text-gray-400 font-bold mt-1">FB & IG Konverzije</p>
+                    </div>
+                  </div>
+
+                  <!-- CARD 5: Overall CTR (Link) -->
+                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div class="flex justify-between items-start mb-2">
+                      <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-600 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-[#111113]"></i>
+                        <i class="fa-solid fa-arrow-pointer text-xs"></i>
+                      </div>
+                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                        {metaAdsData.ctrChange}
+                      </span>
+                    </div>
+                    <div>
+                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Overall CTR (Link)</span>
+                      <h3 class="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{metaAdsData.ctr}</h3>
+                      <p class="text-[10px] text-gray-400 font-bold mt-1">Outbound Link CTR</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CHARTS ROW 1: SPEND VS ROAS & AD FATIGUE WITH WARNING BADGE -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  <!-- CHART 1: Spend vs ROAS Trend (Dual Y-Axis) -->
+                  <div class="lg:col-span-7 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                      <div>
+                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Spend vs. ROAS Trend</h4>
+                        <p class="text-xs text-gray-500 font-semibold">Usporedba dnevne potrošnje i efikasnosti povrata (Dual Y-Axis)</p>
+                      </div>
+                      <span class="z-badge-orange text-[10px] px-3 py-1 text-white shadow-xs">Scaling Check</span>
+                    </div>
+                    <EChartComponent option={metaAdsData.spendRoasOption} style={{ height: '300px', width: '100%' }} />
+                  </div>
+
+                  <!-- CHART 2: Creative Health & Ad Fatigue (Frequency vs CTR) WITH WARNING BADGE -->
+                  <div class="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                      <div>
+                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider flex items-center gap-2">
+                          Creative Health & Fatigue
+                        </h4>
+                        <p class="text-xs text-gray-500 font-semibold">Korelacija frekvencije i CTR klika s upozorenjem</p>
+                      </div>
+                      <span class="px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 text-[10px] font-black border border-rose-200 dark:border-rose-900 shadow-2xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation text-xs animate-bounce"></i>
+                        Frequency &gt; 3.0 Warning
+                      </span>
+                    </div>
+                    <EChartComponent option={metaAdsData.fatigueOption} style={{ height: '300px', width: '100%' }} />
+                  </div>
+                </div>
+
+                <!-- CHARTS ROW 2: FUNNEL LEAKAGE & VIDEO RETENTION & PLACEMENTS -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  <!-- CHART 3: Funnel Leakage (Link Clicks vs Landing Page Views) -->
+                  <div class="lg:col-span-4 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                      <div>
+                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Funnel Leakage</h4>
+                        <p class="text-xs text-gray-500 font-semibold">Link Clicks vs. Landing Page Views</p>
+                      </div>
+                      <span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 text-[10px] font-black">
+                        24.1% Drop-off Rate
+                      </span>
+                    </div>
+                    <EChartComponent option={metaAdsData.funnelOption} style={{ height: '270px', width: '100%' }} />
+                    <div class="mt-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 rounded-xl p-3 text-[11px] font-bold text-amber-900 dark:text-amber-200">
+                      ⚠️ Gubitak veći od 20% ukazuje na sporo učitavanje odredišne stranice ili tehnički problem piksela.
+                    </div>
+                  </div>
+
+                  <!-- CHART 4: Video Creative Retention (Hook Rate vs Hold Rate) -->
+                  <div class="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                      <div>
+                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Video Retention</h4>
+                        <p class="text-xs text-gray-500 font-semibold">Hook Rate (3s / Impr.) vs. Hold Rate (ThruPlays / 3s)</p>
+                      </div>
+                      <span class="z-badge-black text-[10px] px-3 py-1 shadow-xs">Video Funnel</span>
+                    </div>
+                    <EChartComponent option={metaAdsData.retentionOption} style={{ height: '310px', width: '100%' }} />
+                  </div>
+
+                  <!-- CHART 5: Platform & Placement Breakdown -->
+                  <div class="lg:col-span-3 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                      <div>
+                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Placements</h4>
+                        <p class="text-xs text-gray-500 font-semibold">Raspodjela potrošnje po plasmanu</p>
+                      </div>
+                    </div>
+                    <EChartComponent option={metaAdsData.placementOption} style={{ height: '310px', width: '100%' }} />
+                  </div>
+                </div>
+
+                <!-- TABLE 6: Top Ad Creatives Leaderboard -->
+                <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs overflow-hidden">
+                  <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                    <div>
+                      <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Top Ad Creatives Leaderboard</h4>
+                      <p class="text-xs text-gray-500 font-semibold">Detaljna analitika pojedinačnih oglasa po trošku, ROAS-u i retenciji</p>
+                    </div>
+                    <span class="text-xs font-bold text-gray-400">{sortedAds.length} Aktivna Oglasa</span>
+                  </div>
+
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                      <thead>
+                        <tr class="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-extrabold uppercase tracking-wider">
+                          <th class="py-3 px-2">Naziv Oglasa</th>
+                          <th class="py-3 px-2">Plasman</th>
+                          <th onClick={() => handleAdSort('spend')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                            Spend ($) {adSortKey === 'spend' && (adSortDir === 'asc' ? '↑' : '↓')}
+                          </th>
+                          <th onClick={() => handleAdSort('ctr')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                            CTR Link % {adSortKey === 'ctr' && (adSortDir === 'asc' ? '↑' : '↓')}
+                          </th>
+                          <th onClick={() => handleAdSort('cpa')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                            CPA ($) {adSortKey === 'cpa' && (adSortDir === 'asc' ? '↑' : '↓')}
+                          </th>
+                          <th onClick={() => handleAdSort('roas')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                            ROAS {adSortKey === 'roas' && (adSortDir === 'asc' ? '↑' : '↓')}
+                          </th>
+                          <th onClick={() => handleAdSort('hookRate')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                            Hook Rate % {adSortKey === 'hookRate' && (adSortDir === 'asc' ? '↑' : '↓')}
+                          </th>
+                          <th class="py-3 px-2">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
+                        {sortedAds.map(ad => (
+                          <tr key={ad.id} class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                            <td class="py-3.5 px-2 text-[#111113] dark:text-white font-black">{ad.name}</td>
+                            <td class="py-3.5 px-2">
+                              <span class="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[10px] font-black">
+                                {ad.placement}
+                              </span>
+                            </td>
+                            <td class="py-3.5 px-2 text-[#111113] dark:text-white">${ad.spend.toFixed(2)}</td>
+                            <td class="py-3.5 px-2 text-zorange font-black">{ad.ctr}%</td>
+                            <td class="py-3.5 px-2 text-gray-700 dark:text-gray-300">${ad.cpa.toFixed(2)}</td>
+                            <td class="py-3.5 px-2 text-emerald-600 dark:text-emerald-400 font-black">{ad.roas}x</td>
+                            <td class="py-3.5 px-2 text-pink-600 dark:text-pink-400">{ad.hookRate}%</td>
+                            <td class="py-3.5 px-2">
+                              <span class={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase flex items-center gap-1 w-max ${
+                                ad.status === 'Active'
+                                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300'
+                                  : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                              }`}>
+                                <span class={`w-1.5 h-1.5 rounded-full ${ad.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`}></span>
+                                {ad.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </section>
+            )}
+          </main>
+
+        </div>
+      );
     }
 
-    // Switch Posts View Mode (Table vs Gallery)
-    function switchPostsView(viewMode) {
-      const btnTable = document.getElementById('btn-view-table');
-      const btnGallery = document.getElementById('btn-view-gallery');
-      const viewTable = document.getElementById('posts-view-table');
-      const viewGallery = document.getElementById('posts-view-gallery');
-
-      if (viewMode === 'table') {
-        btnTable.className = 'px-3 py-1.5 rounded-full bg-white text-[#111113] shadow-xs font-black transition-all flex items-center gap-1.5';
-        btnGallery.className = 'px-3 py-1.5 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-1.5';
-        viewTable.classList.remove('hidden');
-        viewGallery.classList.add('hidden');
-      } else {
-        btnGallery.className = 'px-3 py-1.5 rounded-full bg-white text-[#111113] shadow-xs font-black transition-all flex items-center gap-1.5';
-        btnTable.className = 'px-3 py-1.5 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-1.5';
-        viewGallery.classList.remove('hidden');
-        viewTable.classList.add('hidden');
-      }
-    }
-
-    // Toggle Notification Popover Dropdown
-    function toggleNotifications() {
-      const popover = document.getElementById('dropdown-notifications');
-      if (popover) {
-        popover.classList.toggle('hidden');
-      }
-    }
-
-    // Close notification dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-      const btn = document.getElementById('btn-notifications');
-      const popover = document.getElementById('dropdown-notifications');
-      if (popover && !popover.classList.contains('hidden')) {
-        if (!popover.contains(e.target) && btn && !btn.contains(e.target)) {
-          popover.classList.add('hidden');
-        }
-      }
-    });
+    // Render React App
+    const root = ReactDOM.createRoot(document.getElementById('react-root'));
+    root.render(<DashboardApp />);
   </script>
 </body>
 </html>
