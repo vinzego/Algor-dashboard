@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= client.name %> - Marketing Dashboard</title>
+  <title><%= client.name %> - ZELLIFY Marketing Dashboard</title>
   <!-- Tailwind Play CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -11,12 +11,11 @@
       theme: {
         extend: {
           colors: {
-            brand: {
-              dark: '#122022',
-              green: '#DAF4AA',
-              cyan: '#96D8D0',
-              pink: '#F1B4B9'
-            }
+            zdark: '#111113',
+            zgray: '#F4F5F7',
+            zorange: '#FF5F00',
+            zorangehover: '#E05300',
+            zmuted: '#6B7280'
           },
           fontFamily: {
             sans: ['Urbanist', 'sans-serif']
@@ -32,127 +31,131 @@
   <!-- Apache ECharts CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
 </head>
-<body class="min-h-screen relative pb-16">
+<body class="bg-[#F4F5F7] min-h-screen relative pb-16 text-[#111113]">
 
-  <!-- Background Decorative Glowing Blobs -->
-  <div class="bg-glow-green top-[-100px] left-[-100px]"></div>
-  <div class="bg-glow-pink bottom-[-100px] right-[-100px]"></div>
-
-  <div class="w-full px-6 sm:px-8 lg:px-12">
+  <!-- Full-Width Container (100% width, matching ZELLIFY iPad layout) -->
+  <div class="w-full max-w-[1680px] mx-auto px-6 sm:px-8 lg:px-10 py-6">
     
-    <!-- Floating Pill Navbar with client detail context -->
-    <header class="pt-6">
-      <nav class="glass-navbar rounded-full px-6 py-3 flex items-center justify-between shadow-lg">
+    <!-- TOP NAVBAR HEADER (ZELLIFY Style Capsule Header) -->
+    <header class="mb-8">
+      <nav class="bg-white rounded-full px-6 py-3.5 flex items-center justify-between shadow-sm border border-black/5">
         
-        <!-- Left: Logo & Back Button -->
+        <!-- Left: Logo & Back Link -->
         <div class="flex items-center gap-4">
-          <a href="/" class="flex items-center justify-center w-8 h-8 rounded-full bg-brand-dark/5 border border-brand-dark/10 text-brand-dark hover:bg-brand-dark hover:text-white transition-all duration-300">
+          <a href="/" class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 border border-black/5 text-[#111113] hover:bg-black hover:text-white transition-all duration-200">
             <i class="fa-solid fa-arrow-left text-xs"></i>
           </a>
-          <div class="hidden sm:flex items-center gap-2 border-l border-brand-dark/15 pl-4">
-            <span class="font-black tracking-wider text-xs px-2 py-0.5 rounded bg-brand-dark text-white"><%= client.logo %></span>
-            <span class="text-sm font-bold text-brand-dark"><%= client.name %></span>
+          
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-zorange flex items-center justify-center text-white font-black text-sm shadow-sm">
+              <i class="fa-solid fa-bolt-lightning"></i>
+            </div>
+            <span class="text-xl font-black tracking-tight text-[#111113]">ZELLIFY<span class="text-zorange">.</span></span>
           </div>
         </div>
         
-        <!-- Center: Platform Switcher (5 Unlocked View Modes) -->
-        <div class="flex items-center bg-brand-dark/5 p-1 rounded-full border border-brand-dark/15 flex-wrap gap-1">
-          <button id="btn-360" class="px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 bg-brand-dark text-white shadow-sm flex items-center gap-1.5" onclick="switchPlatform('360')">
-            <i class="fa-solid fa-globe text-xs"></i> 360° Pregled
+        <!-- Center: Capsule Pill Switcher Navigation (5 Unlocked Views) -->
+        <div class="z-pill-nav flex items-center gap-1">
+          <button id="btn-360" class="z-pill-nav-item-active px-5 py-2 text-xs transition-all duration-200" onclick="switchPlatform('360')">
+            Dashboard
           </button>
 
-          <button id="btn-meta" class="px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 text-brand-dark/80 hover:text-brand-dark flex items-center gap-1.5" onclick="switchPlatform('meta')">
-            <i class="fa-brands fa-meta text-xs text-blue-600"></i> Meta Ads
+          <button id="btn-meta" class="z-pill-nav-item px-4 py-2 text-xs transition-all duration-200" onclick="switchPlatform('meta')">
+            Meta Ads
           </button>
           
-          <button id="btn-google" class="px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 text-brand-dark/80 hover:text-brand-dark flex items-center gap-1.5" onclick="switchPlatform('google')">
-            <i class="fa-brands fa-google text-xs text-rose-500"></i> Google Ads (PMax)
+          <button id="btn-google" class="z-pill-nav-item px-4 py-2 text-xs transition-all duration-200" onclick="switchPlatform('google')">
+            Google Ads (PMax)
           </button>
           
-          <button id="btn-tiktok" class="px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 text-brand-dark/80 hover:text-brand-dark flex items-center gap-1.5" onclick="switchPlatform('tiktok')">
-            <i class="fa-brands fa-tiktok text-xs text-black"></i> TikTok Ads
+          <button id="btn-tiktok" class="z-pill-nav-item px-4 py-2 text-xs transition-all duration-200" onclick="switchPlatform('tiktok')">
+            TikTok Ads
           </button>
 
-          <button id="btn-social" class="px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 text-brand-dark/80 hover:text-brand-dark flex items-center gap-1.5" onclick="switchPlatform('social')">
-            <i class="fa-solid fa-photo-film text-xs"></i> Objave & Sadržaj
+          <button id="btn-social" class="z-pill-nav-item px-4 py-2 text-xs transition-all duration-200" onclick="switchPlatform('social')">
+            Objave & Sadržaj
           </button>
         </div>
         
-        <!-- Right: Profile Info -->
-        <div class="flex items-center gap-2">
-          <div class="w-9 h-9 rounded-full bg-brand-dark/10 flex items-center justify-center border border-brand-dark/15">
-            <i class="fa-solid fa-user text-brand-dark text-sm"></i>
+        <!-- Right Controls: Theme Toggles + Date Filter + Avatar -->
+        <div class="flex items-center gap-3">
+          <!-- Light/Dark Mode Switcher Icons -->
+          <div class="hidden sm:flex items-center gap-1 bg-gray-100 border border-black/5 p-1 rounded-full text-xs font-bold text-gray-600">
+            <button class="w-7 h-7 rounded-full bg-zorange text-white flex items-center justify-center shadow-xs"><i class="fa-solid fa-sun text-xs"></i></button>
+            <button class="w-7 h-7 rounded-full hover:bg-gray-200 flex items-center justify-center"><i class="fa-solid fa-moon text-xs"></i></button>
+          </div>
+
+          <!-- Date Filter Pill Button -->
+          <button class="z-badge-black px-4 py-2 text-xs flex items-center gap-2 hover:bg-gray-800 transition-colors shadow-xs">
+            <i class="fa-solid fa-chart-line text-xs opacity-75"></i>
+            <span>Zadnjih 30 dana</span>
+            <i class="fa-solid fa-chevron-down text-[10px] opacity-75"></i>
+          </button>
+
+          <!-- User Profile Avatar -->
+          <div class="relative w-9 h-9 rounded-full bg-gray-200 border-2 border-white shadow-xs overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Avatar" class="w-full h-full object-cover" />
           </div>
         </div>
       </nav>
     </header>
 
-    <!-- 80/20 Layout Split Container -->
-    <div class="flex flex-col lg:flex-row gap-6 mt-12 items-start">
-      
-      <!-- LEFT COLUMN: Client Dashboard (80% of width) -->
-      <main class="flex-1 lg:w-[76%] xl:w-[79%] min-w-0">
+    <!-- SUBHEADER TITLE & CLIENT INFO ROW -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+          <span>Dobrodošao natrag, Vinko 👋</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-zorange inline-block"></span>
+          <span class="text-[#111113] font-black"><%= client.name %></span>
+        </p>
+        <h1 class="text-3xl md:text-4xl font-black text-[#111113] tracking-tight mt-1">Nadzorna Ploča i Analitika</h1>
+      </div>
 
-        <!-- Package Info Card (Informative Badge, No Locks!) -->
-        <div class="glass-panel rounded-[2rem] p-6 mb-6 shadow-md flex flex-col md:flex-row justify-between items-center gap-6">
-          <div class="flex items-center gap-4 shrink-0">
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-xl border <%= client.accentClass %> <%= client.bgAccentClass %> shadow-sm">
-              <%= client.logo %>
-            </div>
-            <div>
-              <h3 class="text-2xl font-black text-brand-dark"><%= client.name %></h3>
-              <p class="text-xs text-brand-dark/75 font-bold mt-1">Paket suradnje: 
-                <span class="px-2.5 py-1 rounded text-xs font-black uppercase tracking-wider border shadow-sm
-                  <%= client.package === 'Ultra' ? 'bg-gradient-to-tr from-brand-pink/30 to-brand-cyan/30 border-brand-pink/50 text-brand-dark' : '' %>
-                  <%= client.package === 'Pro' ? 'bg-brand-cyan/25 text-brand-dark border-brand-cyan/50' : '' %>
-                  <%= client.package === 'Start' ? 'bg-brand-dark/10 text-brand-dark border-brand-dark/20' : '' %>">
-                  <%= client.package %> (Nivo Usluge)
-                </span>
-              </p>
-            </div>
-          </div>
-          
-          <!-- Mid: Posts published status (Enlarged) -->
-          <div class="flex-grow max-w-md w-full bg-brand-dark/5 rounded-2xl p-4 border border-brand-dark/10">
-            <div class="flex justify-between items-center text-xs md:text-sm text-brand-dark/80 font-bold mb-2">
-              <span class="flex items-center gap-1.5"><i class="fa-solid fa-calendar-check text-brand-dark/70"></i> Mjesečni plan objava:</span>
-              <span class="text-brand-dark font-black"><%= client.publishedPosts %> / <%= client.maxPosts %> objavljeno</span>
-            </div>
-            <div class="w-full bg-brand-dark/10 rounded-full h-3 overflow-hidden">
-              <% const pctVal = Math.min((client.publishedPosts / client.maxPosts) * 100, 100); %>
-              <div class="bg-brand-dark h-3 rounded-full transition-all duration-500" style="width: <%= pctVal %>%; background-color: <%= client.accentColor === '#DAF4AA' ? '#558B2F' : (client.accentColor === '#FFFFFF' ? '#122022' : client.accentColor) %>"></div>
-            </div>
-          </div>
-        </div>
+      <div class="flex items-center gap-3">
+        <!-- Client Package Badge -->
+        <span class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-white border border-black/10 text-[#111113] shadow-xs">
+          Paket: <%= client.package %> (Nivo Usluge)
+        </span>
+        <!-- Monthly Posts Badge -->
+        <span class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-zorange text-white shadow-xs flex items-center gap-1.5">
+          <i class="fa-solid fa-calendar-check text-xs"></i> Objavljeno <%= client.publishedPosts %> / <%= client.maxPosts %> postova
+        </span>
+      </div>
+    </div>
 
-        <!-- EXECUTIVE HEALTH SUMMARY & ACTION PLAN BANNER (Na prvi pogled: Što valja / Što ne valja / Kako popraviti) -->
-        <div class="glass-panel rounded-[2rem] p-6 mb-6 shadow-md border border-brand-dark/15">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-brand-dark/15 pb-4">
+    <!-- MAIN DASHBOARD CONTENT AREA (100% Full Width - AI Sidebar Removed) -->
+    <main class="w-full">
+
+      <!-- SECTION 1: 360° OVERVIEW (ZELLIFY UI CARDS MATCHING REFERENCE IMAGE) -->
+      <section id="panel-advanced-analytics" class="transition-all duration-300 opacity-100 scale-100">
+        
+        <!-- EXECUTIVE HEALTH SUMMARY BANNER (Što valja / Što ne valja / Kako popraviti) -->
+        <div class="z-card-white rounded-[2rem] p-6 mb-8 shadow-sm border border-black/5">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5 border-b border-gray-100 pb-4">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-cyan to-brand-green flex items-center justify-center text-brand-dark font-black text-lg shadow-sm">
-                <i class="fa-solid fa-heart-pulse"></i>
+              <div class="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center font-black text-lg shadow-sm">
+                <i class="fa-solid fa-heart-pulse text-zorange"></i>
               </div>
               <div>
-                <h4 class="text-base font-black text-brand-dark uppercase tracking-wider">Brzi uvid u zdravlje marketinga (At-A-Glance Status)</h4>
-                <p class="text-xs text-brand-dark/75 font-bold">Što funkcionira, što zahtijeva pažnju i što poduzeti za brzi napredak</p>
+                <h4 class="text-base font-black text-[#111113] uppercase tracking-wider">Brzi uvid u zdravlje marketinga (At-A-Glance Status)</h4>
+                <p class="text-xs text-gray-500 font-bold">Što funkcionira, što zahtijeva pažnju i što poduzeti za brzi napredak</p>
               </div>
             </div>
-            <span class="px-4 py-1.5 rounded-full text-xs font-black uppercase bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-sm self-start md:self-auto">
+            <span class="z-badge-green px-4 py-1.5 text-xs uppercase shadow-xs self-start md:self-auto">
               Ukupni Status: <%= client.executiveHealthCheck.overallHealth %>
             </span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            
             <!-- Column 1: What Works Great (Što valja) -->
-            <div class="bg-emerald-500/10 rounded-2xl p-4 border border-emerald-500/20 shadow-sm">
-              <div class="flex items-center gap-2 mb-3 pb-2 border-b border-emerald-500/15">
-                <i class="fa-solid fa-circle-check text-emerald-700 text-sm"></i>
+            <div class="bg-emerald-50 rounded-2xl p-4 border border-emerald-100">
+              <div class="flex items-center gap-2 mb-3 pb-2 border-b border-emerald-200/60">
+                <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
                 <h5 class="text-xs font-black text-emerald-950 uppercase tracking-wider">🟢 Što odlično funkcionira</h5>
               </div>
               <ul class="space-y-2.5">
                 <% client.executiveHealthCheck.goodHighlights.forEach(item => { %>
-                  <li class="text-xs font-bold text-emerald-950 leading-relaxed bg-white/70 p-2.5 rounded-xl border border-emerald-500/15 shadow-2xs">
+                  <li class="text-xs font-bold text-emerald-950 leading-relaxed bg-white p-3 rounded-xl border border-emerald-100 shadow-2xs">
                     <strong class="block text-emerald-900 mb-0.5"><%= item.title %></strong>
                     <%= item.desc %>
                   </li>
@@ -161,14 +164,14 @@
             </div>
 
             <!-- Column 2: What Needs Attention (Što ne valja) -->
-            <div class="bg-rose-500/10 rounded-2xl p-4 border border-rose-500/20 shadow-sm">
-              <div class="flex items-center gap-2 mb-3 pb-2 border-b border-rose-500/15">
-                <i class="fa-solid fa-triangle-exclamation text-rose-700 text-sm"></i>
+            <div class="bg-rose-50 rounded-2xl p-4 border border-rose-100">
+              <div class="flex items-center gap-2 mb-3 pb-2 border-b border-rose-200/60">
+                <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm"></i>
                 <h5 class="text-xs font-black text-rose-950 uppercase tracking-wider">🔴 Što ne valja (Zahtijeva pažnju)</h5>
               </div>
               <ul class="space-y-2.5">
                 <% client.executiveHealthCheck.criticalIssues.forEach(item => { %>
-                  <li class="text-xs font-bold text-rose-950 leading-relaxed bg-white/70 p-2.5 rounded-xl border border-rose-500/15 shadow-2xs">
+                  <li class="text-xs font-bold text-rose-950 leading-relaxed bg-white p-3 rounded-xl border border-rose-100 shadow-2xs">
                     <strong class="block text-rose-900 mb-0.5"><%= item.title %></strong>
                     <%= item.desc %>
                   </li>
@@ -177,1730 +180,905 @@
             </div>
 
             <!-- Column 3: Actionable Fixes (Kako popraviti) -->
-            <div class="bg-brand-cyan/15 rounded-2xl p-4 border border-brand-cyan/30 shadow-sm">
-              <div class="flex items-center gap-2 mb-3 pb-2 border-b border-brand-dark/15">
-                <i class="fa-solid fa-wand-magic-sparkles text-brand-dark text-sm"></i>
-                <h5 class="text-xs font-black text-brand-dark uppercase tracking-wider">💡 Preporučeni brzi popravak</h5>
+            <div class="bg-orange-50 rounded-2xl p-4 border border-orange-100">
+              <div class="flex items-center gap-2 mb-3 pb-2 border-b border-orange-200/60">
+                <i class="fa-solid fa-wand-magic-sparkles text-zorange text-sm"></i>
+                <h5 class="text-xs font-black text-orange-950 uppercase tracking-wider">💡 Preporučeni brzi popravak</h5>
               </div>
               <ul class="space-y-2.5">
                 <% client.executiveHealthCheck.actionFixes.forEach(item => { %>
-                  <li class="text-xs font-bold text-brand-dark leading-relaxed bg-white/70 p-2.5 rounded-xl border border-brand-dark/15 shadow-2xs">
-                    <strong class="block text-brand-dark mb-0.5"><%= item.title %></strong>
-                    <span class="text-brand-dark/85 font-semibold">Utjecaj: <%= item.impact %></span>
+                  <li class="text-xs font-bold text-orange-950 leading-relaxed bg-white p-3 rounded-xl border border-orange-100 shadow-2xs">
+                    <strong class="block text-orange-950 mb-0.5"><%= item.title %></strong>
+                    <span class="text-gray-600 font-semibold">Utjecaj: <%= item.impact %></span>
                   </li>
                 <% }); %>
               </ul>
             </div>
-
-          </div>
-        </div>
-        
-        <!-- Section Breadcrumb & Status Bar -->
-        <div class="flex justify-between items-center mb-6">
-          <div class="flex items-center gap-2">
-            <span class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Prikaz:</span>
-            <span id="platform-title-badge" class="text-xs uppercase tracking-wider text-brand-dark font-black px-3 py-1 rounded bg-brand-dark/10 border border-brand-dark/15">360° Globalni Pregled</span>
-          </div>
-          <div class="glass-panel px-4 py-1.5 rounded-full flex items-center gap-2 text-xs">
-            <span class="text-brand-dark/75 font-bold">Klijent status:</span>
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-black uppercase <%= client.status === 'Active' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' : 'bg-brand-dark/10 text-brand-dark/60' %>">
-              <%= client.status === 'Active' ? 'Aktivno' : 'Neaktivno' %>
-            </span>
           </div>
         </div>
 
-        <!-- PLATFORM 1: META STATISTICS SECTION -->
-        <section id="panel-meta" class="hidden transition-all duration-300 opacity-0 scale-95">
+        <!-- ZELLIFY TOP WIDGETS ROW (MATCHING REFERENCE IMAGE CARDS 1 - 4) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           
-          <!-- Hierarchical 12-column grid of Meta metric cards -->
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
-            
-            <!-- Card 1: Total Spend -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[160px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-4">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Ukupna potrošnja</p>
-                  <h3 class="text-3xl font-black text-brand-dark mt-1.5 tracking-tight"><%= client.metaStats.totalSpend %></h3>
+          <!-- CARD 1: DARK HERO CARD (Like MFR Gauge Card in Image) -->
+          <div class="z-card-dark rounded-[2rem] p-6 flex flex-col justify-between h-[270px] relative overflow-hidden shadow-xl">
+            <div class="flex justify-between items-center z-10">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white text-xs">
+                  <i class="fa-solid fa-gauge-high"></i>
                 </div>
-                <div class="w-9 h-9 rounded-xl bg-brand-dark/5 border border-brand-dark/15 flex items-center justify-center text-[#1877F2] text-base transition-all duration-300 group-hover:scale-110">
-                  <i class="fa-brands fa-facebook-f"></i>
-                </div>
+                <span class="text-xs font-extrabold uppercase tracking-wider text-white/90">MFR / Blended MER</span>
               </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5 mt-1.5">
-                <span>Facebook + Instagram zbirno</span>
-                <span class="font-extrabold text-brand-dark">Meta Ads</span>
+              <span class="z-badge-orange text-[10px] px-2.5 py-1 uppercase shadow-xs">+4% Increased</span>
+            </div>
+
+            <!-- Middle Half-Donut Gauge Meter -->
+            <div class="relative w-full h-[120px] flex items-center justify-center my-1 z-10">
+              <div id="z-chart-mfr-gauge" class="w-full h-full"></div>
+              <div class="absolute bottom-2 text-center">
+                <span class="text-xs font-bold text-white/70 block">Target 3.5x</span>
+                <span class="text-base font-black text-zorange"><%= client.advancedAnalytics.blended.blendedMer %></span>
               </div>
             </div>
-            
-            <!-- Card 2: Cost Per Action (CPA) -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[160px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-4">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Cijena po rezultatu (CPA)</p>
-                  <div class="flex items-baseline gap-2 mt-1.5">
-                    <h3 class="text-3xl font-black text-brand-dark tracking-tight"><%= client.metaStats.cpa %></h3>
-                    <% if (client.metaStats.cpaTrend.direction === 'down') { %>
-                      <span class="inline-flex items-center gap-1 text-xs font-black px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300">
-                        <i class="fa-solid fa-arrow-down"></i> <%= client.metaStats.cpaTrend.value %>
-                      </span>
-                    <% } else { %>
-                      <span class="inline-flex items-center gap-1 text-xs font-black px-2 py-0.5 rounded bg-rose-100 text-rose-900 border border-rose-300">
-                        <i class="fa-solid fa-arrow-up"></i> <%= client.metaStats.cpaTrend.value %>
-                      </span>
-                    <% } %>
-                  </div>
-                </div>
-                <div class="w-9 h-9 rounded-xl bg-brand-dark/5 border border-brand-dark/15 flex items-center justify-center text-brand-dark text-base transition-all duration-300 group-hover:scale-110">
-                  <i class="fa-solid fa-bullseye"></i>
-                </div>
-              </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5 mt-1.5">
-                <span><%= client.metaStats.resultsType %></span>
-                <span class="font-extrabold <%= client.metaStats.cpaTrend.direction === 'down' ? 'text-emerald-800' : 'text-rose-800' %>">
-                  <%= client.metaStats.cpaTrend.direction === 'down' ? 'Pad cijene (odlično)' : 'Rast cijene' %>
-                </span>
-              </div>
+
+            <div class="z-10">
+              <span class="text-[10px] uppercase font-bold text-white/60 block">Zbirni Ulazni Proračun</span>
+              <h3 class="text-3xl font-black text-white tracking-tight"><%= client.advancedAnalytics.blended.totalSpend %></h3>
             </div>
-            
-            <!-- Card 3: Results / ROAS -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[160px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-2">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Rezultati / ROAS</p>
-                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight"><%= client.metaStats.resultsValue %></h3>
+          </div>
+
+          <!-- CARD 2: WHITE LINE SPARKLINE CARD (Like Revenue Card in Image) -->
+          <div class="z-card-white z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[270px]">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[#111113] text-xs">
+                  <i class="fa-solid fa-wallet"></i>
                 </div>
-                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/15 flex items-center justify-center text-brand-dark text-sm shrink-0">
-                  <i class="fa-solid fa-chart-line"></i>
-                </div>
+                <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500">Ukupni Prihod</span>
               </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5 mt-1.5">
-                <span class="truncate">Tip: <%= client.metaStats.resultsType.split(' ')[0] %></span>
-              </div>
+              <button class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-black hover:text-white transition-colors">
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
             </div>
-            
-            <!-- Card 4: Organic Reach -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[160px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-2">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Organski doseg</p>
-                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight"><%= client.metaStats.organicReach %></h3>
-                </div>
-                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/15 flex items-center justify-center text-brand-dark text-sm shrink-0">
+
+            <!-- ECharts Sparkline Trend -->
+            <div id="z-chart-revenue-sparkline" class="w-full h-[110px]"></div>
+
+            <div class="flex items-center justify-between border-t border-gray-100 pt-3">
+              <div>
+                <h3 class="text-3xl font-black text-[#111113] tracking-tight"><%= client.advancedAnalytics.blended.totalRevenue %></h3>
+              </div>
+              <span class="z-badge-black text-xs px-3 py-1 shadow-xs">+4%</span>
+            </div>
+          </div>
+
+          <!-- CARD 3: NEW USERS / TOP CONTENT LIST CARD (Like New Users Card in Image) -->
+          <div class="z-card-white z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[270px]">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[#111113] text-xs">
                   <i class="fa-solid fa-users"></i>
                 </div>
+                <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500">Top Aktivni Postovi</span>
               </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5 mt-1.5">
-                <span>Reach objava</span>
+              <button class="text-gray-400 hover:text-black transition-colors"><i class="fa-solid fa-ellipsis"></i></button>
+            </div>
+
+            <!-- List of Users/Posts -->
+            <div class="space-y-2.5 my-2">
+              <div class="flex items-center justify-between text-xs font-bold">
+                <div class="flex items-center gap-2.5">
+                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&fit=crop" class="w-7 h-7 rounded-full object-cover" />
+                  <div>
+                    <p class="text-[#111113] font-black leading-tight">Nagradni Natječaj</p>
+                    <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online (42.1k)</p>
+                  </div>
+                </div>
+                <button class="text-gray-400 hover:text-black"><i class="fa-solid fa-ellipsis"></i></button>
+              </div>
+
+              <div class="flex items-center justify-between text-xs font-bold">
+                <div class="flex items-center gap-2.5">
+                  <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=100&fit=crop" class="w-7 h-7 rounded-full object-cover" />
+                  <div>
+                    <p class="text-[#111113] font-black leading-tight">Ljetni Popust 20%</p>
+                    <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online (31.4k)</p>
+                  </div>
+                </div>
+                <button class="text-gray-400 hover:text-black"><i class="fa-solid fa-ellipsis"></i></button>
+              </div>
+
+              <div class="flex items-center justify-between text-xs font-bold">
+                <div class="flex items-center gap-2.5">
+                  <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100&fit=crop" class="w-7 h-7 rounded-full object-cover" />
+                  <div>
+                    <p class="text-[#111113] font-black leading-tight">Digital Marketing Vodič</p>
+                    <p class="text-[10px] text-gray-500 font-semibold">Prije 10 minuta</p>
+                  </div>
+                </div>
+                <button class="text-gray-400 hover:text-black"><i class="fa-solid fa-ellipsis"></i></button>
               </div>
             </div>
 
+            <!-- Capsule Search Input -->
+            <div class="bg-gray-100 rounded-full px-3.5 py-1.5 flex items-center gap-2">
+              <i class="fa-solid fa-magnifying-glass text-xs text-gray-400"></i>
+              <input type="text" placeholder="Pretraži objave..." class="bg-transparent text-xs font-medium text-[#111113] placeholder-gray-400 focus:outline-none w-full" />
+            </div>
           </div>
+
+          <!-- CARD 4: SUBSCRIBERS / CONVERSIONS BAR CHART CARD (Like Subscribers Card in Image) -->
+          <div class="z-card-white z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[270px]">
+            <div class="flex justify-between items-start">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[#111113] text-xs">
+                  <i class="fa-solid fa-[#111113]"></i>
+                  <i class="fa-solid fa-user-check text-xs"></i>
+                </div>
+                <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500">Konverzije & Upiti</span>
+              </div>
+              <span class="text-[10px] font-bold text-gray-400 uppercase">Target 10.000</span>
+            </div>
+
+            <!-- Vertical Bar Chart in Electric Orange -->
+            <div id="z-chart-subscribers-bar" class="w-full h-[100px]"></div>
+
+            <div class="flex items-center justify-between border-t border-gray-100 pt-3">
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase mb-0.5">Zadnje ažuriranje prije 2 min</p>
+                <h3 class="text-3xl font-black text-[#111113] tracking-tight"><%= client.advancedAnalytics.blended.totalConversions %> Leads</h3>
+              </div>
+              <div class="flex -space-x-2">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&fit=crop" class="w-7 h-7 rounded-full border-2 border-white object-cover" />
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=100&fit=crop" class="w-7 h-7 rounded-full border-2 border-white object-cover" />
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100&fit=crop" class="w-7 h-7 rounded-full border-2 border-white object-cover" />
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ZELLIFY BOTTOM WIDGETS ROW (MATCHING REFERENCE IMAGE BOTTOM ROW) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
           
-          <!-- Hierarchical Visualizations for Meta -->
-          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6">
-            <!-- Chart 1: Trend učinkovitosti -->
-            <div class="xl:col-span-8 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Trend učinkovitosti (Trošak vs. Konverzije)</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Ključni graf učinka</span>
-              </div>
-              <div id="meta-chart-efficiency" class="w-full" style="height: 350px;"></div>
-            </div>
-            
-            <!-- Chart 2: Usporedba platformi -->
-            <div class="xl:col-span-4 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Usporedba platformi</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Podjela troška</span>
-              </div>
-              <div id="meta-chart-platforms" class="w-full" style="height: 350px;"></div>
-            </div>
-          </div>
-          
-          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6">
-            <!-- Chart 4: Top 5 objava po angažmanu -->
-            <div class="xl:col-span-5 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Top 5 objava po angažmanu</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Engagement ranking</span>
-              </div>
-              <div id="meta-chart-posts" class="w-full" style="height: 330px;"></div>
-            </div>
-
-            <!-- Chart 5: Trend dosega i interakcija -->
-            <div class="xl:col-span-4 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Organski doseg kroz mjesec</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Mjesečni reach</span>
-              </div>
-              <div id="meta-chart-reach" class="w-full" style="height: 330px;"></div>
-            </div>
-
-            <!-- Chart 3: Analiza publike -->
-            <div class="xl:col-span-3 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Analiza publike</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Spol i dob</span>
-              </div>
-              <div id="meta-chart-audience" class="w-full" style="height: 330px;"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- PLATFORM 2: GOOGLE STATISTICS OVERHAULED & HIERARCHICAL SECTION -->
-        <section id="panel-google" class="hidden transition-all duration-300 opacity-0 scale-95">
-          
-          <!-- KPI Cards Section (Trenutno stanje u brojkama) -->
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
-            
-            <!-- KPI 1: Ukupni trošak i preostali budžet -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[160px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-4">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Trošak i preostali budžet</p>
-                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight">
-                    <%= client.googleStats.totalSpend %> 
-                    <span class="text-xs font-bold text-brand-dark/70">/ <%= client.googleStats.monthlyBudgetLimit %> limit</span>
-                  </h3>
+          <!-- LEFT CARD: REVENUE BAR CHART WITH HIGHLIGHTED ORANGE BAR (Like Bottom Left Card in Image) -->
+          <div class="lg:col-span-7 z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 flex flex-col justify-between h-[360px]">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-[#111113]">
+                  <i class="fa-solid fa-chart-simple text-sm"></i>
                 </div>
-                <span class="text-xs font-black px-2.5 py-1 rounded bg-brand-dark text-white"><%= client.googleStats.budgetPercent %>%</span>
+                <h4 class="text-base font-black text-[#111113] uppercase tracking-wider">Prihod i Trend Konverzija</h4>
               </div>
-              <div class="mt-2.5">
-                <div class="w-full bg-brand-dark/10 rounded-full h-2 overflow-hidden">
-                  <div class="bg-brand-dark h-2 rounded-full" style="width: <%= client.googleStats.budgetPercent %>%"></div>
+              <button class="bg-gray-100 hover:bg-black hover:text-white transition-colors rounded-full px-4 py-1.5 text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                <span>Najveći Prihod</span>
+                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center my-2">
+              <div class="md:col-span-4">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="z-badge-black text-xs px-2.5 py-1">+4%</span>
+                  <span class="text-xs text-gray-500 font-bold">u odnosu na prošli mjesec</span>
+                </div>
+                <h2 class="text-4xl font-black text-[#111113] tracking-tight">$1,730</h2>
+                <p class="text-xs text-gray-500 font-semibold mt-1">Nalazite se u top 5% svih prodaja u industriji.</p>
+
+                <div class="flex -space-x-2 mt-4">
+                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&fit=crop" class="w-8 h-8 rounded-full border-2 border-white object-cover" />
+                  <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=100&fit=crop" class="w-8 h-8 rounded-full border-2 border-white object-cover" />
+                  <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100&fit=crop" class="w-8 h-8 rounded-full border-2 border-white object-cover" />
                 </div>
               </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5 mt-1">
-                <span>Preostali budžet: <strong><%= client.googleStats.preostaliBudzet %></strong></span>
-                <span class="font-extrabold text-brand-dark">Google Ads</span>
-              </div>
-            </div>
-            
-            <!-- KPI 2: CPA / ROAS (Ostvareno vs. Cilj) -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[160px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-4">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">CPA (Ostvareno vs. Cilj)</p>
-                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight">
-                    <%= client.googleStats.cpa %> 
-                    <span class="text-xs font-bold text-brand-dark/70">/ <%= client.googleStats.cpaTarget %> cilj</span>
-                  </h3>
-                </div>
-                <% if (client.googleStats.cpaTrend.direction === 'down') { %>
-                  <span class="inline-flex items-center gap-1 text-xs font-black px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300">
-                    <i class="fa-solid fa-arrow-down"></i> <%= client.googleStats.cpaTrend.value %>
-                  </span>
-                <% } else { %>
-                  <span class="inline-flex items-center gap-1 text-xs font-black px-2 py-0.5 rounded bg-rose-100 text-rose-900 border border-rose-300">
-                    <i class="fa-solid fa-arrow-up"></i> <%= client.googleStats.cpaTrend.value %>
-                  </span>
-                <% } %>
-              </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5 mt-1.5">
-                <span>Status:</span>
-                <span class="font-extrabold <%= client.googleStats.cpaTrend.direction === 'down' ? 'text-emerald-800' : 'text-rose-800' %>">
-                  <%= client.googleStats.cpaTrend.direction === 'down' ? 'Unutar cilja (Odlično)' : 'Iznad cilja' %>
-                </span>
-              </div>
-            </div>
-            
-            <!-- KPI 3: Ukupan broj konverzije i CVR -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[160px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-2">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Konverzije & CVR</p>
-                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight"><%= client.googleStats.resultsValue.split(' ')[0] %></h3>
-                </div>
-                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/15 flex items-center justify-center text-brand-dark text-sm shrink-0">
-                  <i class="fa-solid fa-chart-line"></i>
-                </div>
-              </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5 mt-1.5">
-                <span>CVR: <strong><%= client.googleStats.cvr %></strong></span>
-              </div>
-            </div>
-            
-            <!-- KPI 4: Udio pojavljivanja (Impression Share) -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[160px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-2">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Impression Share</p>
-                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight"><%= client.googleStats.impressionShare %></h3>
-                </div>
-                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/15 flex items-center justify-center text-brand-dark text-sm shrink-0">
-                  <i class="fa-solid fa-eye"></i>
-                </div>
-              </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5 mt-1.5">
-                <span class="truncate">Izgubljeno: <%= client.googleStats.lostToBudget %></span>
-              </div>
-            </div>
 
-          </div>
-
-          <!-- Section 2: Financijski grafovi -->
-          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6">
-            <div class="xl:col-span-7 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Trošak vs. Konverzije (Dnevni trend)</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Financijski učinak</span>
-              </div>
-              <div id="google-chart-efficiency" class="w-full" style="height: 360px;"></div>
-            </div>
-            
-            <div class="xl:col-span-5 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Tempo potrošnje (Budget Pacing)</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Kumulativna idealna vs. stvarna linija</span>
-              </div>
-              <div id="google-chart-pacing" class="w-full" style="height: 360px;"></div>
-            </div>
-          </div>
-
-          <!-- Section 3: Strukturna analitika -->
-          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6">
-            <div class="xl:col-span-7 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Top 10 kampanja / Asset grupa</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Poredak kampanja po ROAS-u</span>
-              </div>
-              <div id="google-chart-campaigns" class="w-full" style="height: 380px;"></div>
-            </div>
-
-            <div class="xl:col-span-5 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Raspodjela rezultata po mrežama</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Search vs. PMax vs. YouTube vs. Display</span>
-              </div>
-              <div id="google-chart-networks" class="w-full" style="height: 380px;"></div>
-            </div>
-          </div>
-
-          <!-- Section 4: Geografija i Lijevak -->
-          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6">
-            <div class="xl:col-span-6 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Geografski & Uređajni udjeli</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Usporedba konverzija</span>
-              </div>
-              <div id="google-chart-devices-locations" class="w-full" style="height: 320px;"></div>
-            </div>
-
-            <div class="xl:col-span-6 glass-panel rounded-[1.75rem] p-6 shadow-sm flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between mb-3">
-                  <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Lijevak prodaje (GA4 Funnel)</h4>
-                  <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Klik do kupnje</span>
+              <!-- Bar Chart with Solid Vivid Orange Highlighted Bar + Pill Overlay -->
+              <div class="md:col-span-8 relative">
+                <div class="absolute top-2 right-[28%] z-10">
+                  <span class="z-badge-black text-xs px-3 py-1 shadow-sm">20% Peak</span>
                 </div>
-                <div id="google-chart-funnel" class="w-full" style="height: 300px;"></div>
+                <div id="z-chart-revenue-highlighted" class="w-full h-[200px]"></div>
               </div>
             </div>
           </div>
 
-          <!-- Section 5: Tablice -->
-          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6 items-stretch">
-            
-            <div class="xl:col-span-6 glass-panel rounded-[1.75rem] p-6 shadow-sm flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between mb-3.5">
-                  <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Ključne riječi i pretrage (Search terms)</h4>
-                  <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Top 5 upita</span>
+          <!-- RIGHT CARD: CAMPAIGN & POSTS TABLE (Like Bottom Right Table in Image) -->
+          <div class="lg:col-span-5 z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 flex flex-col justify-between h-[360px]">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-[#111113]">
+                  <i class="fa-solid fa-list-check text-sm"></i>
                 </div>
-                <div class="overflow-x-auto">
-                  <table class="w-full text-xs md:text-sm text-left border-collapse">
-                    <thead>
-                      <tr class="border-b border-brand-dark/15 text-brand-dark font-black">
-                        <th class="pb-2">Pojam</th>
-                        <th class="pb-2 text-center">Klikovi</th>
-                        <th class="pb-2 text-center">Konv.</th>
-                        <th class="pb-2 text-right">Trošak</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <% client.googleChartData.keywords.forEach(kw => { %>
-                        <tr class="border-b border-brand-dark/10 text-brand-dark font-semibold hover:bg-brand-dark/5 transition-colors">
-                          <td class="py-2.5 font-bold truncate max-w-[150px]" title="<%= kw.term %>"><%= kw.term %></td>
-                          <td class="py-2.5 text-center"><%= kw.clicks %></td>
-                          <td class="py-2.5 text-center font-extrabold text-emerald-800"><%= kw.convs %></td>
-                          <td class="py-2.5 text-right font-bold"><%= kw.cost %></td>
-                        </tr>
-                      <% }) %>
-                    </tbody>
-                  </table>
-                </div>
+                <h4 class="text-base font-black text-[#111113] uppercase tracking-wider">Aktivne Kampanje & Performanse</h4>
               </div>
-              <div class="text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5 mt-3">
-                Podaci iz Google Search Console i Ads upita.
-              </div>
-            </div>
-            
-            <div class="xl:col-span-6 glass-panel rounded-[1.75rem] p-6 shadow-sm flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between mb-3.5">
-                  <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Statusi i Upozorenja (Alerts)</h4>
-                  <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Dijagnostika kampanja</span>
-                </div>
-                <div class="space-y-3">
-                  <% client.googleChartData.alerts.forEach(al => { %>
-                    <div class="p-3 rounded-xl border flex flex-col gap-1 
-                      <%= al.type === 'warning' ? 'bg-amber-50 border-amber-300 text-amber-950' : '' %>
-                      <%= al.type === 'info' ? 'bg-sky-50 border-sky-300 text-sky-950' : '' %>
-                      <%= al.type === 'danger' ? 'bg-rose-50 border-rose-300 text-rose-950' : '' %>
-                      <%= al.type === 'normal' ? 'bg-emerald-50 border-emerald-300 text-emerald-950' : '' %>">
-                      <div class="flex justify-between items-center text-xs font-black uppercase">
-                        <span class="truncate max-w-[200px]" title="<%= al.campaign %>"><%= al.campaign %></span>
-                        <span class="px-2 py-0.5 rounded bg-white/60 font-black"><%= al.status %></span>
-                      </div>
-                      <span class="text-xs font-bold"><%= al.alert %></span>
-                    </div>
-                  <% }) %>
-                </div>
-              </div>
-              <div class="text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5 mt-3">
-                Pregled ranga kampanja, statusa učenja i rasta CPA.
-              </div>
+              <button class="bg-gray-100 hover:bg-black hover:text-white transition-colors rounded-full px-4 py-1.5 text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                <span>Spremi Prikaz</span>
+                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+              </button>
             </div>
 
+            <!-- Table of Campaigns -->
+            <div class="overflow-x-auto my-2">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="text-gray-400 uppercase tracking-wider font-bold text-[10px]">
+                    <th class="py-2 px-2">Status</th>
+                    <th class="py-2 px-2">Kampanja</th>
+                    <th class="py-2 px-2 text-right">Stopa Konverzije</th>
+                    <th class="py-2 px-2 text-right">Prihod</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 font-bold text-[#111113]">
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="py-2.5 px-2">
+                      <span class="z-badge-green px-2.5 py-0.5 text-[10px] flex items-center gap-1 w-max">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-2 font-black">Ljetna Akcija 2026</td>
+                    <td class="py-2.5 px-2 text-right">23.58%</td>
+                    <td class="py-2.5 px-2 text-right font-black text-zorange">$4,204</td>
+                  </tr>
+
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="py-2.5 px-2">
+                      <span class="z-badge-green px-2.5 py-0.5 text-[10px] flex items-center gap-1 w-max">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-2 font-black">Google PMax Promo</td>
+                    <td class="py-2.5 px-2 text-right">18.72%</td>
+                    <td class="py-2.5 px-2 text-right font-black text-zorange">$1,632</td>
+                  </tr>
+
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="py-2.5 px-2">
+                      <span class="z-badge-green px-2.5 py-0.5 text-[10px] flex items-center gap-1 w-max">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-2 font-black">Meta Retargeting</td>
+                    <td class="py-2.5 px-2 text-right">13.89%</td>
+                    <td class="py-2.5 px-2 text-right font-black text-zorange">$2,208</td>
+                  </tr>
+
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="py-2.5 px-2">
+                      <span class="z-badge-green px-2.5 py-0.5 text-[10px] flex items-center gap-1 w-max">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-2 font-black">TikTok Reels Campaign</td>
+                    <td class="py-2.5 px-2 text-right">10.54%</td>
+                    <td class="py-2.5 px-2 text-right font-black text-zorange">$1,240</td>
+                  </tr>
+
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="py-2.5 px-2">
+                      <span class="z-badge-green px-2.5 py-0.5 text-[10px] flex items-center gap-1 w-max">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-2 font-black">Organski Reels Natječaj</td>
+                    <td class="py-2.5 px-2 text-right">33.98%</td>
+                    <td class="py-2.5 px-2 text-right font-black text-zorange">$2,421</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
-        </section>
+        </div>
 
-        <!-- PLATFORM 3: TIKTOK STATISTICS SECTION (ULTRA PACKAGE EXCLUSIVE) -->
-        <section id="panel-tiktok" class="hidden transition-all duration-300 opacity-0 scale-95">
-          <!-- Grid of 4 TikTok metric cards -->
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
-            
-            <!-- Card 1: Total Spend -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[160px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-4">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Ukupna potrošnja</p>
-                  <h3 class="text-3xl font-black text-brand-dark mt-1.5 tracking-tight">$300</h3>
-                </div>
-                <div class="w-9 h-9 rounded-xl bg-brand-dark/5 border border-brand-dark/15 flex items-center justify-center text-brand-dark text-base transition-all duration-300 group-hover:scale-110">
-                  <i class="fa-brands fa-tiktok"></i>
-                </div>
-              </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5 mt-1.5">
-                <span>Video i Spark Ads kampanje</span>
-                <span class="font-extrabold text-brand-dark">TikTok Ads</span>
-              </div>
+        <!-- FULL ADVANCED DECISION ANALYTICS ROW -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+          <!-- Blended MER & Revenue Trend Chart -->
+          <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7 shadow-sm border border-black/5">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="text-sm font-black text-[#111113] uppercase tracking-wider">Blended MER & Zbirni Prihod Trend</h4>
+              <span class="text-xs text-gray-500 font-bold">Meta + Google + TikTok</span>
             </div>
-            
-            <!-- Card 2: Cost Per Conversion (CPA) -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[160px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-4">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">CPA (Cijena po upitu)</p>
-                  <h3 class="text-3xl font-black text-brand-dark mt-1.5 tracking-tight">$9.50</h3>
-                </div>
-                <span class="inline-flex items-center gap-1 text-xs font-black px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300">
-                  <i class="fa-solid fa-arrow-down"></i> 14%
-                </span>
-              </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5 mt-1.5">
-                <span>Cilj: $12.00</span>
-                <span class="font-extrabold text-emerald-800">Optimizirano</span>
-              </div>
-            </div>
-            
-            <!-- Card 3: Total Conversions -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[160px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-2">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Konverzije</p>
-                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight">32 Leads</h3>
-                </div>
-                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/15 flex items-center justify-center text-brand-dark text-sm shrink-0">
-                  <i class="fa-solid fa-user-check"></i>
-                </div>
-              </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5 mt-1.5">
-                <span>Generirano upita</span>
-              </div>
-            </div>
-            
-            <!-- Card 4: CTR -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[160px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-2">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Stopa klikanja (CTR)</p>
-                  <h3 class="text-2xl font-black text-brand-dark mt-2 tracking-tight">6.2%</h3>
-                </div>
-                <div class="w-8 h-8 rounded-xl bg-brand-dark/5 border border-brand-dark/15 flex items-center justify-center text-brand-dark text-sm shrink-0">
-                  <i class="fa-solid fa-arrow-pointer"></i>
-                </div>
-              </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5 mt-1.5">
-                <span>Prosjek industrije: 3.5%</span>
-              </div>
-            </div>
-
+            <div id="advanced-chart-blended" class="w-full" style="height: 300px;"></div>
           </div>
 
-          <!-- TikTok Visualizations -->
-          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mt-6">
-            <!-- TikTok Pacing / Efficiency -->
-            <div class="xl:col-span-7 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">TikTok Trend Učinkovitosti</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Dnevni trošak vs. Konverzije</span>
-              </div>
-              <div id="tiktok-chart-efficiency" class="w-full" style="height: 320px;"></div>
+          <!-- Dayparting Heatmap -->
+          <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7 shadow-sm border border-black/5">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="text-sm font-black text-[#111113] uppercase tracking-wider">Dayparting Toplinska Mapa (Vrijeme Konverzija)</h4>
+              <span class="text-xs text-gray-500 font-bold">Dani i sati visoke konverzije</span>
             </div>
-            
-            <!-- TikTok Video views/engagement horizontal bar -->
-            <div class="xl:col-span-5 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Top TikTok Videozapisi</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Klikovi / Pregledi / Dijeljenja</span>
-              </div>
-              <div id="tiktok-chart-videos" class="w-full" style="height: 320px;"></div>
-            </div>
+            <div id="advanced-chart-dayparting" class="w-full" style="height: 300px;"></div>
           </div>
-        </section>
+        </div>
 
-        <!-- PLATFORM LOCKED OVERLAY PANEL -->
-        <section id="panel-locked" class="hidden transition-all duration-300 opacity-0 scale-95">
-          <div class="glass-panel rounded-[2rem] p-12 flex flex-col items-center justify-center min-h-[400px] border-dashed border-2 border-brand-dark/20 text-center">
-            <div class="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-600 text-2xl mb-5 animate-pulse">
-              <i class="fa-solid fa-lock"></i>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+          <!-- Creative Fatigue Chart -->
+          <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7 shadow-sm border border-black/5">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="text-sm font-black text-[#111113] uppercase tracking-wider">Analiza Zamora Kreativnih Materijala</h4>
+              <span class="text-xs text-gray-500 font-bold">Frekvencija vs CTR vs CPA</span>
             </div>
-            <h3 class="text-xl font-black text-brand-dark uppercase tracking-wider mb-2">Platforma zaključana</h3>
-            <p id="locked-panel-text" class="text-brand-dark/80 text-sm font-bold max-w-md leading-relaxed mb-6">
-              Ova platforma nije uključena u zakupljeni paket suradnje.
-            </p>
-            <button onclick="switchPlatform('meta')" class="bg-brand-dark text-white rounded-full px-6 py-2.5 text-xs font-black uppercase tracking-wider hover:bg-brand-cyan hover:text-brand-dark transition-all duration-300 shadow-md">
-              Povratak na Meta Ads
-            </button>
+            <div id="advanced-chart-fatigue" class="w-full" style="height: 300px;"></div>
           </div>
-        </section>
 
-        <!-- SECTION 4: ADVANCED MARKETING DECISION ANALYTICS (360 OVERVIEW) -->
-        <section id="panel-advanced-analytics" class="transition-all duration-300 opacity-100 scale-100">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-cyan to-brand-green flex items-center justify-center shadow-md">
-                <i class="fa-solid fa-chart-pie text-brand-dark text-lg"></i>
-              </div>
-              <div>
-                <h3 class="text-xl font-black text-brand-dark uppercase tracking-wider">Napredna analitika za donošenje odluka</h3>
-                <p class="text-xs text-brand-dark/75 font-bold">Blended MER, Zamor kreativnih materijala, Dayparting analitika i LTV:CAC omjer</p>
-              </div>
+          <!-- LTV:CAC & Cohort Retention Chart -->
+          <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7 shadow-sm border border-black/5">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="text-sm font-black text-[#111113] uppercase tracking-wider">LTV : CAC Omjer & Zadržavanje Korisnika</h4>
+              <span class="text-xs text-gray-500 font-bold">Kohorta zadržavanja po mjesecima</span>
             </div>
-            <span class="px-3.5 py-1.5 rounded-full text-xs font-black uppercase bg-brand-dark text-white shadow-md self-start sm:self-auto">
-              Globalni 360° Uvid
+            <div id="advanced-chart-ltv" class="w-full" style="height: 300px;"></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- SECTION 2: META ADS -->
+      <section id="panel-meta" class="hidden transition-all duration-300 opacity-0 scale-95">
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-5 mb-8">
+          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
+            <p class="text-xs font-bold text-gray-500 uppercase">Potrošnja Meta Ads</p>
+            <h3 class="text-3xl font-black text-[#111113] mt-2"><%= client.metaStats.totalSpend %></h3>
+            <p class="text-xs text-emerald-600 font-bold mt-2">Optimalno iskorišteno</p>
+          </div>
+          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
+            <p class="text-xs font-bold text-gray-500 uppercase">Meta CPA (Trošak po konverziji)</p>
+            <h3 class="text-3xl font-black text-[#111113] mt-2"><%= client.metaStats.cpa %></h3>
+            <p class="text-xs text-emerald-600 font-bold mt-2">↓ <%= client.metaStats.cpaTrend.value %> pad troška</p>
+          </div>
+          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
+            <p class="text-xs font-bold text-gray-500 uppercase">Ostvareni Upiti (Leads)</p>
+            <h3 class="text-3xl font-black text-[#111113] mt-2"><%= client.metaStats.resultsValue %></h3>
+            <p class="text-xs text-gray-500 font-bold mt-2">Facebook & Instagram</p>
+          </div>
+          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
+            <p class="text-xs font-bold text-gray-500 uppercase">Organski Doseg (Reach)</p>
+            <h3 class="text-3xl font-black text-[#111113] mt-2"><%= client.metaStats.organicReach %></h3>
+            <p class="text-xs text-emerald-600 font-bold mt-2">+28% organski skok</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+          <div class="lg:col-span-8 z-card-white rounded-[2rem] p-7">
+            <h4 class="text-sm font-black uppercase text-[#111113] mb-3">Učinkovitost Oglasa po Danima</h4>
+            <div id="meta-chart-efficiency" class="w-full" style="height: 320px;"></div>
+          </div>
+          <div class="lg:col-span-4 z-card-white rounded-[2rem] p-7">
+            <h4 class="text-sm font-black uppercase text-[#111113] mb-3">Potrošnja po Platformama</h4>
+            <div id="meta-chart-platforms" class="w-full" style="height: 320px;"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+          <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7">
+            <h4 class="text-sm font-black uppercase text-[#111113] mb-3">Demografija Publike</h4>
+            <div id="meta-chart-audience" class="w-full" style="height: 320px;"></div>
+          </div>
+          <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7">
+            <h4 class="text-sm font-black uppercase text-[#111113] mb-3">Angažman po Vrsti Objava</h4>
+            <div id="meta-chart-posts" class="w-full" style="height: 320px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: GOOGLE ADS (PMAX FOCUS) -->
+      <section id="panel-google" class="hidden transition-all duration-300 opacity-0 scale-95">
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-5 mb-8">
+          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
+            <p class="text-xs font-bold text-gray-500 uppercase">Google Ads Potrošnja</p>
+            <h3 class="text-3xl font-black text-[#111113] mt-2"><%= client.googleStats.totalSpend %></h3>
+            <p class="text-xs text-gray-500 font-bold mt-2">Proračun: <%= client.googleStats.monthlyBudgetLimit %></p>
+          </div>
+          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
+            <p class="text-xs font-bold text-gray-500 uppercase">Google CPA</p>
+            <h3 class="text-3xl font-black text-[#111113] mt-2"><%= client.googleStats.cpa %></h3>
+            <p class="text-xs text-emerald-600 font-bold mt-2">Cilj: <%= client.googleStats.cpaTarget %></p>
+          </div>
+          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
+            <p class="text-xs font-bold text-gray-500 uppercase">Impression Share</p>
+            <h3 class="text-3xl font-black text-[#111113] mt-2"><%= client.googleStats.impressionShare %></h3>
+            <p class="text-xs text-gray-500 font-bold mt-2">Search & PMax udjel</p>
+          </div>
+          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
+            <p class="text-xs font-bold text-gray-500 uppercase">Prosječni CPC</p>
+            <h3 class="text-3xl font-black text-[#111113] mt-2"><%= client.googleStats.avgCpc %></h3>
+            <p class="text-xs text-emerald-600 font-bold mt-2">Niski trošak klika</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+          <div class="lg:col-span-8 z-card-white rounded-[2rem] p-7">
+            <h4 class="text-sm font-black uppercase text-[#111113] mb-3">Google Ads Trend Učinkovitosti</h4>
+            <div id="google-chart-efficiency" class="w-full" style="height: 320px;"></div>
+          </div>
+          <div class="lg:col-span-4 z-card-white rounded-[2rem] p-7">
+            <h4 class="text-sm font-black uppercase text-[#111113] mb-3">Google Mreže (PMax vs Search)</h4>
+            <div id="google-chart-networks" class="w-full" style="height: 320px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: TIKTOK ADS -->
+      <section id="panel-tiktok" class="hidden transition-all duration-300 opacity-0 scale-95">
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-5 mb-8">
+          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
+            <p class="text-xs font-bold text-gray-500 uppercase">TikTok Potrošnja</p>
+            <h3 class="text-3xl font-black text-[#111113] mt-2">$300</h3>
+            <p class="text-xs text-gray-500 font-bold mt-2">Video Oglasi</p>
+          </div>
+          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
+            <p class="text-xs font-bold text-gray-500 uppercase">Ukupno Pregleda Videa</p>
+            <h3 class="text-3xl font-black text-[#111113] mt-2">22,000</h3>
+            <p class="text-xs text-emerald-600 font-bold mt-2">High Engagement</p>
+          </div>
+          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
+            <p class="text-xs font-bold text-gray-500 uppercase">Konverzije</p>
+            <h3 class="text-3xl font-black text-[#111113] mt-2">32 Leads</h3>
+            <p class="text-xs text-emerald-600 font-bold mt-2">CPA: $9.37</p>
+          </div>
+          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
+            <p class="text-xs font-bold text-gray-500 uppercase">CTR Videa</p>
+            <h3 class="text-3xl font-black text-[#111113] mt-2">6.2%</h3>
+            <p class="text-xs text-emerald-600 font-bold mt-2">Izvanredna udica</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+          <div class="lg:col-span-7 z-card-white rounded-[2rem] p-7">
+            <h4 class="text-sm font-black uppercase text-[#111113] mb-3">TikTok Trend Učinkovitosti</h4>
+            <div id="tiktok-chart-efficiency" class="w-full" style="height: 320px;"></div>
+          </div>
+          <div class="lg:col-span-5 z-card-white rounded-[2rem] p-7">
+            <h4 class="text-sm font-black uppercase text-[#111113] mb-3">Top TikTok Videozapisi</h4>
+            <div id="tiktok-chart-videos" class="w-full" style="height: 320px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 5: OBJAVE & SADRŽAJ (SOCIAL MEDIA VISUAL GALLERY) -->
+      <section id="panel-social" class="hidden transition-all duration-300 opacity-0 scale-95">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+          <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7">
+            <h4 class="text-sm font-black text-[#111113] uppercase mb-3">Pregledi po Platformama</h4>
+            <div id="social-chart-platforms" class="w-full" style="height: 280px;"></div>
+          </div>
+          <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7">
+            <h4 class="text-sm font-black text-[#111113] uppercase mb-3">Učinkovitost po Formatu Objava</h4>
+            <div id="social-chart-formats" class="w-full" style="height: 280px;"></div>
+          </div>
+        </div>
+
+        <!-- VISUAL CREATIVE GALLERY - OBJAVE S SLIKOM I ANALITIKOM -->
+        <div class="mb-8">
+          <div class="flex items-center justify-between gap-3 mb-6">
+            <h4 class="text-xl font-black text-[#111113] uppercase tracking-wider flex items-center gap-2">
+              <i class="fa-solid fa-images text-zorange"></i> Vizualni pregled svih objavljenih kreativa
+            </h4>
+            <span class="z-badge-black text-xs px-4 py-1.5 shadow-xs">
+              Ukupno objavljeno: <%= client.socialMediaStats.creatives.length %> objava
             </span>
           </div>
 
-          <!-- Top Blended KPI Cards -->
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-6">
-            <!-- Card 1: Total Blended Spend -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-3">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Zbirni trošak (All Channels)</p>
-                  <h3 class="text-2xl font-black text-brand-dark mt-1.5 tracking-tight"><%= client.advancedAnalytics.blended.totalSpend %></h3>
-                </div>
-                <div class="w-9 h-9 rounded-xl bg-brand-dark/5 border border-brand-dark/15 flex items-center justify-center text-brand-dark text-base">
-                  <i class="fa-solid fa-calculator"></i>
-                </div>
-              </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5">
-                <span>Meta + Google + TikTok</span>
-                <span class="font-extrabold text-brand-dark">Ukupno</span>
-              </div>
-            </div>
-
-            <!-- Card 2: Total Blended Revenue -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-3">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Ukupni procjenjeni prihod</p>
-                  <h3 class="text-2xl font-black text-emerald-800 mt-1.5 tracking-tight"><%= client.advancedAnalytics.blended.totalRevenue %></h3>
-                </div>
-                <div class="w-9 h-9 rounded-xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-900 text-base">
-                  <i class="fa-solid fa-sack-dollar"></i>
-                </div>
-              </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5">
-                <span>Attributed Revenue</span>
-                <span class="font-extrabold text-emerald-800">Profitabilno</span>
-              </div>
-            </div>
-
-            <!-- Card 3: Blended MER (ROAS) -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-3">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Blended MER / ROAS</p>
-                  <h3 class="text-2xl font-black text-brand-dark mt-1.5 tracking-tight"><%= client.advancedAnalytics.blended.blendedMer %></h3>
-                </div>
-                <div class="w-9 h-9 rounded-xl bg-brand-cyan/30 border border-brand-cyan/50 flex items-center justify-center text-brand-dark text-base">
-                  <i class="fa-solid fa-chart-line"></i>
-                </div>
-              </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5">
-                <span>Marketing Efficiency Ratio</span>
-                <span class="font-extrabold text-brand-dark">Target: >3.5x</span>
-              </div>
-            </div>
-
-            <!-- Card 4: LTV : CAC Ratio -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm relative overflow-hidden group sm:col-span-6 xl:col-span-3">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">LTV : CAC Omjer</p>
-                  <h3 class="text-2xl font-black text-brand-dark mt-1.5 tracking-tight"><%= client.advancedAnalytics.ltvCac.ltvCacRatio %></h3>
-                </div>
-                <div class="w-9 h-9 rounded-xl bg-brand-pink/30 border border-brand-pink/50 flex items-center justify-center text-brand-dark text-base">
-                  <i class="fa-solid fa-scale-balanced"></i>
-                </div>
-              </div>
-              <div class="flex justify-between items-center text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2.5">
-                <span>CAC: <%= client.advancedAnalytics.ltvCac.cac %></span>
-                <span class="font-extrabold text-emerald-800">Zdrav omjer (>3.0x)</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Advanced Charts Row 1: Blended MER & Creative Fatigue -->
-          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mb-6">
-            <!-- Chart 1: Blended MER Trend -->
-            <div class="xl:col-span-7 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">1. Blended MER & Prihod (Zbirno sve platforme)</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Trošak vs. Prihod vs. MER</span>
-              </div>
-              <div id="advanced-chart-blended" class="w-full" style="height: 350px;"></div>
-            </div>
-
-            <!-- Chart 2: Creative Fatigue -->
-            <div class="xl:col-span-5 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">2. Zamor Kreativa i Frekvencija Prikaza</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Frekvencija vs. CTR vs. CPA</span>
-              </div>
-              <div id="advanced-chart-fatigue" class="w-full" style="height: 350px;"></div>
-            </div>
-          </div>
-
-          <!-- Advanced Charts Row 2: Dayparting Heatmap & LTV:CAC Cohort -->
-          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
-            <!-- Chart 3: Dayparting Heatmap -->
-            <div class="xl:col-span-7 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">3. Dayparting Toplinska Karta (Aktivnost po danima i satima)</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Vršni termini konverzija</span>
-              </div>
-              <div id="advanced-chart-dayparting" class="w-full" style="height: 350px;"></div>
-            </div>
-
-            <!-- Chart 4: LTV & Cohort Retention -->
-            <div class="xl:col-span-5 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">4. LTV Rastezanje & Zadržavanje Kupaca</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Vrijednost kroz mjesece</span>
-              </div>
-              <div id="advanced-chart-ltv" class="w-full" style="height: 350px;"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- SECTION 5: SOCIAL MEDIA CONTENT MANAGER SECTION -->
-        <section id="panel-social" class="hidden transition-all duration-300">
-          
-          <!-- Header Banner -->
-          <div class="glass-panel rounded-[2rem] p-6 mb-6 shadow-md border border-brand-dark/15 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div class="flex items-center gap-3.5">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-pink to-brand-cyan flex items-center justify-center text-brand-dark text-xl font-black shadow-sm">
-                <i class="fa-solid fa-photo-film"></i>
-              </div>
-              <div>
-                <h3 class="text-xl font-black text-brand-dark uppercase tracking-wider">Upravljanje Objavama i Sadržajem (Social Media)</h3>
-                <p class="text-xs text-brand-dark/75 font-bold mt-0.5">Instagram, Facebook & TikTok objave s vizualima, pregledima i usporedbom uspješnosti</p>
-              </div>
-            </div>
-            
-            <div class="flex items-center gap-3">
-              <span class="px-3.5 py-1.5 rounded-full text-xs font-black uppercase bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-sm flex items-center gap-1.5">
-                <i class="fa-solid fa-circle-check"></i> <%= client.socialMediaStats.monthlyPublished %> / <%= client.socialMediaStats.monthlyTarget %> Objavljeno (<%= client.socialMediaStats.progressPercent %>%)
-              </span>
-            </div>
-          </div>
-
-          <!-- Social Media Overview Cards -->
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-6">
-            <!-- Card 1: Published Posts Count -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm sm:col-span-6 xl:col-span-3">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Objavljene objave</p>
-                  <h3 class="text-2xl font-black text-brand-dark mt-1.5"><%= client.socialMediaStats.monthlyPublished %> / <%= client.socialMediaStats.monthlyTarget %></h3>
-                </div>
-                <div class="w-9 h-9 rounded-xl bg-brand-cyan/25 border border-brand-cyan/50 flex items-center justify-center text-brand-dark text-base">
-                  <i class="fa-solid fa-cloud-arrow-up"></i>
-                </div>
-              </div>
-              <div class="w-full bg-brand-dark/10 rounded-full h-2.5 overflow-hidden">
-                <div class="bg-brand-dark h-2.5 rounded-full" style="width: <%= client.socialMediaStats.progressPercent %>%;"></div>
-              </div>
-            </div>
-
-            <!-- Card 2: Total Impressions -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm sm:col-span-6 xl:col-span-3">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Ukupno impresija objava</p>
-                  <h3 class="text-2xl font-black text-brand-dark mt-1.5"><%= client.socialMediaStats.totalImpressions %></h3>
-                </div>
-                <div class="w-9 h-9 rounded-xl bg-brand-green/30 border border-brand-green/50 flex items-center justify-center text-brand-dark text-base">
-                  <i class="fa-solid fa-eye"></i>
-                </div>
-              </div>
-              <div class="text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2 flex justify-between">
-                <span>Organski doseg:</span>
-                <span class="font-extrabold text-brand-dark"><%= client.socialMediaStats.totalReach %></span>
-              </div>
-            </div>
-
-            <!-- Card 3: Total Engagements -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm sm:col-span-6 xl:col-span-3">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Reakcije i interakcije</p>
-                  <h3 class="text-2xl font-black text-brand-dark mt-1.5"><%= client.socialMediaStats.totalEngagements %></h3>
-                </div>
-                <div class="w-9 h-9 rounded-xl bg-brand-pink/30 border border-brand-pink/50 flex items-center justify-center text-brand-dark text-base">
-                  <i class="fa-solid fa-heart"></i>
-                </div>
-              </div>
-              <div class="text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2 flex justify-between">
-                <span>Lajkovi + Komentari + Shares</span>
-                <span class="font-extrabold text-brand-dark">Aktivno</span>
-              </div>
-            </div>
-
-            <!-- Card 4: Avg Engagement Rate -->
-            <div class="glass-panel rounded-[1.75rem] p-5 flex flex-col justify-between h-[150px] shadow-sm sm:col-span-6 xl:col-span-3">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-xs uppercase tracking-wider text-brand-dark/75 font-bold">Engagement Rate (Stopa)</p>
-                  <h3 class="text-2xl font-black text-emerald-800 mt-1.5"><%= client.socialMediaStats.avgEngagementRate %></h3>
-                </div>
-                <div class="w-9 h-9 rounded-xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-900 text-base">
-                  <i class="fa-solid fa-bolt"></i>
-                </div>
-              </div>
-              <div class="text-xs text-brand-dark/75 font-bold border-t border-brand-dark/10 pt-2 flex justify-between">
-                <span>Prosjek industrije: ~2.5%</span>
-                <span class="font-extrabold text-emerald-800">Iznad prosjeka</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- SOCIAL MEDIA CHARTS ROW -->
-          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 mb-8">
-            <!-- Chart 1: Platform Views Breakdown (Instagram vs Facebook vs TikTok) -->
-            <div class="xl:col-span-6 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Pregledi objava po platformama</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Instagram / Facebook / TikTok</span>
-              </div>
-              <div id="social-chart-platforms" class="w-full" style="height: 280px;"></div>
-            </div>
-
-            <!-- Chart 2: Format Performance (Reels vs Carousels vs Images) -->
-            <div class="xl:col-span-6 glass-panel rounded-[1.75rem] p-6 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-extrabold text-brand-dark uppercase tracking-wider">Učinkovitost po formatu objava</h4>
-                <span class="text-xs text-brand-dark/75 font-bold uppercase tracking-wider">Prosječni pregledi po vrsti sadržaja</span>
-              </div>
-              <div id="social-chart-formats" class="w-full" style="height: 280px;"></div>
-            </div>
-          </div>
-
-          <!-- VISUAL CREATIVE GALLERY - OBJAVE S SLIKOM I ANALITIKOM -->
-          <div class="mb-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-              <h4 class="text-lg font-black text-brand-dark uppercase tracking-wider flex items-center gap-2">
-                <i class="fa-solid fa-images text-brand-dark"></i> Vizualni pregled svih objavljenih kreativa
-              </h4>
-              <span class="text-xs font-bold text-brand-dark/75 uppercase bg-brand-dark/10 px-3 py-1 rounded-full border border-brand-dark/15">
-                Ukupno objavljeno: <%= client.socialMediaStats.creatives.length %> objava
-              </span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              <% client.socialMediaStats.creatives.forEach(post => { %>
-                <div class="glass-panel rounded-[1.75rem] overflow-hidden shadow-md border border-brand-dark/15 flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% client.socialMediaStats.creatives.forEach(post => { %>
+              <div class="z-card-white z-card-white-hover rounded-[2rem] overflow-hidden flex flex-col justify-between">
+                
+                <!-- Creative Image Header Container -->
+                <div class="relative h-60 w-full overflow-hidden bg-gray-100 group">
+                  <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   
-                  <!-- Creative Image Header Container -->
-                  <div class="relative h-56 w-full overflow-hidden bg-brand-dark/10 group">
-                    <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    
-                    <!-- Gradient Overlay -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-brand-dark/90 via-brand-dark/30 to-transparent"></div>
-                    
-                    <!-- Top Badges Overlay -->
-                    <div class="absolute top-3 left-3 right-3 flex justify-between items-center gap-2">
-                      <span class="px-2.5 py-1 rounded-full text-xs font-black uppercase bg-white/95 text-brand-dark shadow-sm border border-brand-dark/20 flex items-center gap-1.5">
-                        <i class="<%= post.platformIcon %>"></i> <%= post.platform %>
-                      </span>
-                      <span class="px-2.5 py-1 rounded-full text-xs font-black uppercase shadow-sm border <%= post.badgeClass %>">
-                        <%= post.badge %>
-                      </span>
-                    </div>
-
-                    <!-- Bottom Title & Format Overlay -->
-                    <div class="absolute bottom-3 left-3 right-3 text-white">
-                      <span class="text-[10px] font-extrabold uppercase tracking-wider bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded text-white/90 mb-1 inline-block border border-white/20">
-                        <%= post.type %> • <%= post.date %>
-                      </span>
-                      <h5 class="text-base font-black leading-snug drop-shadow-md"><%= post.title %></h5>
-                    </div>
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                  
+                  <div class="absolute top-4 left-4 right-4 flex justify-between items-center gap-2">
+                    <span class="px-3 py-1 rounded-full text-xs font-black uppercase bg-white text-[#111113] shadow-md flex items-center gap-1.5">
+                      <i class="<%= post.platformIcon %>"></i> <%= post.platform %>
+                    </span>
+                    <span class="px-3 py-1 rounded-full text-xs font-black uppercase shadow-md bg-zorange text-white">
+                      <%= post.badge %>
+                    </span>
                   </div>
 
-                  <!-- Creative Performance Stats Grid -->
-                  <div class="p-5">
-                    <div class="grid grid-cols-3 gap-2 bg-brand-dark/5 p-3 rounded-2xl text-center mb-4 border border-brand-dark/10">
-                      <div>
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brand-dark/60">👁️ Pregledi</span>
-                        <span class="font-black text-sm text-brand-dark"><%= post.impressions %></span>
-                      </div>
-                      <div>
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brand-dark/60">👤 Doseg</span>
-                        <span class="font-black text-sm text-brand-dark"><%= post.reach %></span>
-                      </div>
-                      <div>
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-brand-dark/60">⚡ Eng. Rate</span>
-                        <span class="font-black text-sm <%= post.rank === 'top' ? 'text-emerald-800' : (post.rank === 'bottom' ? 'text-amber-900' : 'text-brand-dark') %>"><%= post.engagementRate %></span>
-                      </div>
-                    </div>
-
-                    <!-- Detail Interactions -->
-                    <div class="flex justify-around items-center text-xs font-bold text-brand-dark/80 pb-3 border-b border-brand-dark/10">
-                      <span class="flex items-center gap-1"><i class="fa-solid fa-heart text-rose-500"></i> <%= post.likes %> lajkova</span>
-                      <span class="flex items-center gap-1"><i class="fa-solid fa-comment text-sky-600"></i> <%= post.comments %> komentara</span>
-                      <span class="flex items-center gap-1"><i class="fa-solid fa-share text-emerald-600"></i> <%= post.shares %> dijeljenja</span>
-                    </div>
-
-                    <!-- Note / Performance Feedback Box -->
-                    <div class="mt-3.5 p-3 rounded-xl text-xs font-bold leading-relaxed border <%= post.rank === 'top' ? 'bg-emerald-50 text-emerald-900 border-emerald-200' : (post.rank === 'bottom' ? 'bg-amber-50 text-amber-900 border-amber-200' : 'bg-white/80 text-brand-dark border-brand-dark/15') %>">
-                      <% if (post.rank === 'top') { %>
-                        💡 <strong>Zašto je uspješna:</strong> <%= post.note %>
-                      <% } else if (post.rank === 'bottom') { %>
-                        🛠️ <strong>Savjet za optimizaciju:</strong> <%= post.note %>
-                      <% } else { %>
-                        📌 <strong>Uvid:</strong> <%= post.note %>
-                      <% } %>
-                    </div>
+                  <div class="absolute bottom-4 left-4 right-4 text-white">
+                    <span class="text-[10px] font-black uppercase tracking-wider bg-black/50 backdrop-blur-sm px-2.5 py-0.5 rounded text-white/90 mb-1 inline-block border border-white/20">
+                      <%= post.type %> • <%= post.date %>
+                    </span>
+                    <h5 class="text-base font-black leading-snug drop-shadow-md"><%= post.title %></h5>
                   </div>
-
                 </div>
-              <% }); %>
-            </div>
-          </div>
 
-        </section>
+                <!-- Creative Performance Stats Grid -->
+                <div class="p-6">
+                  <div class="grid grid-cols-3 gap-2 bg-gray-50 p-3 rounded-2xl text-center mb-4 border border-gray-100">
+                    <div>
+                      <span class="block text-[10px] font-bold uppercase text-gray-400">👁️ Pregledi</span>
+                      <span class="font-black text-sm text-[#111113]"><%= post.impressions %></span>
+                    </div>
+                    <div>
+                      <span class="block text-[10px] font-bold uppercase text-gray-400">👤 Doseg</span>
+                      <span class="font-black text-sm text-[#111113]"><%= post.reach %></span>
+                    </div>
+                    <div>
+                      <span class="block text-[10px] font-bold uppercase text-gray-400">⚡ Eng. Rate</span>
+                      <span class="font-black text-sm text-zorange"><%= post.engagementRate %></span>
+                    </div>
+                  </div>
 
-      </main>
+                  <div class="flex justify-around items-center text-xs font-bold text-gray-600 pb-3 border-b border-gray-100">
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-heart text-rose-500"></i> <%= post.likes %></span>
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-comment text-sky-600"></i> <%= post.comments %></span>
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-share text-emerald-600"></i> <%= post.shares %></span>
+                  </div>
 
-      <!-- RIGHT COLUMN: AI Assistant Sidebar (20% of width) -->
-      <aside class="w-full lg:w-[24%] xl:w-[21%] flex flex-col h-[calc(100vh-140px)] sticky top-28 glass-panel rounded-[2rem] shadow-lg overflow-hidden border border-brand-dark/15">
-        
-        <!-- Chat Header -->
-        <div class="flex items-center justify-between p-4 border-b border-brand-dark/15 bg-white/40">
-          <div class="flex items-center gap-2">
-            <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-brand-cyan to-brand-green flex items-center justify-center shadow-sm">
-              <i class="fa-solid fa-wand-magic-sparkles text-xs text-brand-dark"></i>
-            </div>
-            <h4 class="text-xs md:text-sm font-black text-brand-dark uppercase tracking-wider">AI Asistent</h4>
-          </div>
-          <span class="inline-flex items-center gap-1 text-xs font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">
-            Online
-          </span>
-        </div>
+                  <div class="mt-3.5 p-3 rounded-xl text-xs font-bold leading-relaxed border <%= post.rank === 'top' ? 'bg-emerald-50 text-emerald-950 border-emerald-200' : 'bg-gray-50 text-[#111113] border-gray-200' %>">
+                    📌 <strong>Uvid:</strong> <%= post.note %>
+                  </div>
+                </div>
 
-        <!-- Chat History Log -->
-        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 text-xs md:text-sm scrollbar-thin">
-          <!-- Initial Assistant Message -->
-          <div class="flex items-start gap-2.5 max-w-[88%]">
-            <div class="w-8 h-8 rounded-lg bg-brand-dark/10 flex items-center justify-center border border-brand-dark/15 shrink-0">
-              <i class="fa-solid fa-robot text-brand-dark text-xs"></i>
-            </div>
-            <div class="glass-panel p-3.5 rounded-2xl rounded-tl-none text-brand-dark font-medium shadow-sm leading-relaxed border border-brand-dark/15">
-              Pozdrav! Ja sam tvoj integrirani marketinški AI asistent za klijenta <strong><%= client.name %></strong>.
-              Imam uvid u sve brojeve, PMax kampanje, Meta oglase i objave na društvenim mrežama. Pitaj me kako poboljšati rezultate!
-            </div>
+              </div>
+            <% }); %>
           </div>
         </div>
+      </section>
 
-        <!-- Chat Input Form & Suggestions -->
-        <div class="p-3.5 border-t border-brand-dark/15 bg-white/30">
-          <!-- Suggestion Chips -->
-          <div id="suggestion-container" class="flex flex-wrap gap-1.5 mb-2.5">
-            <button onclick="sendSuggestion('Što ne valja i kako to popraviti?')" class="text-xs font-black text-rose-950 bg-rose-100 hover:bg-rose-200 border border-rose-300 px-2.5 py-1 rounded-full transition-all duration-300 shadow-sm">
-              🔴 Što ne valja i kako popraviti?
-            </button>
-            <button onclick="sendSuggestion('Kako optimizirati Google PMax kampanju?')" class="text-xs font-bold text-brand-dark/90 hover:text-brand-dark bg-white/90 hover:bg-white border border-brand-dark/20 px-2.5 py-1 rounded-full transition-all duration-300 shadow-sm">
-              🔍 Optimiziraj PMax
-            </button>
-            <button onclick="sendSuggestion('Kako riješiti zamor Meta Kreative #4?')" class="text-xs font-bold text-brand-dark/90 hover:text-brand-dark bg-white/90 hover:bg-white border border-brand-dark/20 px-2.5 py-1 rounded-full transition-all duration-300 shadow-sm">
-              🎯 Riješi zamor Meta oglasa
-            </button>
-            <button onclick="sendSuggestion('Daj mi preporuku za Mjesečni plan objava')" class="text-xs font-bold text-brand-dark/90 hover:text-brand-dark bg-white/90 hover:bg-white border border-brand-dark/20 px-2.5 py-1 rounded-full transition-all duration-300 shadow-sm">
-              📸 Plan objava i kreativa
-            </button>
-          </div>
-
-          <!-- Input Area -->
-          <form id="chat-form" onsubmit="handleChatSubmit(event)" class="relative flex items-center">
-            <textarea 
-              id="chat-input" 
-              rows="1" 
-              placeholder="Pitaj me nešto..." 
-              class="w-full bg-white/80 border border-brand-dark/20 rounded-2xl pl-4 pr-10 py-2.5 text-xs md:text-sm font-semibold text-brand-dark placeholder-brand-dark/60 focus:outline-none focus:ring-2 focus:ring-brand-cyan/60 resize-none overflow-y-hidden h-[42px] transition-all shadow-sm"
-              oninput="adjustInputHeight(this)"
-              onkeydown="handleInputKeydown(event)"
-            ></textarea>
-            <button 
-              type="submit" 
-              class="absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-dark hover:scale-110 transition-transform"
-            >
-              <i class="fa-solid fa-paper-plane text-sm"></i>
-            </button>
-          </form>
-        </div>
-
-      </aside>
-
-    </div>
+    </main>
 
   </div>
 
-  <!-- Client-side tab switching and ECharts + SSE Chat scripts -->
+  <!-- Client-side tab switching and ECharts initialization scripts -->
   <script>
-    // Load chartData passed from express server
     const clientPackage = '<%= client.package %>';
     const chartData = <%- JSON.stringify(client.chartData) %>;
     const googleChartData = <%- JSON.stringify(client.googleChartData) %>;
     const clientId = '<%= client.id %>';
-    let conversationHistory = []; // Tracks chat messages for multi-turn context
     
-    // Meta Charts
+    // ECharts Instances
+    let mfrGaugeChart, revenueSparklineChart, subscribersBarChart, revenueHighlightedChart;
     let efficiencyChart, platformsChart, audienceChart, postsChart, reachChart;
-    // Google Charts
-    let googleEfficiencyChart, googlePacingChart, googleNetworksChart, googleCampaignsChart, googleDevicesLocationsChart, googleFunnelChart;
-    // TikTok Charts (Ultra Package Exclusive)
+    let googleEfficiencyChart, googleNetworksChart;
     let tiktokEfficiencyChart, tiktokVideosChart;
-    // Advanced Decision Analytics Charts
     let blendedChart, fatigueChart, daypartingChart, ltvChart;
-    // Social Media Content Charts
     let socialPlatformsChart, socialFormatsChart;
 
-    // Helper to initialize ECharts
     document.addEventListener('DOMContentLoaded', () => {
       initCharts();
     });
 
     function initCharts() {
       /* ----------------------------------------------------
-         META ADS ECHARTS SETUP
+         ZELLIFY DASHBOARD ECHARTS SETUP
          ---------------------------------------------------- */
-      efficiencyChart = echarts.init(document.getElementById('meta-chart-efficiency'));
-      efficiencyChart.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
-        legend: {
-          data: ['Dnevni trošak', 'Konverzije'],
-          textStyle: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 700, fontSize: 12 }
-        },
-        grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
-        xAxis: {
-          type: 'category',
-          data: chartData.days,
-          axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.2)' } },
-          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 }
-        },
-        yAxis: [
-          {
-            type: 'value',
-            name: 'Trošak ($)',
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 },
-            splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.08)' } }
-          },
-          {
-            type: 'value',
-            name: 'Konverzije',
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 },
-            splitLine: { show: false }
-          }
-        ],
-        series: [
-          {
-            name: 'Dnevni trošak',
-            type: 'line',
-            data: chartData.spendDaily,
-            smooth: true,
-            symbol: 'circle',
-            symbolSize: 6,
-            lineStyle: { width: 3 },
-            itemStyle: { color: '#00796B' }
-          },
-          {
-            name: 'Konverzije',
-            type: 'line',
-            yAxisIndex: 1,
-            data: chartData.conversionsDaily,
-            smooth: true,
-            symbol: 'circle',
-            symbolSize: 6,
-            lineStyle: { width: 3 },
-            itemStyle: { color: '#D81B60' }
-          }
-        ]
-      });
 
-      platformsChart = echarts.init(document.getElementById('meta-chart-platforms'));
-      platformsChart.setOption({
-        tooltip: { trigger: 'item', formatter: '{b}: ${c} ({d}%)' },
-        legend: {
-          bottom: '0',
-          left: 'center',
-          textStyle: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.9)', fontWeight: 700, fontSize: 12 }
-        },
-        series: [
-          {
-            name: 'Potrošnja',
-            type: 'pie',
-            radius: ['45%', '70%'],
-            avoidLabelOverlap: false,
-            itemStyle: { borderRadius: 10, borderColor: '#ffffff', borderWidth: 2 },
-            label: { show: false, position: 'center' },
-            emphasis: {
-              label: {
-                show: true,
-                fontSize: 15,
-                fontWeight: 'bold',
-                fontFamily: 'Urbanist',
-                formatter: '{b}\n{d}%'
-              }
+      // 1. Hero Dark Card Half-Donut Gauge (MFR / MER)
+      const mfrGaugeElem = document.getElementById('z-chart-mfr-gauge');
+      if (mfrGaugeElem) {
+        mfrGaugeChart = echarts.init(mfrGaugeElem);
+        mfrGaugeChart.setOption({
+          series: [{
+            type: 'gauge',
+            startAngle: 180,
+            endAngle: 0,
+            min: 0,
+            max: 100,
+            pointer: { show: false },
+            progress: {
+              show: true,
+              overlap: false,
+              roundCap: true,
+              clip: false,
+              itemStyle: { color: '#FF5F00' }
             },
-            labelLine: { show: false },
-            data: chartData.platforms,
-            color: ['#96D8D0', '#F1B4B9', '#DAF4AA']
-          }
-        ]
-      });
+            axisLine: { lineStyle: { width: 14, color: [[1, 'rgba(255, 255, 255, 0.15)']] } },
+            splitLine: { show: false },
+            axisTick: { show: false },
+            axisLabel: { show: false },
+            data: [{ value: 74, name: '' }],
+            detail: { show: false }
+          }]
+        });
+      }
 
-      audienceChart = echarts.init(document.getElementById('meta-chart-audience'));
-      audienceChart.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { left: '3%', right: '5%', bottom: '3%', containLabel: true },
-        xAxis: {
-          type: 'value',
-          splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.08)' } },
-          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 }
-        },
-        yAxis: {
-          type: 'category',
-          data: [...chartData.audienceCategories].reverse(),
-          axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.2)' } },
-          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.95)', fontWeight: 700, fontSize: 12 }
-        },
-        series: [
-          {
-            name: 'Konverzije',
-            type: 'bar',
-            data: [...chartData.audienceValues].reverse(),
-            itemStyle: {
-              borderRadius: [0, 5, 5, 0],
-              color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-                { offset: 0, color: '#96D8D0' },
-                { offset: 1, color: '#DAF4AA' }
-              ])
-            }
-          }
-        ]
-      });
-
-      postsChart = echarts.init(document.getElementById('meta-chart-posts'));
-      postsChart.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        legend: {
-          data: ['Lajkovi', 'Komentari', 'Dijeljenja'],
-          bottom: '0',
-          textStyle: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.9)', fontWeight: 700, fontSize: 12 }
-        },
-        grid: { left: '3%', right: '5%', bottom: '10%', containLabel: true },
-        xAxis: {
-          type: 'value',
-          splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.08)' } },
-          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 }
-        },
-        yAxis: {
-          type: 'category',
-          data: [...chartData.topPostsTitles].reverse(),
-          axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.2)' } },
-          axisLabel: { 
-            fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.95)', fontWeight: 700, fontSize: 12,
-            formatter: function(value) { return value.length > 14 ? value.slice(0, 11) + '...' : value; }
-          }
-        },
-        series: [
-          { name: 'Lajkovi', type: 'bar', stack: 'engagement', data: [...chartData.topPostsLikes].reverse(), itemStyle: { color: '#96D8D0' } },
-          { name: 'Komentari', type: 'bar', stack: 'engagement', data: [...chartData.topPostsComments].reverse(), itemStyle: { color: '#F1B4B9' } },
-          { name: 'Dijeljenja', type: 'bar', stack: 'engagement', data: [...chartData.topPostsShares].reverse(), itemStyle: { borderRadius: [0, 3, 3, 0], color: '#DAF4AA' } }
-        ]
-      });
-
-      reachChart = echarts.init(document.getElementById('meta-chart-reach'));
-      reachChart.setOption({
-        tooltip: { trigger: 'axis' },
-        grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: chartData.days,
-          axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.2)' } },
-          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 }
-        },
-        yAxis: {
-          type: 'value',
-          splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.08)' } },
-          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 }
-        },
-        series: [
-          {
-            name: 'Organski doseg',
+      // 2. Revenue Sparkline Trend (Electric Orange)
+      const revSparkElem = document.getElementById('z-chart-revenue-sparkline');
+      if (revSparkElem) {
+        revenueSparklineChart = echarts.init(revSparkElem);
+        revenueSparklineChart.setOption({
+          grid: { top: 5, bottom: 5, left: 5, right: 5 },
+          xAxis: { type: 'category', show: false, data: ['1','2','3','4','5','6','7','8','9','10','11','12'] },
+          yAxis: { type: 'value', show: false },
+          series: [{
+            data: [120, 140, 110, 180, 160, 210, 190, 240, 220, 270, 250, 310],
             type: 'line',
-            data: chartData.organicReachDaily,
             smooth: true,
-            symbol: 'none',
-            lineStyle: { width: 3 },
-            itemStyle: { color: '#33691E' },
+            showSymbol: false,
+            lineStyle: { width: 3, color: '#FF5F00' },
             areaStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: 'rgba(218, 244, 170, 0.65)' },
-                { offset: 1, color: 'rgba(218, 244, 170, 0.05)' }
+                { offset: 0, color: 'rgba(255, 95, 0, 0.25)' },
+                { offset: 1, color: 'rgba(255, 95, 0, 0.0)' }
               ])
             }
-          }
-        ]
-      });
+          }]
+        });
+      }
 
-      /* ----------------------------------------------------
-         GOOGLE ADS ECHARTS SETUP
-         ---------------------------------------------------- */
-      if (clientPackage === 'Pro' || clientPackage === 'Ultra') {
-        googleEfficiencyChart = echarts.init(document.getElementById('google-chart-efficiency'));
-        googleEfficiencyChart.setOption({
-          tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
-          legend: {
-            data: ['Dnevni trošak ($)', 'Konverzije'],
-            textStyle: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 700, fontSize: 12 }
-          },
-          grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
+      // 3. Subscribers Bar Chart
+      const subBarElem = document.getElementById('z-chart-subscribers-bar');
+      if (subBarElem) {
+        subscribersBarChart = echarts.init(subBarElem);
+        subscribersBarChart.setOption({
+          grid: { top: 5, bottom: 5, left: 5, right: 5 },
+          xAxis: { type: 'category', show: false, data: ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'] },
+          yAxis: { type: 'value', show: false },
+          series: [{
+            data: [45, 60, 75, 50, 80, 95, 70, 85, 100, 90, 110, 80, 95, 120, 105],
+            type: 'bar',
+            barWidth: '55%',
+            itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] }
+          }]
+        });
+      }
+
+      // 4. Highlighted Revenue Bar Chart (Matching ZELLIFY bottom left card)
+      const revHighElem = document.getElementById('z-chart-revenue-highlighted');
+      if (revHighElem) {
+        revenueHighlightedChart = echarts.init(revHighElem);
+        revenueHighlightedChart.setOption({
+          tooltip: { trigger: 'axis' },
+          grid: { top: 20, bottom: 25, left: 10, right: 10, containLabel: true },
           xAxis: {
             type: 'category',
-            data: googleChartData.days,
-            axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.2)' } },
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 }
+            data: ['20 Jul', '21 Jul', '22 Jul', '23 Jul', '24 Jul', '25 Jul'],
+            axisLine: { show: false },
+            axisTick: { show: false },
+            axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 700, fontSize: 11 }
           },
-          yAxis: [
-            {
-              type: 'value',
-              name: 'Trošak ($)',
-              axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 },
-              splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.08)' } }
-            },
-            {
-              type: 'value',
-              name: 'Konverzije',
-              axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 },
-              splitLine: { show: false }
-            }
-          ],
-          series: [
-            {
-              name: 'Dnevni trošak ($)',
-              type: 'line',
-              data: googleChartData.spendDaily,
-              smooth: true,
-              symbol: 'circle',
-              symbolSize: 6,
-              lineStyle: { width: 3 },
-              itemStyle: { color: '#00796B' }
-            },
-            {
-              name: 'Konverzije',
-              type: 'line',
-              yAxisIndex: 1,
-              data: googleChartData.conversionsDaily,
-              smooth: true,
-              symbol: 'circle',
-              symbolSize: 6,
-              lineStyle: { width: 3 },
-              itemStyle: { color: '#D81B60' }
-            }
-          ]
-        });
-
-        googlePacingChart = echarts.init(document.getElementById('google-chart-pacing'));
-        googlePacingChart.setOption({
-          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-          legend: {
-            data: ['Idealna putanja', 'Stvarna kumulativna potrošnja'],
-            textStyle: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 700, fontSize: 12 }
-          },
-          grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
-          xAxis: {
-            type: 'category',
-            data: googleChartData.days,
-            axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.2)' } },
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 }
-          },
-          yAxis: {
-            type: 'value',
-            name: 'Budžet ($)',
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 },
-            splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.08)' } }
-          },
-          series: [
-            {
-              name: 'Idealna putanja',
-              type: 'line',
-              data: googleChartData.pacingTargetLinear,
-              smooth: false,
-              symbol: 'none',
-              lineStyle: { width: 2.5, type: 'dashed' },
-              itemStyle: { color: '#475569' }
-            },
-            {
-              name: 'Stvarna kumulativna potrošnja',
-              type: 'bar',
-              data: googleChartData.pacingActualCumulative,
-              itemStyle: { borderRadius: [4, 4, 0, 0], color: '#96D8D0' }
-            }
-          ]
-        });
-
-        googleNetworksChart = echarts.init(document.getElementById('google-chart-networks'));
-        googleNetworksChart.setOption({
-          tooltip: { trigger: 'item', formatter: '{b}: {c} konverzija ({d}%)' },
-          legend: {
-            bottom: '0',
-            left: 'center',
-            textStyle: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.9)', fontWeight: 700, fontSize: 12 }
-          },
-          series: [
-            {
-              name: 'Mreže',
-              type: 'pie',
-              radius: ['45%', '70%'],
-              avoidLabelOverlap: false,
-              itemStyle: { borderRadius: 10, borderColor: '#ffffff', borderWidth: 2 },
-              label: { show: false, position: 'center' },
-              emphasis: {
-                label: {
-                  show: true,
-                  fontSize: 14,
-                  fontWeight: 'bold',
-                  fontFamily: 'Urbanist',
-                  formatter: '{b}\n{d}%'
-                }
-              },
-              labelLine: { show: false },
-              data: googleChartData.networks,
-              color: ['#96D8D0', '#F1B4B9', '#DAF4AA', '#EA4335']
-            }
-          ]
-        });
-
-        googleCampaignsChart = echarts.init(document.getElementById('google-chart-campaigns'));
-        googleCampaignsChart.setOption({
-          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-          grid: { left: '3%', right: '5%', bottom: '3%', containLabel: true },
-          xAxis: {
-            type: 'value',
-            splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.08)' } },
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 }
-          },
-          yAxis: {
-            type: 'category',
-            data: [...googleChartData.top10CampaignsNames].reverse(),
-            axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.2)' } },
-            axisLabel: { 
-              fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.95)', fontWeight: 700, fontSize: 11,
-              formatter: function(value) { return value.length > 16 ? value.slice(0, 13) + '...' : value; }
-            }
-          },
-          series: [
-            {
-              name: 'ROAS / Indeks',
-              type: 'bar',
-              data: [...googleChartData.top10CampaignsValues].reverse(),
-              itemStyle: {
-                borderRadius: [0, 4, 4, 0],
-                color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-                  { offset: 0, color: '#96D8D0' },
-                  { offset: 1, color: '#DAF4AA' }
-                ])
-              }
-            }
-          ]
-        });
-
-        googleDevicesLocationsChart = echarts.init(document.getElementById('google-chart-devices-locations'));
-        googleDevicesLocationsChart.setOption({
-          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-          legend: {
-            data: ['Lokacije (Gradovi)', 'Uređaji'],
-            bottom: '0',
-            textStyle: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.9)', fontWeight: 700, fontSize: 12 }
-          },
-          grid: { left: '3%', right: '3%', bottom: '10%', containLabel: true },
-          xAxis: {
-            type: 'category',
-            data: ['Zagreb/Mob.', 'Split/Rač.', 'Rijeka/Tab.', 'Osijek', 'Zadar'],
-            axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.2)' } },
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.95)', fontWeight: 700, fontSize: 11 }
-          },
-          yAxis: {
-            type: 'value',
-            splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.08)' } },
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 }
-          },
-          series: [
-            {
-              name: 'Lokacije (Gradovi)',
-              type: 'bar',
-              data: googleChartData.locationsValues,
-              itemStyle: { borderRadius: [4, 4, 0, 0], color: '#96D8D0' }
-            },
-            {
-              name: 'Uređaji',
-              type: 'bar',
-              data: [ googleChartData.devicesValues[0], googleChartData.devicesValues[1], googleChartData.devicesValues[2], 0, 0 ],
-              itemStyle: { borderRadius: [4, 4, 0, 0], color: '#F1B4B9' }
-            }
-          ]
-        });
-
-        googleFunnelChart = echarts.init(document.getElementById('google-chart-funnel'));
-        googleFunnelChart.setOption({
-          tooltip: { trigger: 'item', formatter: '{b} : {c} ({d}%)' },
-          legend: { show: false },
-          grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
-          series: [
-            {
-              name: 'Lijevak',
-              type: 'funnel',
-              left: '10%',
-              top: '5%',
-              bottom: '5%',
-              width: '80%',
-              min: 0,
-              max: googleChartData.funnelValues[0],
-              minSize: '10%',
-              maxSize: '100%',
-              sort: 'descending',
-              gap: 2,
-              label: {
-                show: true,
-                position: 'inside',
-                fontFamily: 'Urbanist',
-                fontSize: 11,
-                fontWeight: 'bold',
-                formatter: '{b}: {c}'
-              },
-              labelLine: { show: false },
-              itemStyle: { borderColor: '#fff', borderWidth: 1 },
-              data: [
-                { name: googleChartData.funnelStages[0], value: googleChartData.funnelValues[0] },
-                { name: googleChartData.funnelStages[1], value: googleChartData.funnelValues[1] },
-                { name: googleChartData.funnelStages[2], value: googleChartData.funnelValues[2] },
-                { name: googleChartData.funnelStages[3], value: googleChartData.funnelValues[3] }
-              ],
-              color: ['#96D8D0', '#DAF4AA', '#F1B4B9', '#122022']
-            }
-          ]
+          yAxis: { type: 'value', show: false },
+          series: [{
+            type: 'bar',
+            barWidth: '50%',
+            data: [
+              { value: 1200, itemStyle: { color: '#E5E7EB', borderRadius: [12, 12, 12, 12] } },
+              { value: 950, itemStyle: { color: '#E5E7EB', borderRadius: [12, 12, 12, 12] } },
+              { value: 1100, itemStyle: { color: '#E5E7EB', borderRadius: [12, 12, 12, 12] } },
+              { value: 1400, itemStyle: { color: '#E5E7EB', borderRadius: [12, 12, 12, 12] } },
+              { value: 1950, itemStyle: { color: '#FF5F00', borderRadius: [12, 12, 12, 12] } },
+              { value: 1600, itemStyle: { color: '#E5E7EB', borderRadius: [12, 12, 12, 12] } }
+            ]
+          }]
         });
       }
 
       /* ----------------------------------------------------
-         TIKTOK ADS ECHARTS SETUP (ULTRA ONLY)
-         ---------------------------------------------------- */
-      if (clientPackage === 'Ultra') {
-        tiktokEfficiencyChart = echarts.init(document.getElementById('tiktok-chart-efficiency'));
-        tiktokEfficiencyChart.setOption({
-          tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
-          legend: {
-            data: ['Trošak ($)', 'Konverzije'],
-            textStyle: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 700, fontSize: 12 }
-          },
-          grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
-          xAxis: {
-            type: 'category',
-            data: chartData.days,
-            axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.2)' } },
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 }
-          },
-          yAxis: [
-            {
-              type: 'value',
-              name: 'Trošak ($)',
-              axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 }
-            },
-            {
-              type: 'value',
-              name: 'Konverzije',
-              yAxisIndex: 1,
-              axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 }
-            }
-          ],
-          series: [
-            {
-              name: 'Trošak ($)',
-              type: 'line',
-              smooth: true,
-              data: [10, 12, 15, 14, 12, 10, 15, 16, 18, 12, 11, 15, 14, 12, 10, 9, 11, 14, 15, 12, 11, 12, 14, 16, 12],
-              itemStyle: { color: '#122022' }
-            },
-            {
-              name: 'Konverzije',
-              type: 'line',
-              yAxisIndex: 1,
-              smooth: true,
-              data: [1, 2, 2, 1, 1, 1, 2, 2, 3, 1, 1, 2, 2, 1, 1, 0, 1, 2, 2, 1, 1, 1, 2, 2, 1],
-              itemStyle: { color: '#F1B4B9' }
-            }
-          ]
-        });
-
-        tiktokVideosChart = echarts.init(document.getElementById('tiktok-chart-videos'));
-        tiktokVideosChart.setOption({
-          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-          legend: {
-            data: ['Pregledi (*100)', 'Klikovi', 'Dijeljenja'],
-            bottom: '0',
-            textStyle: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.9)', fontWeight: 700, fontSize: 12 }
-          },
-          grid: { left: '3%', right: '5%', bottom: '10%', containLabel: true },
-          xAxis: { type: 'value' },
-          yAxis: {
-            type: 'category',
-            data: ['Video 1', 'Video 2', 'Video 3', 'Video 4', 'Video 5'].reverse(),
-            axisLabel: { fontFamily: 'Urbanist', fontWeight: 700, fontSize: 11 }
-          },
-          series: [
-            { name: 'Pregledi (*100)', type: 'bar', stack: 'views', data: [150, 120, 90, 80, 160].reverse(), itemStyle: { color: '#96D8D0' } },
-            { name: 'Klikovi', type: 'bar', stack: 'views', data: [45, 30, 22, 19, 58].reverse(), itemStyle: { color: '#F1B4B9' } },
-            { name: 'Dijeljenja', type: 'bar', stack: 'views', data: [12, 8, 4, 3, 22].reverse(), itemStyle: { color: '#122022' } }
-          ]
-        });
-      }
-
-      /* ----------------------------------------------------
-         ADVANCED MARKETING DECISIONS ECHARTS SETUP
+         ADVANCED DECISION ANALYTICS SETUP
          ---------------------------------------------------- */
       const advancedData = <%- JSON.stringify(client.advancedAnalytics) %>;
 
-      // 1. Blended MER Chart
-      blendedChart = echarts.init(document.getElementById('advanced-chart-blended'));
-      blendedChart.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
-        legend: {
-          data: ['Zbirni trošak ($)', 'Procjenjeni prihod ($)', 'Blended MER (x)'],
-          textStyle: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 700, fontSize: 12 }
-        },
-        grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-        xAxis: {
-          type: 'category',
-          data: advancedData.blended.days,
-          axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.2)' } },
-          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 }
-        },
-        yAxis: [
-          {
-            type: 'value',
-            name: 'Iznos ($)',
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 },
-            splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.08)' } }
-          },
-          {
-            type: 'value',
-            name: 'MER (x)',
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 },
-            splitLine: { show: false }
-          }
-        ],
-        series: [
-          {
-            name: 'Zbirni trošak ($)',
-            type: 'bar',
-            data: advancedData.blended.spendDaily,
-            itemStyle: { color: '#96D8D0', borderRadius: [4, 4, 0, 0] }
-          },
-          {
-            name: 'Procjenjeni prihod ($)',
-            type: 'bar',
-            data: advancedData.blended.revenueDaily,
-            itemStyle: { color: '#DAF4AA', borderRadius: [4, 4, 0, 0] }
-          },
-          {
-            name: 'Blended MER (x)',
-            type: 'line',
-            yAxisIndex: 1,
-            data: advancedData.blended.merDaily,
-            smooth: true,
-            symbol: 'circle',
-            symbolSize: 6,
-            lineStyle: { width: 3 },
-            itemStyle: { color: '#122022' }
-          }
-        ]
-      });
+      const blendedElem = document.getElementById('advanced-chart-blended');
+      if (blendedElem) {
+        blendedChart = echarts.init(blendedElem);
+        blendedChart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+          legend: { data: ['Prihod ($)', 'Blended MER (x)'], bottom: '0', textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 12 } },
+          grid: { left: '3%', right: '3%', bottom: '10%', containLabel: true },
+          xAxis: { type: 'category', data: advancedData.blended.days, axisLine: { lineStyle: { color: 'rgba(0,0,0,0.1)' } }, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 } },
+          yAxis: [
+            { type: 'value', name: 'Prihod ($)', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 }, splitLine: { lineStyle: { color: 'rgba(0,0,0,0.05)' } } },
+            { type: 'value', name: 'MER (x)', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 }, splitLine: { show: false } }
+          ],
+          series: [
+            { name: 'Prihod ($)', type: 'bar', data: advancedData.blended.revenueDaily, itemStyle: { color: '#111113', borderRadius: [4, 4, 0, 0] } },
+            { name: 'Blended MER (x)', type: 'line', yAxisIndex: 1, data: advancedData.blended.merDaily, smooth: true, symbol: 'circle', symbolSize: 6, lineStyle: { width: 3 }, itemStyle: { color: '#FF5F00' } }
+          ]
+        });
+      }
 
-      // 2. Creative Fatigue Chart
-      fatigueChart = echarts.init(document.getElementById('advanced-chart-fatigue'));
-      fatigueChart.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
-        legend: {
-          data: ['Frekvencija prikaza', 'CTR (%)', 'CPA ($)'],
-          bottom: '0',
-          textStyle: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 700, fontSize: 12 }
-        },
-        grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-        xAxis: {
-          type: 'category',
-          data: advancedData.creativeFatigue.adNames,
-          axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.2)' } },
-          axisLabel: { 
-            fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 700, fontSize: 10,
-            formatter: function(val) { return val.length > 12 ? val.slice(0, 9) + '...' : val; }
-          }
-        },
-        yAxis: [
-          {
-            type: 'value',
-            name: 'Frekvencija / CTR',
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 },
-            splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.08)' } }
-          },
-          {
-            type: 'value',
-            name: 'CPA ($)',
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 },
-            splitLine: { show: false }
-          }
-        ],
-        series: [
-          {
-            name: 'Frekvencija prikaza',
-            type: 'bar',
-            data: advancedData.creativeFatigue.frequency,
-            itemStyle: { color: '#F1B4B9', borderRadius: [4, 4, 0, 0] }
-          },
-          {
-            name: 'CTR (%)',
-            type: 'line',
-            data: advancedData.creativeFatigue.ctr,
-            smooth: true,
-            lineStyle: { width: 3 },
-            itemStyle: { color: '#00796B' }
-          },
-          {
-            name: 'CPA ($)',
-            type: 'line',
-            yAxisIndex: 1,
-            data: advancedData.creativeFatigue.cpa,
-            smooth: true,
-            lineStyle: { width: 3, type: 'dashed' },
-            itemStyle: { color: '#D81B60' }
-          }
-        ]
-      });
+      const daypartingElem = document.getElementById('advanced-chart-dayparting');
+      if (daypartingElem) {
+        daypartingChart = echarts.init(daypartingElem);
+        daypartingChart.setOption({
+          tooltip: { position: 'top' },
+          grid: { top: '5%', bottom: '12%', left: '10%', right: '5%' },
+          xAxis: { type: 'category', data: advancedData.dayparting.hours, splitArea: { show: true }, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 700, fontSize: 11 } },
+          yAxis: { type: 'category', data: advancedData.dayparting.days, splitArea: { show: true }, axisLabel: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
+          visualMap: { min: 0, max: 25, calculable: true, orient: 'horizontal', left: 'center', bottom: '0', inRange: { color: ['#F3F4F6', '#FF5F00'] } },
+          series: [{ type: 'heatmap', data: advancedData.dayparting.data, label: { show: true, fontSize: 10, fontFamily: 'Urbanist', fontWeight: 'bold' } }]
+        });
+      }
 
-      // 3. Dayparting Heatmap Chart
-      daypartingChart = echarts.init(document.getElementById('advanced-chart-dayparting'));
-      daypartingChart.setOption({
-        tooltip: {
-          position: 'top',
-          formatter: function (p) {
-            return `${advancedData.dayparting.days[p.value[0]]} ${advancedData.dayparting.hours[p.value[1]]}: <b>${p.value[2]} konverzija</b>`;
-          }
-        },
-        grid: { left: '8%', right: '3%', top: '5%', bottom: '15%', containLabel: true },
-        xAxis: {
-          type: 'category',
-          data: advancedData.dayparting.days,
-          splitArea: { show: true },
-          axisLabel: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 700, fontSize: 12 }
-        },
-        yAxis: {
-          type: 'category',
-          data: advancedData.dayparting.hours,
-          splitArea: { show: true },
-          axisLabel: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 600, fontSize: 11 }
-        },
-        visualMap: {
-          min: 0,
-          max: 25,
-          calculable: true,
-          orient: 'horizontal',
-          left: 'center',
-          bottom: '0%',
-          textStyle: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 700, fontSize: 11 },
-          inRange: {
-            color: ['#F0F4F8', '#96D8D0', '#DAF4AA', '#122022']
-          }
-        },
-        series: [
-          {
-            name: 'Konverzije',
-            type: 'heatmap',
-            data: advancedData.dayparting.data,
-            label: {
-              show: true,
-              fontFamily: 'Urbanist',
-              fontSize: 10,
-              fontWeight: 'bold',
-              color: '#122022'
-            },
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowColor: 'rgba(0, 0, 0, 0.3)'
-              }
-            }
-          }
-        ]
-      });
+      const fatigueElem = document.getElementById('advanced-chart-fatigue');
+      if (fatigueElem) {
+        fatigueChart = echarts.init(fatigueElem);
+        fatigueChart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+          legend: { data: ['Frekvencija prikaza', 'CTR (%)', 'CPA ($)'], bottom: '0', textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 12 } },
+          grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
+          xAxis: { type: 'category', data: advancedData.creativeFatigue.adNames, axisLabel: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11, interval: 0, rotate: 15 } },
+          yAxis: [
+            { type: 'value', name: 'Stopa / Frekvencija', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 } },
+            { type: 'value', name: 'CPA ($)', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 }, splitLine: { show: false } }
+          ],
+          series: [
+            { name: 'Frekvencija prikaza', type: 'bar', data: advancedData.creativeFatigue.frequency, itemStyle: { color: '#E5E7EB', borderRadius: [4, 4, 0, 0] } },
+            { name: 'CTR (%)', type: 'line', data: advancedData.creativeFatigue.ctr, smooth: true, lineStyle: { width: 3 }, itemStyle: { color: '#111113' } },
+            { name: 'CPA ($)', type: 'line', yAxisIndex: 1, data: advancedData.creativeFatigue.cpa, smooth: true, lineStyle: { width: 3, type: 'dashed' }, itemStyle: { color: '#FF5F00' } }
+          ]
+        });
+      }
 
-      // 4. LTV:CAC & Retention Cohort Chart
-      ltvChart = echarts.init(document.getElementById('advanced-chart-ltv'));
-      ltvChart.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
-        legend: {
-          data: ['Korisnička vrijednost (LTV)', 'Zadržavanje (Retention %)'],
-          bottom: '0',
-          textStyle: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 700, fontSize: 12 }
-        },
-        grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-        xAxis: {
-          type: 'category',
-          data: advancedData.ltvCac.retentionMonths,
-          axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.2)' } },
-          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 700, fontSize: 11 }
-        },
-        yAxis: [
-          {
-            type: 'value',
-            name: 'Vrijednost ($)',
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 },
-            splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.08)' } }
-          },
-          {
-            type: 'value',
-            name: 'Zadržavanje (%)',
-            axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 },
-            splitLine: { show: false }
-          }
-        ],
-        series: [
-          {
-            name: 'Korisnička vrijednost (LTV)',
-            type: 'bar',
-            data: [14.5, 24.0, 38.5, 48.0, 54.0, 72.5],
-            itemStyle: { color: '#96D8D0', borderRadius: [4, 4, 0, 0] }
-          },
-          {
-            name: 'Zadržavanje (Retention %)',
-            type: 'line',
-            yAxisIndex: 1,
-            data: advancedData.ltvCac.retentionRates,
-            smooth: true,
-            symbol: 'circle',
-            symbolSize: 6,
-            lineStyle: { width: 3 },
-            itemStyle: { color: '#122022' }
-          }
-        ]
-      });
+      const ltvElem = document.getElementById('advanced-chart-ltv');
+      if (ltvElem) {
+        ltvChart = echarts.init(ltvElem);
+        ltvChart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+          legend: { data: ['Korisnička vrijednost (LTV)', 'Zadržavanje (Retention %)'], bottom: '0', textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 12 } },
+          grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
+          xAxis: { type: 'category', data: advancedData.ltvCac.retentionMonths, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 700, fontSize: 11 } },
+          yAxis: [
+            { type: 'value', name: 'Vrijednost ($)', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 } },
+            { type: 'value', name: 'Zadržavanje (%)', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 }, splitLine: { show: false } }
+          ],
+          series: [
+            { name: 'Korisnička vrijednost (LTV)', type: 'bar', data: [14.5, 24.0, 38.5, 48.0, 54.0, 72.5], itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } },
+            { name: 'Zadržavanje (Retention %)', type: 'line', yAxisIndex: 1, data: advancedData.ltvCac.retentionRates, smooth: true, symbol: 'circle', symbolSize: 6, lineStyle: { width: 3 }, itemStyle: { color: '#111113' } }
+          ]
+        });
+      }
 
       /* ----------------------------------------------------
          SOCIAL MEDIA ECHARTS SETUP
          ---------------------------------------------------- */
       const socialData = <%- JSON.stringify(client.socialMediaStats) %>;
 
-      // 1. Social Platforms Views (Instagram vs Facebook vs TikTok)
-      socialPlatformsChart = echarts.init(document.getElementById('social-chart-platforms'));
-      socialPlatformsChart.setOption({
-        tooltip: { trigger: 'item', formatter: '{b}: {c} impresija ({d}%)' },
-        legend: {
-          bottom: '0',
-          left: 'center',
-          textStyle: { fontFamily: 'Urbanist', color: '#122022', fontWeight: 700, fontSize: 12 }
-        },
-        series: [
-          {
+      const socialPlatElem = document.getElementById('social-chart-platforms');
+      if (socialPlatElem) {
+        socialPlatformsChart = echarts.init(socialPlatElem);
+        socialPlatformsChart.setOption({
+          tooltip: { trigger: 'item', formatter: '{b}: {c} impresija ({d}%)' },
+          legend: { bottom: '0', left: 'center', textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 12 } },
+          series: [{
             name: 'Pregledi',
             type: 'pie',
             radius: ['45%', '70%'],
             avoidLabelOverlap: false,
             itemStyle: { borderRadius: 10, borderColor: '#ffffff', borderWidth: 2 },
-            label: { show: false, position: 'center' },
-            emphasis: {
-              label: {
-                show: true,
-                fontSize: 15,
-                fontWeight: 'bold',
-                fontFamily: 'Urbanist',
-                formatter: '{b}\n{d}%'
-              }
-            },
             data: socialData.platformViews,
-            color: ['#E1306C', '#1877F2', '#122022']
-          }
-        ]
-      });
+            color: ['#E1306C', '#1877F2', '#111113']
+          }]
+        });
+      }
 
-      // 2. Social Format Performance
-      socialFormatsChart = echarts.init(document.getElementById('social-chart-formats'));
-      socialFormatsChart.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { left: '3%', right: '5%', bottom: '3%', containLabel: true },
-        xAxis: {
-          type: 'value',
-          splitLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.08)' } },
-          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.85)', fontWeight: 600, fontSize: 11 }
-        },
-        yAxis: {
-          type: 'category',
-          data: socialData.formatPerformanceNames,
-          axisLine: { lineStyle: { color: 'rgba(18, 32, 34, 0.2)' } },
-          axisLabel: { fontFamily: 'Urbanist', color: 'rgba(18, 32, 34, 0.95)', fontWeight: 700, fontSize: 12 }
-        },
-        series: [
-          {
+      const socialFormElem = document.getElementById('social-chart-formats');
+      if (socialFormElem) {
+        socialFormatsChart = echarts.init(socialFormElem);
+        socialFormatsChart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          grid: { left: '3%', right: '5%', bottom: '3%', containLabel: true },
+          xAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 } },
+          yAxis: { type: 'category', data: socialData.formatPerformanceNames, axisLabel: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 12 } },
+          series: [{
             name: 'Prosječni pregledi',
             type: 'bar',
             data: socialData.formatPerformanceValues,
-            itemStyle: {
-              borderRadius: [0, 6, 6, 0],
-              color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-                { offset: 0, color: '#96D8D0' },
-                { offset: 1, color: '#DAF4AA' }
-              ])
-            }
-          }
-        ]
-      });
+            itemStyle: { borderRadius: [0, 6, 6, 0], color: '#FF5F00' }
+          }]
+        });
+      }
+
+      /* ----------------------------------------------------
+         META ECHARTS SETUP
+         ---------------------------------------------------- */
+      const metaEffElem = document.getElementById('meta-chart-efficiency');
+      if (metaEffElem) {
+        efficiencyChart = echarts.init(metaEffElem);
+        efficiencyChart.setOption({
+          tooltip: { trigger: 'axis' },
+          legend: { data: ['Dnevni trošak', 'Konverzije'], textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 12 } },
+          grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
+          xAxis: { type: 'category', data: chartData.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 } },
+          yAxis: [{ type: 'value' }, { type: 'value' }],
+          series: [
+            { name: 'Dnevni trošak', type: 'line', data: chartData.spendDaily, smooth: true, itemStyle: { color: '#111113' } },
+            { name: 'Konverzije', type: 'line', yAxisIndex: 1, data: chartData.conversionsDaily, smooth: true, itemStyle: { color: '#FF5F00' } }
+          ]
+        });
+      }
+
+      const metaPlatElem = document.getElementById('meta-chart-platforms');
+      if (metaPlatElem) {
+        platformsChart = echarts.init(metaPlatElem);
+        platformsChart.setOption({
+          tooltip: { trigger: 'item' },
+          series: [{ type: 'pie', radius: ['45%', '70%'], data: chartData.platforms, color: ['#1877F2', '#E1306C', '#111113'] }]
+        });
+      }
+
+      const metaAudElem = document.getElementById('meta-chart-audience');
+      if (metaAudElem) {
+        audienceChart = echarts.init(metaAudElem);
+        audienceChart.setOption({
+          tooltip: { trigger: 'axis' },
+          xAxis: { type: 'value' },
+          yAxis: { type: 'category', data: [...chartData.audienceCategories].reverse() },
+          series: [{ type: 'bar', data: [...chartData.audienceValues].reverse(), itemStyle: { color: '#FF5F00', borderRadius: [0, 5, 5, 0] } }]
+        });
+      }
+
+      const metaPostElem = document.getElementById('meta-chart-posts');
+      if (metaPostElem) {
+        postsChart = echarts.init(metaPostElem);
+        postsChart.setOption({
+          tooltip: { trigger: 'axis' },
+          xAxis: { type: 'value' },
+          yAxis: { type: 'category', data: [...chartData.topPostsTitles].reverse() },
+          series: [
+            { name: 'Lajkovi', type: 'bar', stack: 'engagement', data: [...chartData.topPostsLikes].reverse(), itemStyle: { color: '#FF5F00' } },
+            { name: 'Komentari', type: 'bar', stack: 'engagement', data: [...chartData.topPostsComments].reverse(), itemStyle: { color: '#111113' } }
+          ]
+        });
+      }
+
+      /* ----------------------------------------------------
+         GOOGLE ECHARTS SETUP
+         ---------------------------------------------------- */
+      const googEffElem = document.getElementById('google-chart-efficiency');
+      if (googEffElem) {
+        googleEfficiencyChart = echarts.init(googEffElem);
+        googleEfficiencyChart.setOption({
+          tooltip: { trigger: 'axis' },
+          xAxis: { type: 'category', data: googleChartData.days },
+          yAxis: [{ type: 'value' }, { type: 'value' }],
+          series: [
+            { name: 'Trošak ($)', type: 'line', data: googleChartData.spendDaily, smooth: true, itemStyle: { color: '#EA4335' } },
+            { name: 'Konverzije', type: 'line', yAxisIndex: 1, data: googleChartData.conversionsDaily, smooth: true, itemStyle: { color: '#FF5F00' } }
+          ]
+        });
+      }
+
+      const googNetElem = document.getElementById('google-chart-networks');
+      if (googNetElem) {
+        googleNetworksChart = echarts.init(googNetElem);
+        googleNetworksChart.setOption({
+          tooltip: { trigger: 'item' },
+          series: [{ type: 'pie', radius: ['45%', '70%'], data: googleChartData.networks, color: ['#4285F4', '#FF5F00', '#FF0000', '#34A853'] }]
+        });
+      }
+
+      /* ----------------------------------------------------
+         TIKTOK ECHARTS SETUP
+         ---------------------------------------------------- */
+      const tikEffElem = document.getElementById('tiktok-chart-efficiency');
+      if (tikEffElem) {
+        tiktokEfficiencyChart = echarts.init(tikEffElem);
+        tiktokEfficiencyChart.setOption({
+          tooltip: { trigger: 'axis' },
+          xAxis: { type: 'category', data: chartData.days },
+          yAxis: [{ type: 'value' }, { type: 'value' }],
+          series: [
+            { name: 'Trošak ($)', type: 'line', data: [10,12,15,18,20,14,16,22,25,30,22,18,20,24,19,16,21,25,22,18,24,28,32,25,22], smooth: true, itemStyle: { color: '#111113' } },
+            { name: 'Konverzije', type: 'line', yAxisIndex: 1, data: [1,2,1,3,2,1,2,3,4,3,2,1,2,3,2,1,2,3,2,1,3,4,3,2,2], smooth: true, itemStyle: { color: '#FF5F00' } }
+          ]
+        });
+      }
+
+      const tikVidElem = document.getElementById('tiktok-chart-videos');
+      if (tikVidElem) {
+        tiktokVideosChart = echarts.init(tikVidElem);
+        tiktokVideosChart.setOption({
+          tooltip: { trigger: 'axis' },
+          xAxis: { type: 'value' },
+          yAxis: { type: 'category', data: ['TikTok Video 1', 'TikTok Video 2', 'TikTok Video 3', 'TikTok Video 4'] },
+          series: [{ type: 'bar', data: [340, 520, 210, 480], itemStyle: { color: '#FF5F00', borderRadius: [0, 5, 5, 0] } }]
+        });
+      }
     }
 
-    // Window resize handler
+    // Window resize listener
     window.addEventListener('resize', () => {
+      if (mfrGaugeChart) mfrGaugeChart.resize();
+      if (revenueSparklineChart) revenueSparklineChart.resize();
+      if (subscribersBarChart) subscribersBarChart.resize();
+      if (revenueHighlightedChart) revenueHighlightedChart.resize();
+
       if (efficiencyChart) efficiencyChart.resize();
       if (platformsChart) platformsChart.resize();
       if (audienceChart) audienceChart.resize();
@@ -1908,11 +1086,7 @@
       if (reachChart) reachChart.resize();
 
       if (googleEfficiencyChart) googleEfficiencyChart.resize();
-      if (googlePacingChart) googlePacingChart.resize();
       if (googleNetworksChart) googleNetworksChart.resize();
-      if (googleCampaignsChart) googleCampaignsChart.resize();
-      if (googleDevicesLocationsChart) googleDevicesLocationsChart.resize();
-      if (googleFunnelChart) googleFunnelChart.resize();
 
       if (tiktokEfficiencyChart) tiktokEfficiencyChart.resize();
       if (tiktokVideosChart) tiktokVideosChart.resize();
@@ -1926,7 +1100,7 @@
       if (socialFormatsChart) socialFormatsChart.resize();
     });
 
-    // Tab switching logic (No locks! All features fully unlocked for 360 degree overview)
+    // Tab switching logic (ZELLIFY Capsule Navigation)
     function switchPlatform(platform) {
       const btn360 = document.getElementById('btn-360');
       const btnMeta = document.getElementById('btn-meta');
@@ -1939,8 +1113,6 @@
       const panelGoogle = document.getElementById('panel-google');
       const panelTiktok = document.getElementById('panel-tiktok');
       const panelSocial = document.getElementById('panel-social');
-      
-      const platformTitleBadge = document.getElementById('platform-title-badge');
 
       // Helper reset all panels
       const panels = [panelAdvanced, panelMeta, panelGoogle, panelTiktok, panelSocial];
@@ -1955,19 +1127,22 @@
       // Reset all navigation buttons
       const buttons = [btn360, btnMeta, btnGoogle, btnTiktok, btnSocial];
       buttons.forEach(b => {
-        if (b) b.className = 'px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 text-brand-dark/80 hover:text-brand-dark flex items-center gap-1.5';
+        if (b) b.className = 'z-pill-nav-item px-4 py-2 text-xs transition-all duration-200';
       });
 
-      // 1. 360° Global Overview
+      // 1. Dashboard (360° Overview)
       if (platform === '360') {
-        if (btn360) btn360.className = 'px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 bg-brand-dark text-white shadow-sm flex items-center gap-1.5';
-        if (platformTitleBadge) platformTitleBadge.textContent = '360° Globalni Pregled';
+        if (btn360) btn360.className = 'z-pill-nav-item-active px-5 py-2 text-xs transition-all duration-200';
         
         if (panelAdvanced) {
           panelAdvanced.classList.remove('hidden');
           setTimeout(() => {
             panelAdvanced.classList.remove('opacity-0', 'scale-95');
             panelAdvanced.classList.add('opacity-100', 'scale-100');
+            if (mfrGaugeChart) mfrGaugeChart.resize();
+            if (revenueSparklineChart) revenueSparklineChart.resize();
+            if (subscribersBarChart) subscribersBarChart.resize();
+            if (revenueHighlightedChart) revenueHighlightedChart.resize();
             if (blendedChart) blendedChart.resize();
             if (fatigueChart) fatigueChart.resize();
             if (daypartingChart) daypartingChart.resize();
@@ -1978,8 +1153,7 @@
 
       // 2. Meta Ads
       else if (platform === 'meta') {
-        if (btnMeta) btnMeta.className = 'px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 bg-brand-dark text-white shadow-sm flex items-center gap-1.5';
-        if (platformTitleBadge) platformTitleBadge.textContent = 'Meta Ads (Facebook & IG)';
+        if (btnMeta) btnMeta.className = 'z-pill-nav-item-active px-5 py-2 text-xs transition-all duration-200';
         
         if (panelMeta) {
           panelMeta.classList.remove('hidden');
@@ -1990,15 +1164,13 @@
             if (platformsChart) platformsChart.resize();
             if (audienceChart) audienceChart.resize();
             if (postsChart) postsChart.resize();
-            if (reachChart) reachChart.resize();
           }, 50);
         }
       }
       
-      // 3. Google Ads (Performance Max Focus - Always Unlocked!)
+      // 3. Google Ads (Performance Max Focus)
       else if (platform === 'google') {
-        if (btnGoogle) btnGoogle.className = 'px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 bg-brand-dark text-white shadow-sm flex items-center gap-1.5';
-        if (platformTitleBadge) platformTitleBadge.textContent = 'Google Ads (Performance Max & Search)';
+        if (btnGoogle) btnGoogle.className = 'z-pill-nav-item-active px-5 py-2 text-xs transition-all duration-200';
 
         if (panelGoogle) {
           panelGoogle.classList.remove('hidden');
@@ -2006,19 +1178,14 @@
             panelGoogle.classList.remove('opacity-0', 'scale-95');
             panelGoogle.classList.add('opacity-100', 'scale-100');
             if (googleEfficiencyChart) googleEfficiencyChart.resize();
-            if (googlePacingChart) googlePacingChart.resize();
             if (googleNetworksChart) googleNetworksChart.resize();
-            if (googleCampaignsChart) googleCampaignsChart.resize();
-            if (googleDevicesLocationsChart) googleDevicesLocationsChart.resize();
-            if (googleFunnelChart) googleFunnelChart.resize();
           }, 50);
         }
       }
       
-      // 4. TikTok Ads (Always Unlocked!)
+      // 4. TikTok Ads
       else if (platform === 'tiktok') {
-        if (btnTiktok) btnTiktok.className = 'px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 bg-brand-dark text-white shadow-sm flex items-center gap-1.5';
-        if (platformTitleBadge) platformTitleBadge.textContent = 'TikTok Video Ads';
+        if (btnTiktok) btnTiktok.className = 'z-pill-nav-item-active px-5 py-2 text-xs transition-all duration-200';
 
         if (panelTiktok) {
           panelTiktok.classList.remove('hidden');
@@ -2031,10 +1198,9 @@
         }
       }
 
-      // 5. Social Media (Objave & Sadržaj - Always Unlocked!)
+      // 5. Social Media (Objave & Sadržaj)
       else if (platform === 'social') {
-        if (btnSocial) btnSocial.className = 'px-4 py-1.5 rounded-full text-xs font-extrabold transition-all duration-300 bg-brand-dark text-white shadow-sm flex items-center gap-1.5';
-        if (platformTitleBadge) platformTitleBadge.textContent = 'Objave & Sadržaj (Social Media)';
+        if (btnSocial) btnSocial.className = 'z-pill-nav-item-active px-5 py-2 text-xs transition-all duration-200';
 
         if (panelSocial) {
           panelSocial.classList.remove('hidden');
@@ -2046,227 +1212,6 @@
           }, 50);
         }
       }
-    }
-
-    /* ----------------------------------------------------
-       AI ASSISTANT CHAT FRONTEND LOGIC (SSE PARSER)
-       ---------------------------------------------------- */
-    function adjustInputHeight(textarea) {
-      textarea.style.height = '38px';
-      const scrollHeight = textarea.scrollHeight;
-      if (scrollHeight > 38) {
-        textarea.style.height = Math.min(scrollHeight, 120) + 'px';
-      }
-    }
-
-    function handleInputKeydown(event) {
-      if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
-        document.getElementById('chat-form').requestSubmit();
-      }
-    }
-
-    function sendSuggestion(text) {
-      const input = document.getElementById('chat-input');
-      input.value = text;
-      adjustInputHeight(input);
-      document.getElementById('chat-form').requestSubmit();
-    }
-
-    async function handleChatSubmit(event) {
-      event.preventDefault();
-      
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-      if (!text) return;
-      
-      input.value = '';
-      adjustInputHeight(input);
-      
-      const chatMessages = document.getElementById('chat-messages');
-
-      const userBubble = document.createElement('div');
-      userBubble.className = 'flex items-start gap-2.5 max-w-[85%] ml-auto justify-end';
-      userBubble.innerHTML = `
-        <div class="bg-brand-dark text-white p-3 rounded-2xl rounded-tr-none shadow-sm leading-relaxed">
-          ${escapeHtml(text)}
-        </div>
-      `;
-      chatMessages.appendChild(userBubble);
-      scrollToBottom();
-
-      const assistantBubble = document.createElement('div');
-      assistantBubble.className = 'flex items-start gap-2.5 max-w-[85%]';
-      
-      const uniqueMsgId = 'assistant-msg-' + Date.now();
-      const uniqueThoughtId = 'thought-log-' + Date.now();
-      const uniqueContentId = 'content-log-' + Date.now();
-      
-      assistantBubble.innerHTML = `
-        <div class="w-8 h-8 rounded-lg bg-brand-dark/10 flex items-center justify-center border border-brand-dark/15 shrink-0">
-          <i class="fa-solid fa-robot text-brand-dark text-xs"></i>
-        </div>
-        <div id="${uniqueMsgId}" class="glass-panel p-3.5 rounded-2xl rounded-tl-none text-brand-dark font-medium shadow-sm leading-relaxed w-full border border-brand-dark/15">
-          <div id="${uniqueThoughtId}" class="text-xs text-brand-dark/75 border-b border-brand-dark/10 pb-2 mb-2">
-            <span class="inline-flex items-center gap-1.5 font-bold uppercase tracking-wider">
-              <i class="fa-solid fa-circle-notch animate-spin text-brand-dark"></i> Razmišljanje...
-            </span>
-            <div class="thought-steps mt-1 font-medium italic space-y-0.5"></div>
-          </div>
-          <div id="${uniqueContentId}" class="prose max-w-none text-xs md:text-sm leading-relaxed space-y-1 text-brand-dark font-medium"></div>
-        </div>
-      `;
-      
-      chatMessages.appendChild(assistantBubble);
-      scrollToBottom();
-
-      try {
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: text,
-            history: conversationHistory,
-            clientId: clientId
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error('Mrežna greška.');
-        }
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        
-        const thoughtBox = assistantBubble.querySelector(`#${uniqueThoughtId}`);
-        const thoughtStepsContainer = thoughtBox.querySelector('.thought-steps');
-        const contentBox = assistantBubble.querySelector(`#${uniqueContentId}`);
-        
-        let finalResponseBuffer = '';
-        let newSuggestions = [];
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
-
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const dataStr = line.slice(6).trim();
-              if (dataStr === '[DONE]') break;
-
-              try {
-                const data = JSON.parse(dataStr);
-                
-                if (data.type === 'THOUGHT') {
-                  const step = document.createElement('div');
-                  step.textContent = '• ' + data.content;
-                  thoughtStepsContainer.appendChild(step);
-                  scrollToBottom();
-                } 
-                else if (data.type === 'FINAL_RESPONSE') {
-                  finalResponseBuffer += data.content;
-                  contentBox.innerHTML = renderSimpleMarkdown(finalResponseBuffer);
-                  scrollToBottom();
-                }
-                else if (data.type === 'SUGGESTION') {
-                  newSuggestions.push(data.content);
-                }
-              } catch (e) {
-                // Ignore parsing errors
-              }
-            }
-          }
-        }
-
-        const spinnerIcon = thoughtBox.querySelector('.fa-circle-notch');
-        if (spinnerIcon) {
-          spinnerIcon.className = 'fa-solid fa-circle-check text-emerald-600';
-        }
-
-        updateSuggestions(newSuggestions);
-
-        conversationHistory.push({ role: 'user', content: text });
-        conversationHistory.push({ role: 'model', content: finalResponseBuffer });
-
-      } catch (err) {
-        console.error(err);
-        const contentBox = assistantBubble.querySelector(`#${uniqueContentId}`);
-        contentBox.innerHTML = `<span class="text-rose-600 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Greška.</span>`;
-        const thoughtBox = assistantBubble.querySelector(`#${uniqueThoughtId}`);
-        if (thoughtBox) thoughtBox.classList.add('hidden');
-        scrollToBottom();
-      }
-    }
-
-    function scrollToBottom() {
-      const chatMessages = document.getElementById('chat-messages');
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function updateSuggestions(suggestions) {
-      const container = document.getElementById('suggestion-container');
-      container.innerHTML = '';
-      
-      if (!suggestions || suggestions.length === 0) return;
-      
-      suggestions.forEach(sug => {
-        const btn = document.createElement('button');
-        btn.onclick = () => sendSuggestion(sug);
-        btn.className = 'text-xs font-bold text-brand-dark/90 hover:text-brand-dark bg-white/80 hover:bg-white border border-brand-dark/20 px-2.5 py-1 rounded-full transition-all duration-300 shadow-sm';
-        btn.textContent = sug;
-        container.appendChild(btn);
-      });
-    }
-
-    function escapeHtml(str) {
-      return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    function renderSimpleMarkdown(md) {
-      let html = md;
-      html = escapeHtml(html);
-      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      html = html.replace(/^### (.*?)$/gm, '<h5 class="text-sm font-black text-brand-dark mt-2.5 mb-1">$1</h5>');
-      html = html.replace(/^## (.*?)$/gm, '<h4 class="text-base font-black text-brand-dark mt-3 mb-1">$1</h4>');
-      html = html.replace(/^- (.*?)$/gm, '<li class="ml-3 list-disc pl-0.5 font-medium">$1</li>');
-
-      const tableRegex = /\|([\s\S]*?)\|/g;
-      if (html.includes('|')) {
-        const lines = html.split('\n');
-        let inTable = false;
-        let tableRows = '';
-        
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i].trim();
-          if (line.startsWith('|') && line.endsWith('|')) {
-            if (line.includes('---')) continue;
-            inTable = true;
-            const cells = line.split('|').slice(1, -1).map(c => c.trim());
-            const rowTag = tableRows === '' ? 'th' : 'td';
-            const rowContent = cells.map(c => `<${rowTag} class="px-2.5 py-1 border border-brand-dark/20 text-left font-bold">${c}</${rowTag}>`).join('');
-            tableRows += `<tr class="border-b border-brand-dark/15">${rowContent}</tr>`;
-          } else {
-            if (inTable) {
-              html = html.replace(/\|[\s\S]*?\|/, `<table class="w-full text-xs border border-brand-dark/15 border-collapse my-2">${tableRows}</table>`);
-              inTable = false;
-              tableRows = '';
-            }
-          }
-        }
-        if (inTable) {
-          html = html.replace(/\|[\s\S]*?\|/, `<table class="w-full text-xs border border-brand-dark/15 border-collapse my-2">${tableRows}</table>`);
-        }
-      }
-      html = html.replace(/\n\n/g, '<div class="h-2"></div>');
-      return html;
     }
   </script>
 </body>

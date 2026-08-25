@@ -1,84 +1,112 @@
 @import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
 
 :root {
-  --color-bg-dark: #122022;
-  --color-accent-green: #DAF4AA;
-  --color-accent-cyan: #96D8D0;
-  --color-accent-pink: #F1B4B9;
+  --color-bg-main: #F4F5F7;
+  --color-card-white: #FFFFFF;
+  --color-card-dark: #111113;
+  --color-accent-orange: #FF5F00;
+  --color-accent-orange-hover: #E05300;
+  --color-text-dark: #111113;
+  --color-text-muted: #6B7280;
   
   --font-urbanist: 'Urbanist', sans-serif;
 }
 
 body {
   font-family: var(--font-urbanist);
-  background: linear-gradient(135deg, #F0F4F8 0%, #FFFFFF 50%, #D4E4F5 100%);
-  background-attachment: fixed;
-  color: var(--color-bg-dark);
+  background-color: var(--color-bg-main);
+  color: var(--color-text-dark);
   overflow-x: hidden;
-  min-h-screen;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Glassmorphism custom classes for light mode with enhanced readability */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(18, 32, 34, 0.12);
-  box-shadow: 0 8px 32px 0 rgba(18, 32, 34, 0.05);
+/* ZELLIFY Inspired UI Cards */
+.z-card-white {
+  background: #FFFFFF;
+  border-radius: 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.03), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  transition: all 0.25s ease-in-out;
 }
 
-.glass-panel-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.z-card-white-hover:hover {
+  box-shadow: 0 12px 30px 0 rgba(0, 0, 0, 0.07);
+  transform: translateY(-2px);
 }
 
-.glass-panel-hover:hover {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(18, 32, 34, 0.22);
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px -15px rgba(18, 32, 34, 0.12);
+.z-card-dark {
+  background: #111113;
+  color: #FFFFFF;
+  border-radius: 2rem;
+  box-shadow: 0 10px 30px -5px rgba(17, 17, 19, 0.25);
+  transition: all 0.25s ease-in-out;
 }
 
-.glass-navbar {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(18, 32, 34, 0.12);
-  box-shadow: 0 8px 32px 0 rgba(18, 32, 34, 0.06);
+.z-pill-nav {
+  background: #111113;
+  border-radius: 9999px;
+  padding: 0.35rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Custom scrollbar matching the light theme */
+.z-pill-nav-item-active {
+  background: #FFFFFF;
+  color: #111113;
+  border-radius: 9999px;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.z-pill-nav-item {
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 9999px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.z-pill-nav-item:hover {
+  color: #FFFFFF;
+}
+
+/* Custom Orange Badge & Buttons */
+.z-badge-orange {
+  background-color: #FF5F00;
+  color: #FFFFFF;
+  border-radius: 9999px;
+  font-weight: 800;
+}
+
+.z-badge-black {
+  background-color: #111113;
+  color: #FFFFFF;
+  border-radius: 9999px;
+  font-weight: 800;
+}
+
+.z-badge-green {
+  background-color: #ECFDF5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+  border-radius: 9999px;
+  font-weight: 800;
+}
+
+/* Custom scrollbar matching ZELLIFY light theme */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F0F4F8;
+  background: #F4F5F7;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(18, 32, 34, 0.1);
-  border-radius: 4px;
+  background: rgba(17, 17, 19, 0.15);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(18, 32, 34, 0.2);
-}
-
-/* Glowing background blobs adapted to light background */
-.bg-glow-green {
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(218, 244, 170, 0.25) 0%, rgba(218, 244, 170, 0) 70%);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.bg-glow-pink {
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(241, 180, 185, 0.2) 0%, rgba(241, 180, 185, 0) 70%);
-  border-radius: 50%;
-  pointer-events: none;
+  background: rgba(17, 17, 19, 0.3);
 }
