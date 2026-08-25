@@ -907,53 +907,101 @@
                   </button>
                 </div>
 
+                {/* IMPROVED DATA-RICH CLIENT CARDS GRID */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {clientsList.map(client => (
-                    <div 
-                      key={client.id}
-                      onClick={() => openClientDashboard(client.id)}
-                      className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[360px] relative overflow-hidden group cursor-pointer shadow-xs border border-gray-200 dark:border-gray-800"
-                    >
-                      <div>
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="w-12 h-12 rounded-2xl bg-[#111113] text-white flex items-center justify-center font-black text-lg shadow-md group-hover:scale-110 transition-transform">
-                            {client.logo || client.name.slice(0, 2).toUpperCase()}
+                  {clientsList.map(client => {
+                    const spendVal = client.id === 'acme-corp' ? 2850 : client.id === 'luxe-fashion' ? 4120 : 3250;
+                    const budgetVal = 5000;
+                    const pct = Math.round((spendVal / budgetVal) * 100);
+                    const roasVal = client.financialTargets ? `${client.financialTargets.targetROAS}x` : '4.25x';
+
+                    return (
+                      <div 
+                        key={client.id}
+                        onClick={() => openClientDashboard(client.id)}
+                        className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between relative overflow-hidden group cursor-pointer shadow-xs border border-gray-200 dark:border-gray-800 transition-all space-y-5"
+                      >
+                        {/* 1. HEADER SECTION */}
+                        <div>
+                          <div className="flex justify-between items-center mb-3">
+                            {/* Dark circular avatar with initials */}
+                            <div className="w-11 h-11 rounded-full bg-[#111113] text-white flex items-center justify-center font-black text-sm shadow-md group-hover:scale-105 transition-transform">
+                              {client.logo || client.name.slice(0, 2).toUpperCase()}
+                            </div>
+
+                            {/* Row of small subtle brand logos */}
+                            <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800/80 px-3 py-1 rounded-full border border-gray-200/60 dark:border-gray-700">
+                              <i className="fa-brands fa-meta text-blue-600 text-xs" title="Meta Ads Active"></i>
+                              <i className="fa-brands fa-google text-amber-500 text-xs" title="Google Ads & PMax Active"></i>
+                              <i className="fa-brands fa-instagram text-pink-500 text-xs" title="Instagram Organic Active"></i>
+                            </div>
                           </div>
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${
-                            client.status === 'Healthy' 
-                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                              : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
-                          }`}>
-                            {client.status === 'Healthy' ? '✓ Healthy' : '⚠️ Needs Attention'}
-                          </span>
+
+                          {/* Client Name & Industry */}
+                          <h3 className="text-xl font-black text-[#111113] dark:text-white tracking-tight group-hover:text-zorange transition-colors">
+                            {client.name}
+                          </h3>
+                          <p className="text-xs text-gray-400 font-bold mt-0.5">{client.industry || 'Digital Marketing Agency'}</p>
                         </div>
 
-                        <h3 className="text-xl font-black text-[#111113] dark:text-white tracking-tight group-hover:text-zorange transition-colors">
-                          {client.name}
-                        </h3>
-                        <p className="text-xs text-gray-500 font-bold mt-0.5">{client.industry || 'Digital Agency'}</p>
+                        {/* 2. METRICS SECTION (2-COLUMN GRID) */}
+                        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-gray-800/80">
+                          
+                          {/* Column 1: Budget Pacing */}
+                          <div>
+                            <span className="text-[10px] font-extrabold uppercase text-gray-400 block mb-0.5 tracking-wider">MJESEČNI SPEND</span>
+                            <span className="text-xl font-black text-[#111113] dark:text-white">
+                              ${spendVal.toLocaleString()}
+                            </span>
+                            
+                            {/* Progress bar */}
+                            <div className="w-full bg-gray-100 dark:bg-gray-800 h-1.5 rounded-full mt-2 overflow-hidden">
+                              <div 
+                                className="bg-zorange h-full rounded-full transition-all duration-500" 
+                                style={{ width: `${pct}%` }}
+                              ></div>
+                            </div>
+                            
+                            <span className="text-[10px] text-gray-400 font-bold mt-1 block">
+                              ${spendVal.toLocaleString()} of ${budgetVal.toLocaleString()}
+                            </span>
+                          </div>
 
-                        <div className="grid grid-cols-2 gap-3 mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                          {/* Column 2: Performance */}
                           <div>
-                            <span className="text-[10px] font-extrabold uppercase text-gray-400 block">Mjesečni Spend</span>
-                            <span className="text-base font-black text-[#111113] dark:text-white">
-                              {client.metaStats ? client.metaStats.totalSpend : '$4,850'}
+                            <span className="text-[10px] font-extrabold uppercase text-gray-400 block mb-0.5 tracking-wider">OVERALL ROAS</span>
+                            <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">
+                              {roasVal}
+                            </span>
+                            <span className="text-[10px] text-gray-400 font-bold mt-3 block">
+                              Target: 3.50x
                             </span>
                           </div>
-                          <div>
-                            <span className="text-[10px] font-extrabold uppercase text-gray-400 block">Overall ROAS</span>
-                            <span className="text-base font-black text-emerald-600 dark:text-emerald-400">
-                              {client.financialTargets ? client.financialTargets.targetROAS : '4.25x'}
-                            </span>
-                          </div>
+
                         </div>
+
+                        {/* 3. AI ALERT / STATUS SECTION (CONDITIONAL) */}
+                        <div>
+                          {client.status === 'Healthy' ? (
+                            <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 rounded-xl p-2.5 px-3 flex items-center gap-2 text-[11px] font-bold text-emerald-800 dark:text-emerald-300">
+                              <i className="fa-solid fa-wand-magic-sparkles text-emerald-600 dark:text-emerald-400 text-xs shrink-0"></i>
+                              <span className="truncate">✓ AI: Sustav je optimalan - ROAS 18% iznad cilja</span>
+                            </div>
+                          ) : (
+                            <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 rounded-xl p-2.5 px-3 flex items-center gap-2 text-[11px] font-bold text-amber-800 dark:text-amber-300">
+                              <i className="fa-solid fa-triangle-exclamation text-amber-600 dark:text-amber-400 text-xs shrink-0"></i>
+                              <span className="truncate">⚠️ AI: Google PMax ROAS is 15% below target - Click to fix</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 4. FOOTER BUTTON */}
+                        <button className="w-full py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-[#111113] dark:text-white text-xs font-black uppercase tracking-wider group-hover:bg-zorange group-hover:text-white transition-all flex items-center justify-center gap-2">
+                          OTVORI NADZORNU PLOČU →
+                        </button>
                       </div>
-
-                      <button className="w-full py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-[#111113] dark:text-white text-xs font-black uppercase tracking-wider group-hover:bg-zorange group-hover:text-white transition-colors flex items-center justify-center gap-2">
-                        Otvori Nadzornu Ploču <i className="fa-solid fa-arrow-right text-xs"></i>
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
             ) : (
