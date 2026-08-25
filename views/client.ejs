@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= client.name %> - Marketing Analytics Dashboard</title>
+  <title><%= client ? client.name : 'Agency Portfolio' %> - ZELLIFY Marketing Dashboard</title>
 
   <!-- Tailwind Play CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -40,7 +40,7 @@
   <!-- Babel Standalone for JSX compilation -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
-<body class="bg-[#F4F5F7] dark:bg-[#0B0B0C] min-h-screen text-[#111113] dark:text-gray-100 transition-colors duration-200">
+<body class="bg-[#F4F5F7] dark:bg-[#0B0B0C] min-h-screen text-[#111113] dark:text-gray-100 transition-colors duration-200 antialiased overflow-x-hidden">
   
   <!-- React Mount Point -->
   <div id="react-root"></div>
@@ -50,8 +50,8 @@
     const { useState, useEffect, useMemo, useRef } = React;
 
     // --- ACCOUNTS DATA FROM EXPRESS BACKEND ---
-    const ACCOUNTS = <%- JSON.stringify(clients.map(c => ({ id: c.id, name: c.name, package: c.package }))) %>;
-    const INITIAL_CLIENT_ID = '<%= client.id %>';
+    const INITIAL_CLIENTS = <%- JSON.stringify(clients) %>;
+    const SERVER_CLIENT_ID = <%= client ? `'${client.id}'` : 'null' %>;
 
     const DATE_RANGES = [
       { id: '7d', label: 'Zadnjih 7 dana (Last 7 Days)' },
@@ -59,8 +59,7 @@
       { id: 'this_month', label: 'Ovaj Mjesec (This Month)' }
     ];
 
-    // Helper for generating dynamic daily arrays
-    const getDays = (count = 14) => Array.from({ length: count }, (_, i) => `${i + 1}.08.`);
+    const getDays = (count = 12) => Array.from({ length: count }, (_, i) => `${i + 1}.08.`);
 
     // --- REUSABLE ECHARTS REACT COMPONENT WITH RESIZEOBSERVER ---
     const EChartComponent = ({ option, style = { width: '100%', height: '280px' } }) => {
@@ -75,14 +74,10 @@
         instanceRef.current.setOption(option, true);
 
         const resizeChart = () => {
-          if (instanceRef.current) {
-            instanceRef.current.resize();
-          }
+          if (instanceRef.current) instanceRef.current.resize();
         };
 
-        const observer = new ResizeObserver(() => {
-          resizeChart();
-        });
+        const observer = new ResizeObserver(() => resizeChart());
         observer.observe(chartRef.current);
 
         window.addEventListener('resize', resizeChart);
@@ -109,18 +104,64 @@
 
     // --- MAIN REACT DASHBOARD APPLICATION ---
     function DashboardApp() {
-      const [activeView, setActiveView] = useState('instagram'); // 'instagram' | 'meta-ads'
-      const [selectedAccount, setSelectedAccount] = useState(INITIAL_CLIENT_ID);
+      const [clientsList, setClientsList] = useState(INITIAL_CLIENTS);
+      const [selectedAccount, setSelectedAccount] = useState(SERVER_CLIENT_ID || 'acme-corp');
+      const [isHomeView, setIsHomeView] = useState(SERVER_CLIENT_ID === null);
+      
+      const [clientTab, setClientTab] = useState('organic'); // 'organic' | 'meta-ads' | 'google-ads'
       const [dateRange, setDateRange] = useState('30d');
       const [isLoading, setIsLoading] = useState(false);
       const [darkMode, setDarkMode] = useState(false);
 
-      // Table Sorting state for Instagram Posts & Meta Ads
+      // AI Sidebar State
+      const [isAiOpen, setIsAiOpen] = useState(false);
+      const [aiMessages, setAiMessages] = useState([
+        { 
+          id: 1, 
+          sender: 'ai', 
+          content: 'Pozdrav Vinko! Ja sam tvoj Marketing Co-Pilot. Spreman sam za analizu učinkovitosti i optimizaciju oglasa.',
+          thoughts: ['Učitavam bazu podataka i aktivne metrike...'],
+          actions: [
+            { label: '🔍 Analiziraj trenutni prikaz', prompt: 'Napravi brzu dijagnostiku trenutnog prikaza' },
+            { label: '💡 Predloži ad copy varijante', prompt: 'Predloži 3 nova naslova za oglas s visokim CTR-om' }
+          ]
+        }
+      ]);
+      const [aiInputText, setAiInputText] = useState('');
+      const [isAiTyping, setIsAiTyping] = useState(false);
+
+      // Modal & Banner state
+      const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+      const [bannerDismissed, setBannerDismissed] = useState(false);
+
+      // Form state for Add Client Modal
+      const [newClientForm, setNewClientForm] = useState({
+        name: '',
+        industry: '',
+        targetAudience: '',
+        primaryGoal: 'Lead Generation',
+        targetBudget: '5000',
+        targetCPA: '15.00',
+        targetROAS: '4.0',
+        metaBusinessId: '',
+        metaAdAccountId: '',
+        googleAdsId: '',
+        fbPageId: '',
+        igProfileId: ''
+      });
+
+      // Table Sorting states
       const [postSortKey, setPostSortKey] = useState('reach');
       const [postSortDir, setPostSortDir] = useState('desc');
 
       const [adSortKey, setAdSortKey] = useState('spend');
       const [adSortDir, setAdSortDir] = useState('desc');
+
+      const [searchTermSortKey, setSearchTermSortKey] = useState('clicks');
+      const [searchTermSortDir, setSearchTermSortDir] = useState('desc');
+
+      // Negative Keywords list
+      const [negativeKeywords, setNegativeKeywords] = useState(['besplatno', 'torrent', 'rabljeno']);
 
       // Toggle Dark Mode
       useEffect(() => {
@@ -131,782 +172,1244 @@
         }
       }, [darkMode]);
 
-      // Redirect to selected client URL route
+      const currentClientObj = useMemo(() => {
+        return clientsList.find(c => c.id === selectedAccount) || clientsList[0];
+      }, [clientsList, selectedAccount]);
+
+      // Handle Client Change
       const handleAccountChange = (e) => {
-        const newId = e.target.value;
-        setSelectedAccount(newId);
-        if (newId !== INITIAL_CLIENT_ID) {
-          window.location.href = `/client/${newId}`;
+        const id = e.target.value;
+        if (id === 'HOME') {
+          setIsHomeView(true);
+          return;
         }
+        setIsLoading(true);
+        setSelectedAccount(id);
+        setIsHomeView(false);
+        setTimeout(() => setIsLoading(false), 300);
       };
 
       const handleDateChange = (e) => {
         setIsLoading(true);
         setDateRange(e.target.value);
-        setTimeout(() => setIsLoading(false), 350);
+        setTimeout(() => setIsLoading(false), 300);
       };
 
-      // Current Account Details
-      const accountObj = useMemo(() => {
-        return ACCOUNTS.find(a => a.id === selectedAccount) || ACCOUNTS[0];
-      }, [selectedAccount]);
+      // Open Client Dashboard from Home Card
+      const openClientDashboard = (clientId) => {
+        setSelectedAccount(clientId);
+        setIsHomeView(false);
+      };
 
-      // --- PAGE 1: INSTAGRAM ORGANIC DATA ---
-      const instagramData = useMemo(() => {
-        const mult = dateRange === '7d' ? 0.35 : dateRange === 'this_month' ? 0.85 : 1.0;
-        return {
-          reach: Math.round(128450 * mult).toLocaleString(),
-          reachChange: '+14.2%',
-          impressions: Math.round(412900 * mult).toLocaleString(),
-          impressionsChange: '+8.6%',
-          err: '6.4%',
-          errChange: '+1.1%',
-          netFollowers: `+${Math.round(1380 * mult)}`,
-          followersChange: '+24.5%',
-          profileVisits: Math.round(14250 * mult).toLocaleString(),
-          websiteTaps: Math.round(3890 * mult).toLocaleString(),
-          visitsChange: '+18.3%',
-          // Chart 1: Reach vs Impressions
-          reachTrendOption: {
-            tooltip: { trigger: 'axis' },
-            legend: { data: ['Total Reach', 'Total Impressions'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
-            grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
-            xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
-            yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
-            series: [
-              { name: 'Total Reach', type: 'line', data: [8200, 9400, 11200, 10800, 12500, 14100, 13800, 15200, 16800, 15900, 17400, 18600].map(v => Math.round(v * mult)), smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, areaStyle: { color: 'rgba(255, 95, 0, 0.15)' }, itemStyle: { color: '#FF5F00' } },
-              { name: 'Total Impressions', type: 'line', data: [24000, 27500, 31000, 29800, 34200, 38900, 37500, 41200, 44800, 42900, 46100, 49500].map(v => Math.round(v * mult)), smooth: true, lineStyle: { width: 3, color: darkMode ? '#E4E4E7' : '#111113' }, itemStyle: { color: darkMode ? '#E4E4E7' : '#111113' } }
-            ]
-          },
-          // Chart 2: Engagement Breakdown (Saves & Shares vs Likes & Comments)
-          engagementOption: {
-            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-            legend: { data: ['Saves (Core Signal)', 'Shares (Core Signal)', 'Likes', 'Comments'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
-            grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
-            xAxis: { type: 'category', data: ['Post #1', 'Post #2', 'Post #3', 'Post #4', 'Post #5', 'Post #6'], axisLabel: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 10 } },
-            yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
-            series: [
-              { name: 'Saves (Core Signal)', type: 'bar', stack: 'total', data: [340, 520, 410, 680, 590, 810], itemStyle: { color: '#FF5F00' } },
-              { name: 'Shares (Core Signal)', type: 'bar', stack: 'total', data: [210, 380, 290, 450, 390, 560], itemStyle: { color: darkMode ? '#E4E4E7' : '#111113' } },
-              { name: 'Likes', type: 'bar', stack: 'total', data: [1200, 1850, 1420, 2100, 1950, 2600], itemStyle: { color: '#E1306C' } },
-              { name: 'Comments', type: 'bar', stack: 'total', data: [180, 290, 210, 340, 280, 410], itemStyle: { color: '#1877F2', borderRadius: [4, 4, 0, 0] } }
-            ]
-          },
-          // Chart 3: Follower Growth vs Unfollows
-          growthOption: {
-            tooltip: { trigger: 'axis' },
-            legend: { data: ['New Follows (+)', 'Unfollows (-)', 'Net Growth Trend'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
-            grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
-            xAxis: { type: 'category', data: getDays(10), axisLabel: { color: '#6B7280', fontSize: 10 } },
-            yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
-            series: [
-              { name: 'New Follows (+)', type: 'bar', data: [85, 110, 95, 140, 165, 150, 180, 210, 195, 230], itemStyle: { color: '#059669', borderRadius: [4, 4, 0, 0] } },
-              { name: 'Unfollows (-)', type: 'bar', data: [-18, -24, -20, -32, -28, -25, -30, -35, -29, -38], itemStyle: { color: '#EF4444', borderRadius: [0, 0, 4, 4] } },
-              { name: 'Net Growth Trend', type: 'line', data: [67, 86, 75, 108, 137, 125, 150, 175, 166, 192], smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
-            ]
-          },
-          // Posts Table Data
-          posts: [
-            { id: 1, thumb: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&fit=crop', caption: 'Ljetni popust 20% na sve usluge! 🚀', type: 'Reel', reach: 42100, likes: 3200, comments: 240, saves: 890, shares: 640 },
-            { id: 2, thumb: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=120&fit=crop', caption: 'Vodič kroz marketing strategiju u 2026. 📊', type: 'Carousel', reach: 31400, likes: 2450, comments: 180, saves: 1120, shares: 480 },
-            { id: 3, thumb: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=120&fit=crop', caption: 'Kako doći do više konverzija uz Meta Ads? 💡', type: 'Reel', reach: 28900, likes: 2100, comments: 165, saves: 740, shares: 390 },
-            { id: 4, thumb: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=120&fit=crop', caption: 'Priča iza našeg najnovijeg projekta 🔥', type: 'Single Image', reach: 19800, likes: 1450, comments: 95, saves: 310, shares: 180 },
-            { id: 5, thumb: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=120&fit=crop', caption: 'Top 5 grešaka u dizajnu oglasa ❌', type: 'Carousel', reach: 24600, likes: 1920, comments: 140, saves: 850, shares: 420 }
-          ]
-        };
-      }, [dateRange, darkMode]);
+      // --- ADD NEW CLIENT HANDLER ---
+      const handleAddClientSubmit = async (e) => {
+        e.preventDefault();
+        if (!newClientForm.name) return;
 
-      // Sorted Posts Table Data
-      const sortedPosts = useMemo(() => {
-        const list = [...instagramData.posts];
-        list.sort((a, b) => {
-          let valA = a[postSortKey];
-          let valB = b[postSortKey];
-          if (postSortKey === 'err') {
-            valA = ((a.likes + a.comments + a.saves + a.shares) / a.reach) * 100;
-            valB = ((b.likes + b.comments + b.saves + b.shares) / b.reach) * 100;
+        try {
+          const res = await fetch('/api/client/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(newClientForm)
+          });
+          const data = await res.json();
+          if (data.success && data.client) {
+            setClientsList(prev => [...prev, data.client]);
+            setSelectedAccount(data.client.id);
+            setIsHomeView(false);
+            setIsAddModalOpen(false);
           }
-          if (valA < valB) return postSortDir === 'asc' ? -1 : 1;
-          if (valA > valB) return postSortDir === 'asc' ? 1 : -1;
-          return 0;
-        });
-        return list;
-      }, [instagramData.posts, postSortKey, postSortDir]);
-
-      const handlePostSort = (key) => {
-        if (postSortKey === key) {
-          setPostSortDir(postSortDir === 'asc' ? 'desc' : 'asc');
-        } else {
-          setPostSortKey(key);
-          setPostSortDir('desc');
+        } catch (err) {
+          console.error(err);
+          // Local fallback
+          const slugId = newClientForm.name.toLowerCase().replace(/\s+/g, '-');
+          const mockCreated = {
+            id: slugId,
+            name: newClientForm.name,
+            logo: newClientForm.name.slice(0, 2).toUpperCase(),
+            package: 'Enterprise',
+            industry: newClientForm.industry || 'E-commerce',
+            status: 'Healthy',
+            stats: { reach: '10.5k', impressions: '45.2k', ctr: '3.1%', spend: `$${newClientForm.targetBudget}` },
+            metaStats: { totalSpend: `$${newClientForm.targetBudget}`, cpa: `$${newClientForm.targetCPA}`, cpaTrend: { value: '5%', direction: 'down' }, resultsValue: '180 Leads' }
+          };
+          setClientsList(prev => [...prev, mockCreated]);
+          setSelectedAccount(slugId);
+          setIsHomeView(false);
+          setIsAddModalOpen(false);
         }
       };
 
-      // --- PAGE 2: META ADS PERFORMANCE DATA ---
-      const metaAdsData = useMemo(() => {
-        const mult = dateRange === '7d' ? 0.35 : dateRange === 'this_month' ? 0.85 : 1.0;
-        return {
-          spend: `$${(4850.00 * mult).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-          spendChange: '+5.4%',
-          roas: '4.25x',
-          roasChange: '+0.4x',
-          cpa: `$${(14.20).toFixed(2)}`,
-          cpaChange: '-8.5%', // lower CPA is better
-          conversions: `${Math.round(341 * mult)} Leads`,
-          conversionsChange: '+15.2%',
-          ctr: '2.84%',
-          ctrChange: '+0.3%',
-          // Chart 1: Spend vs ROAS (Dual Y-Axis)
-          spendRoasOption: {
-            tooltip: { trigger: 'axis' },
-            legend: { data: ['Daily Spend ($)', 'Blended ROAS (x)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
-            grid: { top: 30, bottom: 40, left: 15, right: 15, containLabel: true },
-            xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
-            yAxis: [
-              { type: 'value', name: 'Spend ($)', axisLabel: { color: '#6B7280', fontSize: 10, formatter: '${value}' } },
-              { type: 'value', name: 'ROAS (x)', min: 0, max: 6, axisLabel: { color: '#FF5F00', fontSize: 10, formatter: '{value}x' } }
-            ],
-            series: [
-              { name: 'Daily Spend ($)', type: 'bar', barWidth: '35%', data: [210, 240, 280, 310, 290, 340, 420, 390, 450, 480, 460, 520].map(v => Math.round(v * mult)), itemStyle: { color: darkMode ? '#3F3F46' : '#111113', borderRadius: [4, 4, 0, 0] } },
-              { name: 'Blended ROAS (x)', type: 'line', yAxisIndex: 1, data: [4.8, 4.6, 4.3, 3.9, 4.2, 4.5, 3.8, 4.1, 4.4, 4.2, 4.5, 4.3], smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
-            ]
-          },
-          // Chart 2: Creative Health & Ad Fatigue (Frequency vs CTR Link)
-          fatigueOption: {
-            tooltip: { trigger: 'axis' },
-            legend: { data: ['Ad Frequency', 'CTR Link (%)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
-            grid: { top: 30, bottom: 40, left: 15, right: 15, containLabel: true },
-            xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
-            yAxis: [
-              { type: 'value', name: 'Frequency', min: 1, max: 5, axisLabel: { color: '#EF4444', fontSize: 10, formatter: '{value}x' } },
-              { type: 'value', name: 'CTR (%)', min: 0, max: 5, axisLabel: { color: '#059669', fontSize: 10, formatter: '{value}%' } }
-            ],
-            series: [
-              { name: 'Ad Frequency', type: 'line', data: [1.4, 1.7, 2.1, 2.4, 2.8, 3.1, 3.4, 3.7, 4.0, 4.2, 4.5, 4.8], smooth: true, lineStyle: { width: 3, color: '#EF4444' }, itemStyle: { color: '#EF4444' } },
-              { name: 'CTR Link (%)', type: 'line', yAxisIndex: 1, data: [3.8, 3.6, 3.4, 3.1, 2.8, 2.4, 2.1, 1.8, 1.5, 1.3, 1.1, 0.9], smooth: true, lineStyle: { width: 3, color: '#059669' }, itemStyle: { color: '#059669' } }
-            ]
-          },
-          // Chart 3: Funnel Leakage (Link Clicks vs Landing Page Views)
-          funnelOption: {
-            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-            legend: { data: ['Outbound Link Clicks', 'Verified Landing Page Views'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
-            grid: { top: 20, bottom: 45, left: 15, right: 15, containLabel: true },
-            xAxis: { type: 'category', data: ['Tjedan 1', 'Tjedan 2', 'Tjedan 3', 'Tjedan 4'], axisLabel: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
-            yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
-            series: [
-              { name: 'Outbound Link Clicks', type: 'bar', barWidth: '35%', data: [1240, 1480, 1620, 1850].map(v => Math.round(v * mult)), itemStyle: { color: '#1877F2', borderRadius: [4, 4, 0, 0] } },
-              { name: 'Verified Landing Page Views', type: 'bar', barWidth: '35%', data: [940, 1120, 1210, 1380].map(v => Math.round(v * mult)), itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } }
-            ]
-          },
-          // Chart 4: Video Creative Retention (Hook Rate vs Hold Rate)
-          retentionOption: {
-            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-            legend: { data: ['Hook Rate (3s Views / Impressions %)', 'Hold Rate (ThruPlays / 3s Views %)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
-            grid: { top: 20, bottom: 45, left: 10, right: 20, containLabel: true },
-            xAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10, formatter: '{value}%' } },
-            yAxis: { type: 'category', data: ['Ad 1: Ljetni Popust', 'Ad 2: Vodič Strategija', 'Ad 3: Demo Proizvoda', 'Ad 4: Klijent Review'], axisLabel: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
-            series: [
-              { name: 'Hook Rate (3s Views / Impressions %)', type: 'bar', barWidth: '30%', data: [44.2, 38.5, 51.0, 31.4], itemStyle: { color: '#FF5F00', borderRadius: [0, 4, 4, 0] } },
-              { name: 'Hold Rate (ThruPlays / 3s Views %)', type: 'bar', barWidth: '30%', data: [28.4, 22.1, 35.8, 19.2], itemStyle: { color: darkMode ? '#E4E4E7' : '#111113', borderRadius: [0, 4, 4, 0] } }
-            ]
-          },
-          // Chart 5: Platform & Placement Breakdown
-          placementOption: {
-            tooltip: { trigger: 'item', formatter: '{b}: ${c} ({d}%)' },
-            legend: { bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
-            series: [{
-              name: 'Potrošnja po Plasmanu',
-              type: 'pie',
-              radius: ['45%', '70%'],
-              avoidLabelOverlap: false,
-              itemStyle: { borderRadius: 10, borderColor: darkMode ? '#161618' : '#ffffff', borderWidth: 2 },
-              data: [
-                { value: Math.round(1850 * mult), name: 'Instagram Feed', itemStyle: { color: '#E1306C' } },
-                { value: Math.round(1420 * mult), name: 'Instagram Reels', itemStyle: { color: '#FF5F00' } },
-                { value: Math.round(1120 * mult), name: 'Facebook Feed', itemStyle: { color: '#1877F2' } },
-                { value: Math.round(460 * mult), name: 'Instagram Stories', itemStyle: { color: '#833AB4' } }
-              ]
-            }]
-          },
-          // Ads Table Leaderboard
-          ads: [
-            { id: 1, name: 'Ljetni Popust 20% Video', placement: 'IG Reels', spend: 1420.00, ctr: 3.42, cpa: 12.40, roas: 4.8, hookRate: 44.2, views3s: 14200, impressions: 32100, status: 'Active' },
-            { id: 2, name: 'Retargeting Napuštene Košarice', placement: 'FB Feed', spend: 1180.00, ctr: 2.85, cpa: 14.10, roas: 4.1, hookRate: 38.5, views3s: 9800, impressions: 25400, status: 'Active' },
-            { id: 3, name: 'Lookalike 1% KUPCI Karusel', placement: 'IG Feed', spend: 950.00, ctr: 2.41, cpa: 16.80, roas: 3.5, hookRate: 31.0, views3s: 6400, impressions: 20600, status: 'Active' },
-            { id: 4, name: 'Digital Marketing Vodič Storitve', placement: 'IG Stories', spend: 460.00, ctr: 1.95, cpa: 19.20, roas: 2.8, hookRate: 28.4, views3s: 4100, impressions: 14500, status: 'Paused' }
+      // --- AI ASSISTANT CHAT SEND HANDLER ---
+      const handleSendAiMessage = async (customPrompt) => {
+        const textToSend = customPrompt || aiInputText;
+        if (!textToSend.trim()) return;
+
+        const userMsg = { id: Date.now(), sender: 'user', content: textToSend };
+        setAiMessages(prev => [...prev, userMsg]);
+        if (!customPrompt) setAiInputText('');
+        setIsAiTyping(true);
+
+        // Add temporary AI streaming message
+        const aiMsgId = Date.now() + 1;
+        setAiMessages(prev => [
+          ...prev, 
+          { 
+            id: aiMsgId, 
+            sender: 'ai', 
+            content: '', 
+            thoughts: [`Dohvaćam aktivne podatke za ${currentClientObj ? currentClientObj.name : 'Portfolio'}...`, `Analiziram metrike (${clientTab.toUpperCase()}, ${dateRange})...`] 
+          }
+        ]);
+
+        try {
+          const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: textToSend,
+              clientId: selectedAccount
+            })
+          });
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+          let accumulatedContent = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunkStr = decoder.decode(value);
+            const lines = chunkStr.split('\n\n');
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const dataStr = line.replace('data: ', '').trim();
+                if (dataStr === '[DONE]') continue;
+                try {
+                  const parsed = JSON.parse(dataStr);
+                  if (parsed.type === 'FINAL_RESPONSE') {
+                    accumulatedContent += parsed.content;
+                    setAiMessages(prev => prev.map(m => m.id === aiMsgId ? { ...m, content: accumulatedContent } : m));
+                  }
+                } catch (e) {}
+              }
+            }
+          }
+        } catch (err) {
+          setAiMessages(prev => prev.map(m => m.id === aiMsgId ? {
+            ...m,
+            content: `**AI Analiza za ${currentClientObj.name}:**\n\nMetrike za **${clientTab.toUpperCase()}** pokazuju stabilne performanse uz ciljani CPA od **${currentClientObj.financialTargets ? currentClientObj.financialTargets.targetCPA : '$15.00'}**.\n\nPreporučujem povećanje budžeta za 15% na najjačim kreativi.`
+          } : m));
+        } finally {
+          setIsAiTyping(false);
+        }
+      };
+
+      // Action triggers from inline AI buttons
+      const triggerAiIntervention = (promptText) => {
+        setIsAiOpen(true);
+        handleSendAiMessage(promptText);
+      };
+
+      const addNegativeKeyword = (kw) => {
+        if (!negativeKeywords.includes(kw)) {
+          setNegativeKeywords(prev => [...prev, kw]);
+        }
+        triggerAiIntervention(`Dodan negativni ključni izraz: "${kw}". Potvrdi optimizaciju kampanje.`);
+      };
+
+      // --- MOCK DATASETS & ECHARTS OPTIONS ---
+      const mult = dateRange === '7d' ? 0.35 : dateRange === 'this_month' ? 0.85 : 1.0;
+
+      // TAB 1: Organic Data
+      const organicData = useMemo(() => ({
+        reach: Math.round(128450 * mult).toLocaleString(),
+        err: '6.4%',
+        netFollowers: `+${Math.round(1380 * mult)}`,
+        websiteTaps: Math.round(3890 * mult).toLocaleString(),
+        reachTrendOption: {
+          tooltip: { trigger: 'axis' },
+          legend: { data: ['Total Reach', 'Total Impressions'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
+          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
+          yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
+          series: [
+            { name: 'Total Reach', type: 'line', data: [8200, 9400, 11200, 10800, 12500, 14100, 13800, 15200, 16800, 15900, 17400, 18600].map(v => Math.round(v * mult)), smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, areaStyle: { color: 'rgba(255, 95, 0, 0.15)' }, itemStyle: { color: '#FF5F00' } },
+            { name: 'Total Impressions', type: 'line', data: [24000, 27500, 31000, 29800, 34200, 38900, 37500, 41200, 44800, 42900, 46100, 49500].map(v => Math.round(v * mult)), smooth: true, lineStyle: { width: 3, color: darkMode ? '#E4E4E7' : '#111113' }, itemStyle: { color: darkMode ? '#E4E4E7' : '#111113' } }
           ]
-        };
-      }, [dateRange, darkMode]);
+        },
+        engagementOption: {
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          legend: { data: ['Saves (Core Signal)', 'Shares (Core Signal)', 'Likes', 'Comments'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
+          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          xAxis: { type: 'category', data: ['Post #1', 'Post #2', 'Post #3', 'Post #4', 'Post #5', 'Post #6'], axisLabel: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 10 } },
+          yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
+          series: [
+            { name: 'Saves (Core Signal)', type: 'bar', stack: 'total', data: [340, 520, 410, 680, 590, 810], itemStyle: { color: '#FF5F00' } },
+            { name: 'Shares (Core Signal)', type: 'bar', stack: 'total', data: [210, 380, 290, 450, 390, 560], itemStyle: { color: darkMode ? '#E4E4E7' : '#111113' } },
+            { name: 'Likes', type: 'bar', stack: 'total', data: [1200, 1850, 1420, 2100, 1950, 2600], itemStyle: { color: '#E1306C' } },
+            { name: 'Comments', type: 'bar', stack: 'total', data: [180, 290, 210, 340, 280, 410], itemStyle: { color: '#1877F2', borderRadius: [4, 4, 0, 0] } }
+          ]
+        },
+        posts: [
+          { id: 1, thumb: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&fit=crop', caption: 'Ljetni popust 20% na sve usluge! 🚀', type: 'Reel', reach: 42100, err: '7.8%', saves: 890, shares: 640 },
+          { id: 2, thumb: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=120&fit=crop', caption: 'Vodič kroz marketing strategiju 📊', type: 'Carousel', reach: 31400, err: '6.5%', saves: 1120, shares: 480 },
+          { id: 3, thumb: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=120&fit=crop', caption: 'Kako doći do više konverzija uz Meta Ads? 💡', type: 'Reel', reach: 28900, err: '5.9%', saves: 740, shares: 390 }
+        ]
+      }), [mult, darkMode]);
 
-      // Sorted Ads Leaderboard
-      const sortedAds = useMemo(() => {
-        const list = [...metaAdsData.ads];
-        list.sort((a, b) => {
-          let valA = a[adSortKey];
-          let valB = b[adSortKey];
-          if (valA < valB) return adSortDir === 'asc' ? -1 : 1;
-          if (valA > valB) return adSortDir === 'asc' ? 1 : -1;
-          return 0;
-        });
-        return list;
-      }, [metaAdsData.ads, adSortKey, adSortDir]);
+      // TAB 2: Meta Ads Data
+      const metaAdsData = useMemo(() => ({
+        spend: `$${(4850.00 * mult).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+        roas: '4.25x',
+        cpa: `$${(14.20).toFixed(2)}`,
+        conversions: `${Math.round(341 * mult)} Leads`,
+        efficiencyOption: {
+          tooltip: { trigger: 'axis' },
+          legend: { data: ['Daily Spend ($)', 'Blended ROAS (x)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
+          grid: { top: 30, bottom: 40, left: 15, right: 15, containLabel: true },
+          xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
+          yAxis: [
+            { type: 'value', name: 'Spend ($)', axisLabel: { color: '#6B7280', fontSize: 10, formatter: '${value}' } },
+            { type: 'value', name: 'ROAS (x)', min: 0, max: 6, axisLabel: { color: '#FF5F00', fontSize: 10, formatter: '{value}x' } }
+          ],
+          series: [
+            { name: 'Daily Spend ($)', type: 'bar', barWidth: '35%', data: [210, 240, 280, 310, 290, 340, 420, 390, 450, 480, 460, 520].map(v => Math.round(v * mult)), itemStyle: { color: darkMode ? '#3F3F46' : '#111113', borderRadius: [4, 4, 0, 0] } },
+            { name: 'Blended ROAS (x)', type: 'line', yAxisIndex: 1, data: [4.8, 4.6, 4.3, 3.9, 4.2, 4.5, 3.8, 4.1, 4.4, 4.2, 4.5, 4.3], smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
+          ]
+        },
+        fatigueOption: {
+          tooltip: { trigger: 'axis' },
+          legend: { data: ['Ad Frequency', 'CTR Link (%)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
+          grid: { top: 30, bottom: 40, left: 15, right: 15, containLabel: true },
+          xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
+          yAxis: [
+            { type: 'value', name: 'Frequency', min: 1, max: 5, axisLabel: { color: '#EF4444', fontSize: 10, formatter: '{value}x' } },
+            { type: 'value', name: 'CTR (%)', min: 0, max: 5, axisLabel: { color: '#059669', fontSize: 10, formatter: '{value}%' } }
+          ],
+          series: [
+            { name: 'Ad Frequency', type: 'line', data: [1.4, 1.7, 2.1, 2.4, 2.8, 3.1, 3.4, 3.7, 4.0, 4.2, 4.5, 4.8], smooth: true, lineStyle: { width: 3, color: '#EF4444' }, itemStyle: { color: '#EF4444' } },
+            { name: 'CTR Link (%)', type: 'line', yAxisIndex: 1, data: [3.8, 3.6, 3.4, 3.1, 2.8, 2.4, 2.1, 1.8, 1.5, 1.3, 1.1, 0.9], smooth: true, lineStyle: { width: 3, color: '#059669' }, itemStyle: { color: '#059669' } }
+          ]
+        },
+        funnelOption: {
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          legend: { data: ['Outbound Link Clicks', 'Verified Landing Page Views'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
+          grid: { top: 20, bottom: 45, left: 15, right: 15, containLabel: true },
+          xAxis: { type: 'category', data: ['Tjedan 1', 'Tjedan 2', 'Tjedan 3', 'Tjedan 4'], axisLabel: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
+          yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
+          series: [
+            { name: 'Outbound Link Clicks', type: 'bar', barWidth: '35%', data: [1240, 1480, 1620, 1850].map(v => Math.round(v * mult)), itemStyle: { color: '#1877F2', borderRadius: [4, 4, 0, 0] } },
+            { name: 'Verified Landing Page Views', type: 'bar', barWidth: '35%', data: [940, 1120, 1210, 1380].map(v => Math.round(v * mult)), itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } }
+          ]
+        },
+        ads: [
+          { id: 1, name: 'Ljetni Popust 20% Video', placement: 'IG Reels', spend: 1420.00, ctr: 3.42, cpa: 12.40, hookRate: 44.2, status: 'Active' },
+          { id: 2, name: 'Retargeting Napuštene Košarice', placement: 'FB Feed', spend: 1180.00, ctr: 2.85, cpa: 14.10, hookRate: 38.5, status: 'Active' },
+          { id: 3, name: 'Lookalike 1% KUPCI Karusel', placement: 'IG Feed', spend: 950.00, ctr: 2.41, cpa: 16.80, hookRate: 31.0, status: 'Active' },
+          { id: 4, name: 'Ad 4: Klijent Review Video', placement: 'IG Stories', spend: 460.00, ctr: 0.90, cpa: 22.40, hookRate: 28.4, status: 'Active' }
+        ]
+      }), [mult, darkMode]);
 
-      const handleAdSort = (key) => {
-        if (adSortKey === key) {
-          setAdSortDir(adSortDir === 'asc' ? 'desc' : 'asc');
-        } else {
-          setAdSortKey(key);
-          setAdSortDir('desc');
-        }
-      };
+      // TAB 3: Google Ads Data
+      const googleAdsData = useMemo(() => ({
+        spend: `$${(550.00 * mult).toFixed(2)}`,
+        convValue: `$${(2640.00 * mult).toFixed(2)}`,
+        cpa: `$${(18.33).toFixed(2)}`,
+        impressionShare: '72%',
+        trafficCostOption: {
+          tooltip: { trigger: 'axis' },
+          legend: { data: ['Clicks', 'Avg. CPC ($)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
+          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
+          yAxis: [
+            { type: 'value', name: 'Clicks', axisLabel: { color: '#6B7280', fontSize: 10 } },
+            { type: 'value', name: 'CPC ($)', min: 0, max: 2, axisLabel: { color: '#FF5F00', fontSize: 10, formatter: '${value}' } }
+          ],
+          series: [
+            { name: 'Clicks', type: 'line', data: [42, 48, 55, 61, 58, 64, 72, 69, 78, 82, 79, 88].map(v => Math.round(v * mult)), smooth: true, lineStyle: { width: 3, color: '#4285F4' }, itemStyle: { color: '#4285F4' } },
+            { name: 'Avg. CPC ($)', type: 'line', yAxisIndex: 1, data: [0.92, 0.88, 0.85, 0.82, 0.84, 0.79, 0.76, 0.78, 0.75, 0.73, 0.74, 0.71], smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
+          ]
+        },
+        campaignBreakdownOption: {
+          tooltip: { trigger: 'item', formatter: '{b}: ${c} ({d}%)' },
+          legend: { bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
+          series: [{
+            name: 'Potrošnja po Tipu Kampanje',
+            type: 'pie',
+            radius: ['45%', '70%'],
+            avoidLabelOverlap: false,
+            itemStyle: { borderRadius: 10, borderColor: darkMode ? '#161618' : '#ffffff', borderWidth: 2 },
+            data: [
+              { value: Math.round(302.50 * mult), name: 'Google Search', itemStyle: { color: '#4285F4' } },
+              { value: Math.round(176.00 * mult), name: 'Performance Max (PMax)', itemStyle: { color: '#34A853' } },
+              { value: Math.round(71.50 * mult), name: 'Display & Remarketing', itemStyle: { color: '#FBBC05' } }
+            ]
+          }]
+        },
+        searchTerms: [
+          { keyword: 'digitalna agencija zagreb', clicks: 142, conversions: 18, cost: 124.50, suggestedNegative: null },
+          { keyword: 'izrada web stranica cijena', clicks: 98, conversions: 12, cost: 89.20, suggestedNegative: null },
+          { keyword: 'besplatni marketing tečajovi', clicks: 64, conversions: 0, cost: 48.00, suggestedNegative: 'besplatni' },
+          { keyword: 'najbolje marketing agencije hr', clicks: 52, conversions: 6, cost: 42.10, suggestedNegative: null },
+          { keyword: 'torrent marketing knjige pdf', clicks: 38, conversions: 0, cost: 32.50, suggestedNegative: 'torrent' }
+        ]
+      }), [mult, darkMode]);
 
       return (
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-8 py-5 transition-all duration-300">
           
-          {/* TOP HEADER WITH CONTROLS & NAVIGATION */}
-          <header className="mb-8">
-            {/* TOP BAR: BRAND + SELECTORS + THEME TOGGLE */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-gray-200 dark:border-gray-800">
+          {/* ========================================================================= */}
+          {/* 1. GLOBAL TOP NAVIGATION BAR */}
+          {/* ========================================================================= */}
+          <header className="mb-6">
+            <div className="bg-white dark:bg-[#161618] rounded-full px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-sm border border-gray-200 dark:border-gray-800">
               
-              {/* Brand Logo & Tenant Badge + Back to All Clients Link */}
+              {/* Left: Brand + Breadcrumb Navigation */}
               <div className="flex items-center gap-3">
-                <a 
-                  href="/" 
-                  className="w-10 h-10 rounded-2xl bg-[#111113] text-white flex items-center justify-center font-black text-sm shadow-md border border-white/10 hover:bg-zorange transition-colors"
-                  title="Povratak na pregled svih klijenata"
-                >
-                  <i className="fa-solid fa-arrow-left text-zorange"></i>
-                </a>
-                <div>
-                  <h1 className="text-2xl font-black tracking-tight text-[#111113] dark:text-white flex items-center gap-1.5">
-                    ZELLIFY<span className="text-zorange">.</span>
-                    <a href="/" className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange border border-orange-200 dark:border-orange-900 hover:bg-zorange hover:text-white transition-colors">
-                      ← Svi Klijenti
-                    </a>
-                  </h1>
-                  <p className="text-xs text-gray-500 font-semibold">Client Marketing Analytics System</p>
+                <div className="w-9 h-9 rounded-2xl bg-zorange text-white flex items-center justify-center font-black text-sm shadow-sm">
+                  <i className="fa-solid fa-bolt-lightning"></i>
+                </div>
+                <div className="flex items-center gap-2 text-xs font-black">
+                  <button 
+                    onClick={() => setIsHomeView(true)}
+                    className="text-[#111113] dark:text-white hover:text-zorange transition-colors flex items-center gap-1.5"
+                  >
+                    <span>ZELLIFY</span>
+                    <span className="text-zorange font-black">.</span>
+                    <span className="text-gray-400 font-bold uppercase text-[11px]">Home</span>
+                  </button>
+                  
+                  {!isHomeView && currentClientObj && (
+                    <>
+                      <i className="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                      <span className="px-2.5 py-1 rounded-full bg-orange-100 dark:bg-orange-950/80 text-zorange border border-orange-200 dark:border-orange-900">
+                        {currentClientObj.name}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
 
-              {/* Center Capsule Navigation Switcher (Instagram Organic vs Meta Ads Performance) */}
-              <div className="z-pill-nav flex items-center gap-1 self-start lg:self-auto">
-                <button 
-                  onClick={() => setActiveView('instagram')} 
-                  className={`px-5 py-2.5 text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center gap-2 ${
-                    activeView === 'instagram' 
-                      ? 'bg-white text-[#111113] rounded-full shadow-md' 
-                      : 'text-white/80 hover:text-white'
-                  }`}
-                >
-                  <i className="fa-brands fa-instagram text-pink-500 text-sm"></i>
-                  Instagram Organic
-                </button>
-                <button 
-                  onClick={() => setActiveView('meta-ads')} 
-                  className={`px-5 py-2.5 text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center gap-2 ${
-                    activeView === 'meta-ads' 
-                      ? 'bg-white text-[#111113] rounded-full shadow-md' 
-                      : 'text-white/80 hover:text-white'
-                  }`}
-                >
-                  <i className="fa-brands fa-meta text-blue-500 text-sm"></i>
-                  Meta Ads Performance
-                </button>
-              </div>
-
-              {/* Right Dropdowns & Theme Toggle */}
+              {/* Center / Right Controls: Account Selector + Date Picker + Alerts + AI Assistant Button */}
               <div className="flex items-center gap-3 flex-wrap">
-                {/* Account Selector */}
-                <div className="relative flex items-center gap-1.5 bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 rounded-full px-4 py-2 shadow-xs text-xs font-bold">
-                  <i className="fa-solid fa-building text-zorange"></i>
-                  <span className="text-gray-400 font-medium">Klijent:</span>
+                
+                {/* Account Switcher Dropdown */}
+                <div className="relative flex items-center gap-1 bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-full px-3.5 py-1.5 text-xs font-bold">
+                  <i className="fa-solid fa-building text-zorange text-xs"></i>
                   <select 
-                    value={selectedAccount} 
+                    value={isHomeView ? 'HOME' : selectedAccount} 
                     onChange={handleAccountChange} 
-                    className="bg-transparent font-black text-[#111113] dark:text-white focus:outline-none cursor-pointer pr-2"
+                    className="bg-transparent font-black text-[#111113] dark:text-white focus:outline-none cursor-pointer pr-1"
                   >
-                    {ACCOUNTS.map(acc => (
-                      <option key={acc.id} value={acc.id} className="bg-white dark:bg-[#161618] text-[#111113] dark:text-white">
-                        {acc.name} ({acc.package})
+                    <option value="HOME" className="bg-white dark:bg-[#161618] font-bold">🏢 Pregled Svih Klijenata (Home)</option>
+                    {clientsList.map(acc => (
+                      <option key={acc.id} value={acc.id} className="bg-white dark:bg-[#161618]">
+                        {acc.name} ({acc.package || 'Enterprise'})
                       </option>
                     ))}
                   </select>
                 </div>
 
                 {/* Global Date Range Picker */}
-                <div className="relative flex items-center gap-1.5 bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 rounded-full px-4 py-2 shadow-xs text-xs font-bold">
-                  <i className="fa-solid fa-calendar-days text-zorange"></i>
+                <div className="relative flex items-center gap-1 bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-full px-3.5 py-1.5 text-xs font-bold">
+                  <i className="fa-solid fa-calendar-days text-zorange text-xs"></i>
                   <select 
                     value={dateRange} 
                     onChange={handleDateChange} 
                     className="bg-transparent font-black text-[#111113] dark:text-white focus:outline-none cursor-pointer"
                   >
                     {DATE_RANGES.map(d => (
-                      <option key={d.id} value={d.id} className="bg-white dark:bg-[#161618] text-[#111113] dark:text-white">
+                      <option key={d.id} value={d.id} className="bg-white dark:bg-[#161618]">
                         {d.label}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                {/* Light / Dark Theme Switcher Button */}
+                {/* Light / Dark Mode Switcher */}
                 <button 
                   onClick={() => setDarkMode(!darkMode)} 
-                  className="w-9 h-9 rounded-full bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 text-[#111113] dark:text-white flex items-center justify-center shadow-xs hover:border-zorange transition-colors"
+                  className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[#111113] dark:text-white flex items-center justify-center hover:border-zorange transition-colors"
                   title="Promijeni temu"
                 >
-                  <i className={`fa-solid ${darkMode ? 'fa-sun text-amber-400' : 'fa-moon text-indigo-600'} text-sm`}></i>
+                  <i className={`fa-solid ${darkMode ? 'fa-sun text-amber-400' : 'fa-moon text-indigo-600'} text-xs`}></i>
                 </button>
-              </div>
 
+                {/* AI Alerts Bell Notification Badge */}
+                <button 
+                  onClick={() => { setIsAiOpen(true); triggerAiIntervention('Prikaži sve kritične AI alerte za trenutnog klijenta.'); }}
+                  className="relative w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-900 text-amber-800 dark:text-amber-200 flex items-center justify-center hover:scale-105 transition-transform"
+                  title="AI Upozorenja"
+                >
+                  <i className="fa-solid fa-bell text-xs"></i>
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-black flex items-center justify-center animate-pulse">2</span>
+                </button>
+
+                {/* Prominent AI Assistant Toggle Button */}
+                <button 
+                  onClick={() => setIsAiOpen(!isAiOpen)}
+                  className="z-badge-black px-4 py-2 text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-md hover:bg-zorange hover:text-white transition-all transform active:scale-95"
+                >
+                  <i className="fa-solid fa-wand-magic-sparkles text-zorange"></i>
+                  <span>AI Assistant</span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                </button>
+
+              </div>
             </div>
           </header>
 
-          {/* MAIN DASHBOARD CONTENT AREA */}
+          {/* ========================================================================= */}
+          {/* 2. MAIN CONTENT AREA */}
+          {/* ========================================================================= */}
           <main>
-            {isLoading ? (
-              /* SKELETON LOADING STATE */
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <SkeletonCard />
-                <SkeletonCard />
-                <SkeletonCard />
-                <SkeletonCard />
-              </div>
-            ) : activeView === 'instagram' ? (
-              /* PAGE 1: INSTAGRAM ORGANIC VIEW */
+            {isHomeView ? (
+              /* ----------------------------------------------------------------------- */
+              /* HOME VIEW: CLIENT PORTFOLIO GRID & ONBOARDING MODAL */
+              /* ----------------------------------------------------------------------- */
               <section className="space-y-8">
-                
-                {/* TOP 5 KPI CARDS ROW */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-                  {/* CARD 1: Total Reach */}
-                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange flex items-center justify-center text-xs">
-                        <i className="fa-solid fa-users"></i>
-                      </div>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
-                        {instagramData.reachChange}
+                {/* Hero Header & Add Client Action */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-[#161618] rounded-[2rem] p-8 shadow-xs border border-gray-200 dark:border-gray-800">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 text-[10px] font-black">
+                        ● Svi sustavi aktivni
                       </span>
+                      <span className="text-xs text-gray-400 font-bold">Ukupno klijenata: {clientsList.length}</span>
                     </div>
-                    <div>
-                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Total Reach</span>
-                      <h3 className="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.reach}</h3>
-                      <p className="text-[10px] text-gray-400 font-bold mt-1">Jedinstveni računi dosegnuti</p>
-                    </div>
+                    <h2 className="text-3xl font-black tracking-tight text-[#111113] dark:text-white">
+                      Marketing Sustavi Klijenata
+                    </h2>
+                    <p className="text-xs text-gray-500 font-semibold mt-1">
+                      Upravljajte marketing kampanjama, budžetima i AI optimizacijama vaših klijenata.
+                    </p>
                   </div>
-
-                  {/* CARD 2: Total Impressions */}
-                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 text-[#111113] dark:text-white flex items-center justify-center text-xs">
-                        <i className="fa-solid fa-eye"></i>
-                      </div>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
-                        {instagramData.impressionsChange}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Total Impressions</span>
-                      <h3 className="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.impressions}</h3>
-                      <p className="text-[10px] text-gray-400 font-bold mt-1">Ukupan broj prikazivanja</p>
-                    </div>
-                  </div>
-
-                  {/* CARD 3: Avg. ERR % */}
-                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-950/60 text-pink-600 flex items-center justify-center text-xs">
-                        <i className="fa-solid fa-fire"></i>
-                      </div>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
-                        {instagramData.errChange}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Avg. ERR %</span>
-                      <h3 className="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.err}</h3>
-                      <p className="text-[10px] text-gray-400 font-bold mt-1">Interakcije / Doseg * 100</p>
-                    </div>
-                  </div>
-
-                  {/* CARD 4: Net Follower Growth */}
-                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center text-xs">
-                        <i className="fa-solid fa-user-plus"></i>
-                      </div>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
-                        {instagramData.followersChange}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Net Follower Growth</span>
-                      <h3 className="text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">{instagramData.netFollowers}</h3>
-                      <p className="text-[10px] text-gray-400 font-bold mt-1">Novi pratitelji u razdoblju</p>
-                    </div>
-                  </div>
-
-                  {/* CARD 5: Profile Visits & Bio Taps */}
-                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center text-xs">
-                        <i className="fa-solid fa-link"></i>
-                      </div>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
-                        {instagramData.visitsChange}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Visits / Bio Link</span>
-                      <h3 className="text-xl lg:text-2xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.profileVisits}</h3>
-                      <p className="text-[10px] text-zorange font-bold mt-1">Bio Link Taps: {instagramData.websiteTaps}</p>
-                    </div>
-                  </div>
+                  
+                  <button 
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="z-badge-orange px-6 py-3 text-xs text-white font-black uppercase tracking-wider flex items-center gap-2 shadow-lg hover:bg-zorangehover transition-all"
+                  >
+                    <i className="fa-solid fa-plus text-sm"></i> Add New Client
+                  </button>
                 </div>
 
-                {/* CHARTS ROW 1: REACH TREND & ENGAGEMENT BREAKDOWN */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  {/* CHART 1: Reach & Impressions Trend */}
-                  <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                {/* Client Cards Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {clientsList.map(client => (
+                    <div 
+                      key={client.id}
+                      onClick={() => openClientDashboard(client.id)}
+                      className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[360px] relative overflow-hidden group cursor-pointer shadow-xs border border-gray-200 dark:border-gray-800"
+                    >
                       <div>
-                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Reach & Impressions Trend</h4>
-                        <p className="text-xs text-gray-500 font-semibold">Dnevni omjer dosegnutih jedinstvenih korisnika i ukupnih impresija</p>
-                      </div>
-                      <span className="z-badge-orange text-[10px] px-3 py-1 text-white shadow-xs">Daily Live Data</span>
-                    </div>
-                    <EChartComponent option={instagramData.reachTrendOption} style={{ height: '300px', width: '100%' }} />
-                  </div>
+                        {/* Top Badge & Initials */}
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="w-12 h-12 rounded-2xl bg-[#111113] text-white flex items-center justify-center font-black text-lg shadow-md group-hover:scale-110 transition-transform">
+                            {client.logo || client.name.slice(0, 2).toUpperCase()}
+                          </div>
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${
+                            client.status === 'Healthy' 
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                              : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                          }`}>
+                            {client.status === 'Healthy' ? '✓ Healthy' : '⚠️ Needs Attention'}
+                          </span>
+                        </div>
 
-                  {/* CHART 2: Engagement Breakdown (Saves & Shares vs Likes & Comments) */}
-                  <div className="lg:col-span-5 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                      <div>
-                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Engagement Breakdown</h4>
-                        <p className="text-xs text-gray-500 font-semibold">Saves & Shares (Core Signal) vs. Likes & Comments</p>
+                        {/* Client Name & Industry */}
+                        <h3 className="text-xl font-black text-[#111113] dark:text-white tracking-tight group-hover:text-zorange transition-colors">
+                          {client.name}
+                        </h3>
+                        <p className="text-xs text-gray-500 font-bold mt-0.5">{client.industry || 'Digital Agency'}</p>
+
+                        {/* Spend & ROAS Metrics */}
+                        <div className="grid grid-cols-2 gap-3 mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                          <div>
+                            <span className="text-[10px] font-extrabold uppercase text-gray-400 block">Mjesečni Spend</span>
+                            <span className="text-base font-black text-[#111113] dark:text-white">
+                              {client.metaStats ? client.metaStats.totalSpend : '$4,850'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-extrabold uppercase text-gray-400 block">Overall ROAS</span>
+                            <span className="text-base font-black text-emerald-600 dark:text-emerald-400">
+                              {client.financialTargets ? client.financialTargets.targetROAS : '4.25x'}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <span className="z-badge-black text-[10px] px-3 py-1 shadow-xs">Stacked Bar</span>
+
+                      {/* Action Button */}
+                      <button className="w-full py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-[#111113] dark:text-white text-xs font-black uppercase tracking-wider group-hover:bg-zorange group-hover:text-white transition-colors flex items-center justify-center gap-2">
+                        Otvori Nadzornu Ploču <i className="fa-solid fa-arrow-right text-xs"></i>
+                      </button>
                     </div>
-                    <EChartComponent option={instagramData.engagementOption} style={{ height: '300px', width: '100%' }} />
-                  </div>
+                  ))}
                 </div>
-
-                {/* CHARTS ROW 2: FOLLOWER GROWTH & TOP PERFORMING POSTS TABLE */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  {/* CHART 3: Follower Growth vs. Unfollows */}
-                  <div className="lg:col-span-5 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                      <div>
-                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Followers vs. Unfollows</h4>
-                        <p className="text-xs text-gray-500 font-semibold">Novi pratitelji (+), unfollows (-) i neto trend rasta</p>
-                      </div>
-                      <span className="z-badge-green text-[10px] px-3 py-1 shadow-xs">Growth Rate</span>
-                    </div>
-                    <EChartComponent option={instagramData.growthOption} style={{ height: '300px', width: '100%' }} />
-                  </div>
-
-                  {/* TABLE 4: Top Performing Posts / Reels */}
-                  <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs overflow-hidden">
-                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                      <div>
-                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Top Performing Posts & Reels</h4>
-                        <p className="text-xs text-gray-500 font-semibold">Kliknite na zaglavlja stupaca za razvrstavanje (sorting)</p>
-                      </div>
-                      <span className="text-xs font-bold text-gray-400">{sortedPosts.length} Objava</span>
-                    </div>
-
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs">
-                        <thead>
-                          <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-extrabold uppercase tracking-wider">
-                            <th className="py-3 px-2">Kreativa</th>
-                            <th className="py-3 px-2">Tip</th>
-                            <th onClick={() => handlePostSort('reach')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
-                              Reach {postSortKey === 'reach' && (postSortDir === 'asc' ? '↑' : '↓')}
-                            </th>
-                            <th onClick={() => handlePostSort('err')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
-                              ERR % {postSortKey === 'err' && (postSortDir === 'asc' ? '↑' : '↓')}
-                            </th>
-                            <th onClick={() => handlePostSort('saves')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
-                              Saves {postSortKey === 'saves' && (postSortDir === 'asc' ? '↑' : '↓')}
-                            </th>
-                            <th onClick={() => handlePostSort('shares')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
-                              Shares {postSortKey === 'shares' && (postSortDir === 'asc' ? '↑' : '↓')}
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
-                          {sortedPosts.map(post => {
-                            const errVal = (((post.likes + post.comments + post.saves + post.shares) / post.reach) * 100).toFixed(1);
-                            return (
-                              <tr key={post.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                <td className="py-3 px-2 flex items-center gap-3">
-                                  <img src={post.thumb} className="w-10 h-10 rounded-xl object-cover shadow-xs" />
-                                  <span className="truncate max-w-[180px] text-[#111113] dark:text-white font-black">{post.caption}</span>
-                                </td>
-                                <td className="py-3 px-2">
-                                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${
-                                    post.type === 'Reel' 
-                                      ? 'bg-pink-100 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300' 
-                                      : post.type === 'Carousel'
-                                      ? 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300'
-                                      : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
-                                  }`}>
-                                    {post.type}
-                                  </span>
-                                </td>
-                                <td className="py-3 px-2 text-[#111113] dark:text-white">{post.reach.toLocaleString()}</td>
-                                <td className="py-3 px-2 text-zorange font-black">{errVal}%</td>
-                                <td className="py-3 px-2 text-gray-700 dark:text-gray-300">{post.saves}</td>
-                                <td className="py-3 px-2 text-gray-700 dark:text-gray-300">{post.shares}</td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-
               </section>
             ) : (
-              /* PAGE 2: META ADS PERFORMANCE VIEW */
-              <section className="space-y-8">
+              /* ----------------------------------------------------------------------- */
+              /* CLIENT DASHBOARD VIEW (TABS + AI URGENT INTERVENTIONS + METRICS) */
+              /* ----------------------------------------------------------------------- */
+              <section className="space-y-6">
                 
-                {/* TOP 5 KPI CARDS ROW */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-                  {/* CARD 1: Total Ad Spend */}
-                  <div className="z-card-dark rounded-[2rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-xs">
-                        <i className="fa-brands fa-meta"></i>
-                      </div>
-                      <span className="z-badge-orange text-[10px] px-2.5 py-0.5 uppercase shadow-xs">
-                        {metaAdsData.spendChange}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-white/70 block mb-1">Total Ad Spend</span>
-                      <h3 className="text-2xl lg:text-3xl font-black text-white tracking-tight">{metaAdsData.spend}</h3>
-                      <p className="text-[10px] text-white/60 font-bold mt-1">FB + IG Kombinirano</p>
-                    </div>
+                {/* TABS NAVIGATION & COMPACT AI INTERVENTIONS BAR */}
+                <div className="space-y-4">
+                  {/* 3 Main Tabs: Organic (IG & FB), Meta Ads, Google Ads */}
+                  <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-3">
+                    <button 
+                      onClick={() => setClientTab('organic')}
+                      className={`px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
+                        clientTab === 'organic'
+                          ? 'bg-[#111113] text-white dark:bg-white dark:text-[#111113] shadow-md'
+                          : 'bg-white dark:bg-[#161618] text-gray-500 hover:text-[#111113] dark:hover:text-white'
+                      }`}
+                    >
+                      <i className="fa-brands fa-instagram text-pink-500"></i> Organic (IG & FB)
+                    </button>
+
+                    <button 
+                      onClick={() => setClientTab('meta-ads')}
+                      className={`px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
+                        clientTab === 'meta-ads'
+                          ? 'bg-[#111113] text-white dark:bg-white dark:text-[#111113] shadow-md'
+                          : 'bg-white dark:bg-[#161618] text-gray-500 hover:text-[#111113] dark:hover:text-white'
+                      }`}
+                    >
+                      <i className="fa-brands fa-meta text-blue-500"></i> Meta Ads
+                    </button>
+
+                    <button 
+                      onClick={() => setClientTab('google-ads')}
+                      className={`px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
+                        clientTab === 'google-ads'
+                          ? 'bg-[#111113] text-white dark:bg-white dark:text-[#111113] shadow-md'
+                          : 'bg-white dark:bg-[#161618] text-gray-500 hover:text-[#111113] dark:hover:text-white'
+                      }`}
+                    >
+                      <i className="fa-brands fa-google text-amber-500"></i> Google Ads
+                    </button>
                   </div>
 
-                  {/* CARD 2: Blended ROAS */}
-                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center text-xs">
-                        <i className="fa-solid fa-chart-line"></i>
+                  {/* Compact AI Urgent Interventions Bar */}
+                  {!bannerDismissed && (
+                    <div className="bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-orange-500/10 border border-amber-300 dark:border-amber-900 rounded-2xl p-3 px-5 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+                      <div className="flex items-center gap-3">
+                        <span className="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-black shadow-xs">
+                          ⚠️
+                        </span>
+                        <div>
+                          <p className="text-xs font-black text-[#111113] dark:text-white flex items-center gap-2">
+                            <span>AI Urgent Intervention Required:</span>
+                            <span className="text-rose-600 dark:text-rose-400">Meta Ad Frequency is 4.8x (&gt; 3.0 threshold) - Ad Fatigue on Creative #4</span>
+                          </p>
+                          <p className="text-[11px] text-gray-500 font-semibold">Također: Google Search kampanja je limitirana budžetom za 18% prikazivanja.</p>
+                        </div>
                       </div>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
-                        {metaAdsData.roasChange}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Blended ROAS</span>
-                      <h3 className="text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">{metaAdsData.roas}</h3>
-                      <p className="text-[10px] text-gray-400 font-bold mt-1">Return on Ad Spend</p>
-                    </div>
-                  </div>
 
-                  {/* CARD 3: Cost Per Result (CPA) */}
-                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange flex items-center justify-center text-xs">
-                        <i className="fa-solid fa-sack-dollar"></i>
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => triggerAiIntervention('Riješi problem ad fatigue-a na Meta kreativi #4 i optimiziraj Google Ads budžet.')}
+                          className="px-4 py-1.5 rounded-full bg-zorange text-white text-xs font-black uppercase tracking-wider hover:bg-zorangehover transition-all flex items-center gap-1.5 shadow-sm"
+                        >
+                          <i className="fa-solid fa-wand-magic-sparkles text-xs"></i> Fix with AI
+                        </button>
+                        <button 
+                          onClick={() => setBannerDismissed(true)} 
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-white text-sm px-2"
+                        >
+                          ✕
+                        </button>
                       </div>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
-                        {metaAdsData.cpaChange}
-                      </span>
                     </div>
-                    <div>
-                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Meta CPA</span>
-                      <h3 className="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{metaAdsData.cpa}</h3>
-                      <p className="text-[10px] text-gray-400 font-bold mt-1">Cost Per Lead / Purchase</p>
-                    </div>
-                  </div>
-
-                  {/* CARD 4: Total Conversions */}
-                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center text-xs">
-                        <i className="fa-solid fa-bullseye"></i>
-                      </div>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
-                        {metaAdsData.conversionsChange}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Total Conversions</span>
-                      <h3 className="text-xl lg:text-2xl font-black text-[#111113] dark:text-white tracking-tight">{metaAdsData.conversions}</h3>
-                      <p className="text-[10px] text-gray-400 font-bold mt-1">FB & IG Konverzije</p>
-                    </div>
-                  </div>
-
-                  {/* CARD 5: Overall CTR (Link) */}
-                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-600 flex items-center justify-center text-xs">
-                        <i className="fa-solid fa-[#111113]"></i>
-                        <i className="fa-solid fa-arrow-pointer text-xs"></i>
-                      </div>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
-                        {metaAdsData.ctrChange}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Overall CTR (Link)</span>
-                      <h3 className="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{metaAdsData.ctr}</h3>
-                      <p className="text-[10px] text-gray-400 font-bold mt-1">Outbound Link CTR</p>
-                    </div>
-                  </div>
+                  )}
                 </div>
 
-                {/* CHARTS ROW 1: SPEND VS ROAS & AD FATIGUE WITH WARNING BADGE */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  {/* CHART 1: Spend vs ROAS Trend (Dual Y-Axis) */}
-                  <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                      <div>
-                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Spend vs. ROAS Trend</h4>
-                        <p className="text-xs text-gray-500 font-semibold">Usporedba dnevne potrošnje i efikasnosti povrata (Dual Y-Axis)</p>
-                      </div>
-                      <span className="z-badge-orange text-[10px] px-3 py-1 text-white shadow-xs">Scaling Check</span>
-                    </div>
-                    <EChartComponent option={metaAdsData.spendRoasOption} style={{ height: '300px', width: '100%' }} />
+                {isLoading ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard />
                   </div>
-
-                  {/* CHART 2: Creative Health & Ad Fatigue (Frequency vs CTR) WITH WARNING BADGE */}
-                  <div className="lg:col-span-5 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                      <div>
-                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider flex items-center gap-2">
-                          Creative Health & Fatigue
-                        </h4>
-                        <p className="text-xs text-gray-500 font-semibold">Korelacija frekvencije i CTR klika s upozorenjem</p>
+                ) : clientTab === 'organic' ? (
+                  /* ========================================================================= */
+                  /* TAB 1: ORGANIC (IG & FB) */
+                  /* ========================================================================= */
+                  <div className="space-y-6">
+                    {/* Top 4 KPI Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                      <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange flex items-center justify-center text-xs">
+                            <i className="fa-solid fa-users"></i>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[10px] font-black">+14.2%</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Total Reach</span>
+                          <h3 className="text-2xl font-black text-[#111113] dark:text-white">{organicData.reach}</h3>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">Jedinstveni dosegnuti korisnici</p>
+                        </div>
                       </div>
-                      <span className="px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 text-[10px] font-black border border-rose-200 dark:border-rose-900 shadow-2xs flex items-center gap-1.5">
-                        <i className="fa-solid fa-triangle-exclamation text-xs animate-bounce"></i>
-                        Frequency &gt; 3.0 Warning
-                      </span>
-                    </div>
-                    <EChartComponent option={metaAdsData.fatigueOption} style={{ height: '300px', width: '100%' }} />
-                  </div>
-                </div>
 
-                {/* CHARTS ROW 2: FUNNEL LEAKAGE & VIDEO RETENTION (BALANCED 6 & 6 COLS WITH RESIZEOBSERVER) */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  {/* CHART 3: Funnel Leakage (Link Clicks vs Landing Page Views) */}
-                  <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                      <div>
-                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Funnel Leakage</h4>
-                        <p className="text-xs text-gray-500 font-semibold">Link Clicks vs. Landing Page Views</p>
+                      <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-950/60 text-pink-600 flex items-center justify-center text-xs">
+                            <i className="fa-solid fa-fire"></i>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[10px] font-black">+1.1%</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Engagement Rate (ERR)</span>
+                          <h3 className="text-2xl font-black text-[#111113] dark:text-white">{organicData.err}</h3>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">Stopa angažmana po dosegu</p>
+                        </div>
                       </div>
-                      <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 text-[10px] font-black">
-                        24.1% Drop-off Rate
-                      </span>
-                    </div>
-                    <EChartComponent option={metaAdsData.funnelOption} style={{ height: '280px', width: '100%' }} />
-                    <div className="mt-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 rounded-xl p-3 text-[11px] font-bold text-amber-900 dark:text-amber-200">
-                      ⚠️ Gubitak veći od 20% ukazuje na sporo učitavanje odredišne stranice ili tehnički problem piksela.
-                    </div>
-                  </div>
 
-                  {/* CHART 4: Video Creative Retention (Hook Rate vs Hold Rate) */}
-                  <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                      <div>
-                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Video Retention</h4>
-                        <p className="text-xs text-gray-500 font-semibold">Hook Rate (3s / Impr.) vs. Hold Rate (ThruPlays / 3s)</p>
+                      <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center text-xs">
+                            <i className="fa-solid fa-user-plus"></i>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 text-[10px] font-black">+24.5%</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Net Follower Growth</span>
+                          <h3 className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{organicData.netFollowers}</h3>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">Novi pratitelji</p>
+                        </div>
                       </div>
-                      <span className="z-badge-black text-[10px] px-3 py-1 shadow-xs">Video Funnel</span>
-                    </div>
-                    <EChartComponent option={metaAdsData.retentionOption} style={{ height: '340px', width: '100%' }} />
-                  </div>
-                </div>
 
-                {/* CHARTS ROW 3: PLATFORM & PLACEMENT BREAKDOWN */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  <div className="lg:col-span-12 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                      <div>
-                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Platform & Placement Breakdown</h4>
-                        <p className="text-xs text-gray-500 font-semibold">Raspodjela potrošnje po plasmanu (Instagram Feed, Reels, Facebook Feed, Stories)</p>
+                      <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center text-xs">
+                            <i className="fa-solid fa-link"></i>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 text-[10px] font-black">+18.3%</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Website Taps</span>
+                          <h3 className="text-2xl font-black text-[#111113] dark:text-white">{organicData.websiteTaps}</h3>
+                          <p className="text-[10px] text-zorange font-bold mt-1">Bio Link Klikovi</p>
+                        </div>
                       </div>
                     </div>
-                    <EChartComponent option={metaAdsData.placementOption} style={{ height: '300px', width: '100%' }} />
-                  </div>
-                </div>
 
-                {/* TABLE 6: Top Ad Creatives Leaderboard */}
-                <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs overflow-hidden">
-                  <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
-                    <div>
-                      <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Top Ad Creatives Leaderboard</h4>
-                      <p className="text-xs text-gray-500 font-semibold">Detaljna analitika pojedinačnih oglasa po trošku, ROAS-u i retenciji</p>
+                    {/* Charts Row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                      <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                        <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">Reach vs. Impressions Trend</h4>
+                        <EChartComponent option={organicData.reachTrendOption} style={{ height: '280px', width: '100%' }} />
+                      </div>
+
+                      <div className="lg:col-span-5 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                        <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">Engagement Breakdown</h4>
+                        <EChartComponent option={organicData.engagementOption} style={{ height: '280px', width: '100%' }} />
+                      </div>
                     </div>
-                    <span className="text-xs font-bold text-gray-400">{sortedAds.length} Aktivna Oglasa</span>
-                  </div>
 
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead>
-                        <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-extrabold uppercase tracking-wider">
-                          <th className="py-3 px-2">Naziv Oglasa</th>
-                          <th className="py-3 px-2">Plasman</th>
-                          <th onClick={() => handleAdSort('spend')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
-                            Spend ($) {adSortKey === 'spend' && (adSortDir === 'asc' ? '↑' : '↓')}
-                          </th>
-                          <th onClick={() => handleAdSort('ctr')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
-                            CTR Link % {adSortKey === 'ctr' && (adSortDir === 'asc' ? '↑' : '↓')}
-                          </th>
-                          <th onClick={() => handleAdSort('cpa')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
-                            CPA ($) {adSortKey === 'cpa' && (adSortDir === 'asc' ? '↑' : '↓')}
-                          </th>
-                          <th onClick={() => handleAdSort('roas')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
-                            ROAS {adSortKey === 'roas' && (adSortDir === 'asc' ? '↑' : '↓')}
-                          </th>
-                          <th onClick={() => handleAdSort('hookRate')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
-                            Hook Rate % {adSortKey === 'hookRate' && (adSortDir === 'asc' ? '↑' : '↓')}
-                          </th>
-                          <th className="py-3 px-2">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
-                        {sortedAds.map(ad => (
-                          <tr key={ad.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                            <td className="py-3.5 px-2 text-[#111113] dark:text-white font-black">{ad.name}</td>
-                            <td className="py-3.5 px-2">
-                              <span className="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[10px] font-black">
-                                {ad.placement}
-                              </span>
-                            </td>
-                            <td className="py-3.5 px-2 text-[#111113] dark:text-white">${ad.spend.toFixed(2)}</td>
-                            <td className="py-3.5 px-2 text-zorange font-black">{ad.ctr}%</td>
-                            <td className="py-3.5 px-2 text-gray-700 dark:text-gray-300">${ad.cpa.toFixed(2)}</td>
-                            <td className="py-3.5 px-2 text-emerald-600 dark:text-emerald-400 font-black">{ad.roas}x</td>
-                            <td className="py-3.5 px-2 text-pink-600 dark:text-pink-400">{ad.hookRate}%</td>
-                            <td className="py-3.5 px-2">
-                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase flex items-center gap-1 w-max ${
-                                ad.status === 'Active'
-                                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300'
-                                  : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
-                              }`}>
-                                <span className={`w-1.5 h-1.5 rounded-full ${ad.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`}></span>
-                                {ad.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    {/* Content Leaderboard Table */}
+                    <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs overflow-hidden">
+                      <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-4">Content Leaderboard</h4>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead>
+                            <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-black uppercase">
+                              <th className="py-3 px-2">Objava</th>
+                              <th className="py-3 px-2">Tip</th>
+                              <th className="py-3 px-2">Reach</th>
+                              <th className="py-3 px-2">ERR %</th>
+                              <th className="py-3 px-2">Saves</th>
+                              <th className="py-3 px-2">Shares</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
+                            {organicData.posts.map(post => (
+                              <tr key={post.id}>
+                                <td className="py-3 px-2 flex items-center gap-3">
+                                  <img src={post.thumb} className="w-9 h-9 rounded-xl object-cover" />
+                                  <span className="text-[#111113] dark:text-white font-black">{post.caption}</span>
+                                </td>
+                                <td className="py-3 px-2">
+                                  <span className="px-2.5 py-1 rounded-full bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-300 text-[10px] font-black">{post.type}</span>
+                                </td>
+                                <td className="py-3 px-2">{post.reach.toLocaleString()}</td>
+                                <td className="py-3 px-2 text-zorange font-black">{post.err}</td>
+                                <td className="py-3 px-2">{post.saves}</td>
+                                <td className="py-3 px-2">{post.shares}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ) : clientTab === 'meta-ads' ? (
+                  /* ========================================================================= */
+                  /* TAB 2: META ADS */
+                  /* ========================================================================= */
+                  <div className="space-y-6">
+                    {/* Top 4 KPI Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                      <div className="z-card-dark rounded-[2rem] p-5 flex flex-col justify-between shadow-xl">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-xs">
+                            <i className="fa-brands fa-meta"></i>
+                          </div>
+                          <span className="z-badge-orange text-[10px] px-2.5 py-0.5 uppercase">+5.4%</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold uppercase text-white/70 block mb-1">Total Spend</span>
+                          <h3 className="text-2xl font-black text-white">{metaAdsData.spend}</h3>
+                          <p className="text-[10px] text-white/60 font-bold mt-1">FB + IG Kombinirano</p>
+                        </div>
+                      </div>
+
+                      <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center text-xs">
+                            <i className="fa-solid fa-chart-line"></i>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black">+0.4x</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold uppercase text-gray-400 block mb-1">Blended ROAS</span>
+                          <h3 className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{metaAdsData.roas}</h3>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">Return on Ad Spend</p>
+                        </div>
+                      </div>
+
+                      <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="w-8 h-8 rounded-full bg-orange-100 text-zorange flex items-center justify-center text-xs">
+                            <i className="fa-solid fa-sack-dollar"></i>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black">-8.5%</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold uppercase text-gray-400 block mb-1">Meta CPA</span>
+                          <h3 className="text-2xl font-black text-[#111113] dark:text-white">{metaAdsData.cpa}</h3>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">Target: $16.00</p>
+                        </div>
+                      </div>
+
+                      <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs">
+                            <i className="fa-solid fa-bullseye"></i>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black">+15.2%</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold uppercase text-gray-400 block mb-1">Total Conversions</span>
+                          <h3 className="text-2xl font-black text-[#111113] dark:text-white">{metaAdsData.conversions}</h3>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">FB & IG Konverzije</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Charts Row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                      <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                        <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">Efficiency Trend (Spend vs. ROAS)</h4>
+                        <EChartComponent option={metaAdsData.efficiencyOption} style={{ height: '280px', width: '100%' }} />
+                      </div>
+
+                      <div className="lg:col-span-5 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                        <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">Ad Fatigue Tracker (Frequency vs CTR)</h4>
+                        <EChartComponent option={metaAdsData.fatigueOption} style={{ height: '280px', width: '100%' }} />
+                      </div>
+                    </div>
+
+                    {/* Funnel Leakage & Creative Leaderboard */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                      <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                        <div className="flex justify-between items-center mb-3">
+                          <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider">Funnel Leakage</h4>
+                          <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-black">24.1% Drop-off Rate</span>
+                        </div>
+                        <EChartComponent option={metaAdsData.funnelOption} style={{ height: '250px', width: '100%' }} />
+                      </div>
+
+                      <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                        <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">Creative Leaderboard</h4>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs">
+                            <thead>
+                              <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-black uppercase">
+                                <th className="py-2.5 px-2">Oglas</th>
+                                <th className="py-2.5 px-2">Spend</th>
+                                <th className="py-2.5 px-2">CPA</th>
+                                <th className="py-2.5 px-2">Hook Rate</th>
+                                <th className="py-2.5 px-2">Status</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
+                              {metaAdsData.ads.map(ad => (
+                                <tr key={ad.id}>
+                                  <td className="py-3 px-2 text-[#111113] dark:text-white font-black">{ad.name}</td>
+                                  <td className="py-3 px-2">${ad.spend.toFixed(2)}</td>
+                                  <td className="py-3 px-2">${ad.cpa.toFixed(2)}</td>
+                                  <td className="py-3 px-2 text-zorange font-black">{ad.hookRate}%</td>
+                                  <td className="py-3 px-2">
+                                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-black">Active</span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* ========================================================================= */
+                  /* TAB 3: GOOGLE ADS */
+                  /* ========================================================================= */
+                  <div className="space-y-6">
+                    {/* Top 4 KPI Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                      <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">
+                            <i className="fa-brands fa-google"></i>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black">+4.2%</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold uppercase text-gray-400 block mb-1">Total Spend</span>
+                          <h3 className="text-2xl font-black text-[#111113] dark:text-white">{googleAdsData.spend}</h3>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">Google Search + PMax</p>
+                        </div>
+                      </div>
+
+                      <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">
+                            <i className="fa-solid fa-money-bill-trend-up"></i>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black">+18.4%</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold uppercase text-gray-400 block mb-1">Conversion Value</span>
+                          <h3 className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{googleAdsData.convValue}</h3>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">ROAS: 4.8x</p>
+                        </div>
+                      </div>
+
+                      <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="w-8 h-8 rounded-full bg-orange-100 text-zorange flex items-center justify-center text-xs">
+                            <i className="fa-solid fa-bullseye"></i>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[10px] font-black">+2.1%</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold uppercase text-gray-400 block mb-1">Actual vs Target CPA</span>
+                          <h3 className="text-2xl font-black text-[#111113] dark:text-white">{googleAdsData.cpa}</h3>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">Target: $15.00</p>
+                        </div>
+                      </div>
+
+                      <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs">
+                            <i className="fa-solid fa-chart-pie"></i>
+                          </div>
+                          <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-black">-18% Budget Cap</span>
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold uppercase text-gray-400 block mb-1">Search Impression Share</span>
+                          <h3 className="text-2xl font-black text-[#111113] dark:text-white">{googleAdsData.impressionShare}</h3>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">Izgubljeno zbog budžeta: 18%</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Charts Row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                      <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                        <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">Traffic vs. Cost (Clicks vs CPC)</h4>
+                        <EChartComponent option={googleAdsData.trafficCostOption} style={{ height: '280px', width: '100%' }} />
+                      </div>
+
+                      <div className="lg:col-span-5 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                        <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">Campaign Type Breakdown</h4>
+                        <EChartComponent option={googleAdsData.campaignBreakdownOption} style={{ height: '280px', width: '100%' }} />
+                      </div>
+                    </div>
+
+                    {/* Top Search Terms Table & AI Negative Keyword Suggestions */}
+                    <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs overflow-hidden">
+                      <div className="flex justify-between items-center mb-4">
+                        <div>
+                          <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider">Top Search Terms & AI Negative Keywords</h4>
+                          <p className="text-xs text-gray-500 font-semibold">Identificirajte irelevantne termine za ugradnju negativnih ključnih riječi</p>
+                        </div>
+                        <span className="text-xs font-bold text-gray-400">Negativnih ključnih riječi: {negativeKeywords.length}</span>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead>
+                            <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-black uppercase">
+                              <th className="py-3 px-2">Pretraživani Izraz</th>
+                              <th className="py-3 px-2">Klikovi</th>
+                              <th className="py-3 px-2">Konverzije</th>
+                              <th className="py-3 px-2">Trošak ($)</th>
+                              <th className="py-3 px-2">AI Preporuka</th>
+                              <th className="py-3 px-2">Akcija</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
+                            {googleAdsData.searchTerms.map((st, idx) => (
+                              <tr key={idx}>
+                                <td className="py-3 px-2 text-[#111113] dark:text-white font-black">{st.keyword}</td>
+                                <td className="py-3 px-2">{st.clicks}</td>
+                                <td className="py-3 px-2 text-emerald-600 dark:text-emerald-400">{st.conversions}</td>
+                                <td className="py-3 px-2">${st.cost.toFixed(2)}</td>
+                                <td className="py-3 px-2">
+                                  {st.suggestedNegative ? (
+                                    <span className="px-2.5 py-1 rounded-full bg-rose-100 text-rose-700 text-[10px] font-black flex items-center gap-1 w-max">
+                                      ⚠️ Dodaj "{st.suggestedNegative}" u negativne
+                                    </span>
+                                  ) : (
+                                    <span className="text-gray-400 font-normal">Visoka konverzija</span>
+                                  )}
+                                </td>
+                                <td className="py-3 px-2">
+                                  {st.suggestedNegative && (
+                                    <button 
+                                      onClick={() => addNegativeKeyword(st.suggestedNegative)}
+                                      className="px-3 py-1 rounded-xl bg-[#111113] text-white hover:bg-zorange text-[10px] font-black uppercase transition-colors"
+                                    >
+                                      + Add Negative Keyword
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
               </section>
             )}
           </main>
+
+          {/* ========================================================================= */}
+          {/* 4. AI ASSISTANT PANEL (RIGHT SLIDE-OUT SIDEBAR) */}
+          {/* ========================================================================= */}
+          <div className={`fixed inset-y-0 right-0 w-full sm:w-[420px] bg-white dark:bg-[#161618] shadow-2xl z-50 transform transition-transform duration-300 ease-in-out border-l border-gray-200 dark:border-gray-800 flex flex-col ${isAiOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+            
+            {/* Sidebar Header */}
+            <div className="p-5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between bg-gray-50 dark:bg-[#111113]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-zorange text-white flex items-center justify-center text-xs font-black shadow-sm">
+                  <i className="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-[#111113] dark:text-white tracking-tight flex items-center gap-1.5">
+                    Marketing Co-Pilot
+                  </h3>
+                  <p className="text-[10px] text-gray-400 font-bold">Autonomous AI Optimization Engine</p>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => setIsAiOpen(false)}
+                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-500 hover:text-[#111113] dark:hover:text-white flex items-center justify-center text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Dynamic Context Banner */}
+            <div className="bg-orange-50 dark:bg-orange-950/40 border-b border-orange-200 dark:border-orange-900/60 px-5 py-2.5 text-[11px] font-bold text-orange-900 dark:text-orange-200 flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <i className="fa-solid fa-circle-dot text-zorange text-[9px] animate-pulse"></i>
+                Analyzing: <strong>{isHomeView ? 'Agency Portfolio' : clientTab.toUpperCase()}</strong> ({dateRange})
+              </span>
+              <span className="text-[10px] font-black uppercase text-zorange">Live Context</span>
+            </div>
+
+            {/* Quick Action Chips */}
+            <div className="p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-[#161618] flex items-center gap-2 overflow-x-auto">
+              <button 
+                onClick={() => handleSendAiMessage('Napravi brzu dijagnostiku trenutnog prikaza i predloži optimizacije.')}
+                className="px-3 py-1 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[10px] font-black whitespace-nowrap hover:border-zorange transition-colors"
+              >
+                🔍 Analyze Current View
+              </button>
+              <button 
+                onClick={() => handleSendAiMessage('Predloži 3 nova naslova za oglase s visokom stopom konverzije.')}
+                className="px-3 py-1 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[10px] font-black whitespace-nowrap hover:border-zorange transition-colors"
+              >
+                💡 Suggest Ad Copies
+              </button>
+              <button 
+                onClick={() => handleSendAiMessage('Analiziraj CPA skokove i ponudi rješenje.')}
+                className="px-3 py-1 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[10px] font-black whitespace-nowrap hover:border-zorange transition-colors"
+              >
+                ⚡ Fix CPA Spikes
+              </button>
+            </div>
+
+            {/* Chat Messages Area */}
+            <div className="flex-1 p-5 overflow-y-auto space-y-4 font-sans">
+              {aiMessages.map(msg => (
+                <div key={msg.id} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
+                  
+                  {/* Thought Steps if available */}
+                  {msg.thoughts && msg.thoughts.map((th, idx) => (
+                    <div key={idx} className="text-[10px] font-bold text-gray-400 mb-1 flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-lg animate-pulse">
+                      <i className="fa-solid fa-gear text-zorange text-[9px] animate-spin"></i> {th}
+                    </div>
+                  ))}
+
+                  {/* Message Bubble */}
+                  <div className={`p-4 rounded-2xl text-xs leading-relaxed max-w-[90%] ${
+                    msg.sender === 'user'
+                      ? 'bg-zorange text-white rounded-br-none font-bold shadow-sm'
+                      : 'bg-gray-100 dark:bg-gray-800 text-[#111113] dark:text-gray-100 rounded-bl-none shadow-2xs'
+                  }`}>
+                    <div dangerouslySetInnerHTML={{ __html: msg.content.replace(/\n/g, '<br/>') }} />
+                  </div>
+
+                  {/* Interactive Action Buttons inside Chat */}
+                  {msg.actions && (
+                    <div className="mt-2.5 flex flex-wrap gap-2">
+                      {msg.actions.map((act, i) => (
+                        <button 
+                          key={i} 
+                          onClick={() => handleSendAiMessage(act.prompt)}
+                          className="px-3 py-1.5 rounded-xl bg-[#111113] text-white hover:bg-zorange text-[10px] font-black uppercase transition-all shadow-2xs"
+                        >
+                          {act.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                </div>
+              ))}
+
+              {isAiTyping && (
+                <div className="flex items-center gap-2 text-gray-400 text-xs font-bold bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded-xl w-max animate-pulse">
+                  <i className="fa-solid fa-circle-notch animate-spin text-zorange text-xs"></i> Marketing Co-Pilot razmišlja...
+                </div>
+              )}
+            </div>
+
+            {/* Chat Input Area */}
+            <div className="p-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161618]">
+              <form 
+                onSubmit={(e) => { e.preventDefault(); handleSendAiMessage(); }}
+                className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-2xl px-3 py-2 border border-gray-200 dark:border-gray-700"
+              >
+                <button type="button" className="text-gray-400 hover:text-zorange px-1" title="Priloži datoteku">
+                  <i className="fa-solid fa-paperclip text-xs"></i>
+                </button>
+                
+                <input 
+                  type="text" 
+                  value={aiInputText} 
+                  onChange={(e) => setAiInputText(e.target.value)}
+                  placeholder="Pitaj AI za analizu ili optimizaciju..."
+                  className="flex-1 bg-transparent text-xs font-bold text-[#111113] dark:text-white focus:outline-none placeholder-gray-400"
+                />
+
+                <button type="button" className="text-gray-400 hover:text-zorange px-1" title="Glasovni unos">
+                  <i className="fa-solid fa-microphone text-xs"></i>
+                </button>
+
+                <button 
+                  type="submit" 
+                  className="w-8 h-8 rounded-xl bg-zorange text-white flex items-center justify-center text-xs font-black shadow-sm hover:bg-zorangehover transition-colors"
+                >
+                  <i className="fa-solid fa-arrow-up text-xs"></i>
+                </button>
+              </form>
+            </div>
+
+          </div>
+
+          {/* ========================================================================= */}
+          {/* 5. "ADD NEW CLIENT" ONBOARDING MODAL */}
+          {/* ========================================================================= */}
+          {isAddModalOpen && (
+            <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+              <div className="bg-white dark:bg-[#161618] rounded-[2rem] max-w-2xl w-full p-7 shadow-2xl border border-gray-200 dark:border-gray-800 my-8 space-y-6">
+                
+                {/* Modal Header */}
+                <div className="flex justify-between items-center border-b border-gray-100 dark:border-gray-800 pb-4">
+                  <div>
+                    <h3 className="text-xl font-black text-[#111113] dark:text-white tracking-tight">Add New Client (Onboarding)</h3>
+                    <p className="text-xs text-gray-500 font-semibold">Unesite poslovni kontekst i tehničke ID-ove za točnu AI analitiku</p>
+                  </div>
+                  <button onClick={() => setIsAddModalOpen(false)} className="text-gray-400 hover:text-gray-600 text-lg font-black">✕</button>
+                </div>
+
+                <form onSubmit={handleAddClientSubmit} className="space-y-6">
+                  
+                  {/* GROUP 1: BUSINESS CONTEXT */}
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-black uppercase text-zorange tracking-wider flex items-center gap-1.5">
+                      <i className="fa-solid fa-building"></i> 1. Poslovni Kontekst (Business Context)
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-[11px] font-bold text-gray-500 block mb-1">Naziv Klijenta *</label>
+                        <input 
+                          type="text" required 
+                          value={newClientForm.name} 
+                          onChange={(e) => setNewClientForm({...newClientForm, name: e.target.value})}
+                          placeholder="npr. Apex Brand" 
+                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-gray-500 block mb-1">Industrija / Niša</label>
+                        <input 
+                          type="text" 
+                          value={newClientForm.industry} 
+                          onChange={(e) => setNewClientForm({...newClientForm, industry: e.target.value})}
+                          placeholder="npr. E-commerce Fashion" 
+                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-[11px] font-bold text-gray-500 block mb-1">Opis Ciljane Publike</label>
+                        <input 
+                          type="text" 
+                          value={newClientForm.targetAudience} 
+                          onChange={(e) => setNewClientForm({...newClientForm, targetAudience: e.target.value})}
+                          placeholder="npr. Žene 25-45 god, modni entuzijasti" 
+                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-gray-500 block mb-1">Primarni Marketing Cilj</label>
+                        <select 
+                          value={newClientForm.primaryGoal} 
+                          onChange={(e) => setNewClientForm({...newClientForm, primaryGoal: e.target.value})}
+                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
+                        >
+                          <option value="Lead Generation">Lead Generation (Sakupljanje upita)</option>
+                          <option value="E-commerce Sales">E-commerce Sales (Online Prodaja)</option>
+                          <option value="Brand Awareness">Brand Awareness (Prepoznatljivost)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* GROUP 2: FINANCIAL TARGETS */}
+                  <div className="space-y-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+                    <h4 className="text-xs font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-wider flex items-center gap-1.5">
+                      <i className="fa-solid fa-chart-line"></i> 2. Financijski Ciljevi (Financial Targets)
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="text-[11px] font-bold text-gray-500 block mb-1">Ciljani Mjesečni Budžet ($)</label>
+                        <input 
+                          type="number" 
+                          value={newClientForm.targetBudget} 
+                          onChange={(e) => setNewClientForm({...newClientForm, targetBudget: e.target.value})}
+                          placeholder="5000" 
+                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-gray-500 block mb-1">Ciljani CPA ($)</label>
+                        <input 
+                          type="number" step="0.1" 
+                          value={newClientForm.targetCPA} 
+                          onChange={(e) => setNewClientForm({...newClientForm, targetCPA: e.target.value})}
+                          placeholder="15.00" 
+                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-gray-500 block mb-1">Ciljani ROAS (x)</label>
+                        <input 
+                          type="number" step="0.1" 
+                          value={newClientForm.targetROAS} 
+                          onChange={(e) => setNewClientForm({...newClientForm, targetROAS: e.target.value})}
+                          placeholder="4.0" 
+                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* GROUP 3: INTEGRATIONS & TECHNICAL IDS */}
+                  <div className="space-y-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+                    <h4 className="text-xs font-black uppercase text-blue-600 dark:text-blue-400 tracking-wider flex items-center gap-1.5">
+                      <i className="fa-solid fa-plug"></i> 3. Integracije i Tehnički ID-ovi
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="text-[11px] font-bold text-gray-500 block mb-1">Meta Business ID</label>
+                        <input 
+                          type="text" 
+                          value={newClientForm.metaBusinessId} 
+                          onChange={(e) => setNewClientForm({...newClientForm, metaBusinessId: e.target.value})}
+                          placeholder="MB-984120" 
+                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-gray-500 block mb-1">Meta Ad Account ID</label>
+                        <input 
+                          type="text" 
+                          value={newClientForm.metaAdAccountId} 
+                          onChange={(e) => setNewClientForm({...newClientForm, metaAdAccountId: e.target.value})}
+                          placeholder="act_1048201" 
+                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-gray-500 block mb-1">Google Ads ID</label>
+                        <input 
+                          type="text" 
+                          value={newClientForm.googleAdsId} 
+                          onChange={(e) => setNewClientForm({...newClientForm, googleAdsId: e.target.value})}
+                          placeholder="492-108-9410" 
+                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
+                    <button 
+                      type="button" 
+                      onClick={() => setIsAddModalOpen(false)}
+                      className="px-5 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-bold text-gray-500"
+                    >
+                      Odustani
+                    </button>
+                    <button 
+                      type="submit"
+                      className="px-6 py-2.5 rounded-xl bg-zorange text-white text-xs font-black uppercase tracking-wider hover:bg-zorangehover transition-colors shadow-md"
+                    >
+                      Spremi Klijenta & Pokreni AI Analysis
+                    </button>
+                  </div>
+
+                </form>
+
+              </div>
+            </div>
+          )}
 
         </div>
       );

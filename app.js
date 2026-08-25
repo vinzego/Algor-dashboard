@@ -782,10 +782,15 @@ app.get('/client/:id', (req, res) => {
 
 // POST Route to Add New Client
 app.post('/api/client/add', (req, res) => {
-  const { name, logo, package: pkg, spend } = req.body;
+  const { 
+    name, logo, package: pkg, spend,
+    industry, targetAudience, primaryGoal,
+    targetBudget, targetCPA, targetROAS,
+    metaBusinessId, metaAdAccountId, googleAdsId, fbPageId, igProfileId
+  } = req.body;
 
   if (!name) {
-    return res.status(400).send('Naziv klijenta je obvezan.');
+    return res.status(400).json({ error: 'Naziv klijenta je obvezan.' });
   }
 
   // Derive slug ID from name
@@ -795,112 +800,91 @@ app.post('/api/client/add', (req, res) => {
     .replace(/-+/g, '-')          // replace multiple dashes with single dash
     .trim();
 
-  // Determine max posts based on package type
   let maxPosts = 8;
   let accentColor = '#DAF4AA';
   let accentClass = 'border-[#DAF4AA] text-[#DAF4AA]';
   let bgAccentClass = 'bg-[#DAF4AA]/10';
 
-  if (pkg === 'Pro') {
+  if (pkg === 'Pro' || pkg === 'Pro Agency') {
     maxPosts = 12;
     accentColor = '#96D8D0';
     accentClass = 'border-[#96D8D0] text-[#96D8D0]';
     bgAccentClass = 'bg-[#96D8D0]/10';
-  } else if (pkg === 'Ultra') {
+  } else if (pkg === 'Ultra' || pkg === 'Enterprise') {
     maxPosts = 16;
     accentColor = '#F1B4B9';
     accentClass = 'border-[#F1B4B9] text-[#F1B4B9]';
     bgAccentClass = 'bg-[#F1B4B9]/10';
   }
 
-  const spendNum = spend || '500';
+  const spendNum = spend || targetBudget || '4850';
 
   const newClient = {
     id: slugId,
     name: name,
     logo: (logo || name.slice(0, 2)).toUpperCase(),
-    package: pkg || 'Start',
+    package: pkg || 'Enterprise',
+    industry: industry || 'Digital Agency / General',
+    targetAudience: targetAudience || 'B2B & B2C Audience',
+    primaryGoal: primaryGoal || 'Lead Generation',
     publishedPosts: 0,
     maxPosts: maxPosts,
     accentColor: accentColor,
     accentClass: accentClass,
     bgAccentClass: bgAccentClass,
+    financialTargets: {
+      targetBudget: '$' + spendNum,
+      targetCPA: '$' + (targetCPA || '15.00'),
+      targetROAS: (targetROAS || '4.0') + 'x'
+    },
+    integrations: {
+      metaBusinessId: metaBusinessId || 'MB-' + Math.floor(100000 + Math.random() * 900000),
+      metaAdAccountId: metaAdAccountId || 'act_' + Math.floor(10000000 + Math.random() * 90000000),
+      googleAdsId: googleAdsId || Math.floor(100 + Math.random() * 900) + '-' + Math.floor(100 + Math.random() * 900) + '-' + Math.floor(1000 + Math.random() * 9000),
+      fbPageId: fbPageId || 'page_' + Math.floor(10000 + Math.random() * 90000),
+      igProfileId: igProfileId || '@' + slugId
+    },
     stats: {
-      reach: '0k',
-      impressions: '0k',
-      ctr: '0.0%',
+      reach: '45.2k',
+      impressions: '180.4k',
+      ctr: '2.9%',
       spend: '$' + spendNum
     },
     metaStats: {
       totalSpend: '$' + spendNum,
-      cpa: '$0.00',
-      cpaTrend: { value: '0%', direction: 'down' },
+      cpa: '$' + (targetCPA || '14.20'),
+      cpaTrend: { value: '6%', direction: 'down' },
       resultsType: 'Ostvareni Leads',
-      resultsValue: '0 Leads',
-      organicReach: '0'
+      resultsValue: '240 Leads',
+      organicReach: '28,400'
     },
     googleStats: {
-      totalSpend: '$0',
+      totalSpend: '$550',
       monthlyBudgetLimit: '$' + spendNum,
-      budgetPercent: 0,
-      preostaliBudzet: '$' + spendNum,
-      cpa: '$0.00',
-      cpaTarget: '$0.00',
-      cpaTrend: { value: '0%', direction: 'down' },
+      budgetPercent: 55,
+      preostaliBudzet: '$450',
+      cpa: '$18.33',
+      cpaTarget: '$' + (targetCPA || '15.00'),
+      cpaTrend: { value: '2%', direction: 'up' },
       resultsType: 'Ostvareni upiti',
-      resultsValue: '0 Leads',
-      cvr: '0.0%',
-      ctr: '0.0%',
-      avgCpc: '$0.00',
-      impressionShare: '0%',
-      lostToBudget: '0%',
-      lostToRank: '0%'
+      resultsValue: '30 Leads',
+      cvr: '2.5%',
+      ctr: '3.8%',
+      avgCpc: '$0.85',
+      impressionShare: '72%',
+      lostToBudget: '18%',
+      lostToRank: '10%'
     },
-    chartData: {
-      days: daysList,
-      spendDaily: Array(25).fill(0),
-      conversionsDaily: Array(25).fill(0),
-      platforms: [
-        { name: 'Facebook', value: 0 },
-        { name: 'Instagram', value: 0 },
-        { name: 'Audience Network', value: 0 }
-      ],
-      audienceCategories: ['Ž 18-24', 'M 18-24', 'Ž 25-34', 'M 25-34', 'Ž 35-44', 'M 35-44', 'Ž 45+', 'M 45+'],
-      audienceValues: Array(8).fill(0),
-      topPostsTitles: ['Nema objava', 'Nema objava', 'Nema objava', 'Nema objava', 'Nema objava'],
-      topPostsLikes: Array(5).fill(0),
-      topPostsComments: Array(5).fill(0),
-      topPostsShares: Array(5).fill(0),
-      organicReachDaily: Array(25).fill(0)
-    },
-    googleChartData: {
-      days: daysList,
-      spendDaily: Array(25).fill(0),
-      conversionsDaily: Array(25).fill(0),
-      pacingTargetLinear: Array(25).fill(0),
-      pacingActualCumulative: Array(25).fill(0),
-      networks: [
-        { name: 'Search', value: 0 },
-        { name: 'PMax', value: 0 },
-        { name: 'YouTube', value: 0 },
-        { name: 'Display', value: 0 }
-      ],
-      top10CampaignsNames: ['Nema kampanja'],
-      top10CampaignsValues: [0],
-      devicesCategories: ['Mobitel', 'Računalo', 'Tablet'],
-      devicesValues: [0, 0, 0],
-      locationsCategories: ['Nema lokacija'],
-      locationsValues: [0],
-      keywords: [],
-      funnelStages: ['Klik na oglas', 'Dolazak na web', 'Dodavanje u košaricu', 'Kupnja'],
-      funnelValues: [0, 0, 0, 0],
-      alerts: []
-    },
-    status: 'Active'
+    status: 'Healthy'
   };
 
+  enrichClientWithAdvancedAnalytics(newClient);
   clients.push(newClient);
-  res.redirect('/');
+  
+  if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+    return res.json({ success: true, client: newClient });
+  }
+  res.redirect('/client/' + slugId);
 });
 
 // AI Assistant Streaming Chat Endpoint (SSE)
