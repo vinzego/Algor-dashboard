@@ -477,6 +477,105 @@
           ]
         };
 
+        // NEW CHART 4: Profile Activity & Traffic Intent (Dual Area Chart)
+        const profileVisitsData = [450, 520, 610, 590, 680, 750, 720, 810, 890, 840, 920, 980].map(v => Math.round(v * mult));
+        const ctaClicksData = [68, 84, 102, 95, 115, 132, 126, 148, 165, 152, 171, 186].map(v => Math.round(v * mult));
+
+        const trafficIntentOption = {
+          tooltip: {
+            trigger: 'axis',
+            formatter: (params) => {
+              let dateStr = params[0].name;
+              let visits = 0;
+              let clicks = 0;
+              let res = `<div style="font-weight:900;margin-bottom:4px;">${dateStr}</div>`;
+              params.forEach(p => {
+                if (p.seriesName === 'Profile Visits') visits = p.value;
+                if (p.seriesName === 'Website Taps / CTA Clicks') clicks = p.value;
+                res += `<div style="font-size:12px;"><span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${p.color};"></span>${p.seriesName}: <strong>${p.value.toLocaleString()}</strong></div>`;
+              });
+              if (visits > 0) {
+                const convRate = ((clicks / visits) * 100).toFixed(1);
+                res += `<div style="margin-top:6px;padding-top:4px;border-top:1px solid #eee;color:#FF5F00;font-weight:900;font-size:11px;">📈 Traffic Conversion Rate: ${convRate}% (Visits → Clicks)</div>`;
+              }
+              return res;
+            }
+          },
+          legend: { 
+            data: ['Profile Visits', 'Website Taps / CTA Clicks'], 
+            bottom: 0, 
+            textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } 
+          },
+          grid: { top: 20, bottom: 45, left: 10, right: 15, containLabel: true },
+          xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
+          yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
+          series: [
+            {
+              name: 'Profile Visits',
+              type: 'line',
+              smooth: true,
+              data: profileVisitsData,
+              lineStyle: { width: 3, color: '#1877F2' },
+              areaStyle: { color: 'rgba(24, 119, 242, 0.2)' },
+              itemStyle: { color: '#1877F2' }
+            },
+            {
+              name: 'Website Taps / CTA Clicks',
+              type: 'line',
+              smooth: true,
+              data: ctaClicksData,
+              lineStyle: { width: 3, color: '#FF5F00' },
+              areaStyle: { color: 'rgba(255, 95, 0, 0.15)' },
+              itemStyle: { color: '#FF5F00' }
+            }
+          ]
+        };
+
+        // NEW CHART 5: Performance by Content Format (Horizontal Grouped Bar Chart)
+        const formatCategories = isFb 
+          ? ['Link Post', 'Single Image', 'Carousel', 'Reels / Video']
+          : ['Single Image', 'Carousel', 'Reels / Video'];
+
+        const avgReachData = isFb 
+          ? [18400, 22100, 31200, 41500] 
+          : [19800, 31400, 42100];
+
+        const avgEngData = isFb 
+          ? [540, 720, 1120, 1480] 
+          : [310, 1120, 890];
+
+        const contentFormatOption = {
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          legend: { 
+            data: ['Avg. Reach', 'Avg. Engagement (Saves/Shares)'], 
+            bottom: 0, 
+            textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } 
+          },
+          grid: { top: 20, bottom: 45, left: 15, right: 35, containLabel: true },
+          xAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
+          yAxis: { type: 'category', data: formatCategories, axisLabel: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
+          series: [
+            {
+              name: 'Avg. Reach',
+              type: 'bar',
+              data: avgReachData,
+              itemStyle: { color: darkMode ? '#3F3F46' : '#9CA3AF', borderRadius: [0, 4, 4, 0] },
+              markLine: {
+                symbol: 'none',
+                label: { formatter: 'Account Avg: {c}', position: 'end', color: '#FF5F00', fontWeight: 'bold', fontSize: 10 },
+                lineStyle: { type: 'dashed', color: '#FF5F00', width: 2 },
+                data: [{ xAxis: 28000 }]
+              }
+            },
+            {
+              name: 'Avg. Engagement (Saves/Shares)',
+              type: 'bar',
+              data: avgEngData,
+              itemStyle: { color: '#FF5F00', borderRadius: [0, 4, 4, 0] }
+            }
+          ]
+        };
+
         // Complete Mock Posts Array with isoDate for date filtering
         const allPosts = [
           { id: 1, platform: 'instagram', icon: 'fa-brands fa-instagram text-pink-500', thumb: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&fit=crop', caption: 'Ljetni popust 20% na sve usluge! 🚀', type: 'Reel', isoDate: '2026-08-22', datePublished: '22. Aug 2026', reach: 42100, err: '7.8%', coreActionLabel: 'Saves', coreActionValue: 890 },
@@ -508,6 +607,8 @@
           reachTrendOption,
           engagementOption,
           audienceHealthOption,
+          trafficIntentOption,
+          contentFormatOption,
           posts
         };
       }, [organicPlatform, leaderboardStartDate, leaderboardEndDate, mult, darkMode]);
@@ -1002,6 +1103,35 @@
                       </div>
                     </div>
 
+                    {/* CHARTS ROW 3: PROFILE ACTIVITY & TRAFFIC INTENT + PERFORMANCE BY CONTENT FORMAT */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                      {/* Chart 1: Profile Activity & Traffic Intent */}
+                      <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                        <div className="flex justify-between items-center mb-3">
+                          <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider">
+                            Profile Activity & Traffic Intent
+                          </h4>
+                          <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 text-[10px] font-black">
+                            Intent Conversion
+                          </span>
+                        </div>
+                        <EChartComponent option={organicData.trafficIntentOption} style={{ height: '300px', width: '100%' }} />
+                      </div>
+
+                      {/* Chart 2: Performance by Content Format */}
+                      <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                        <div className="flex justify-between items-center mb-3">
+                          <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider">
+                            Performance by Content Format
+                          </h4>
+                          <span className="px-2.5 py-0.5 rounded-full bg-orange-100 text-zorange dark:bg-orange-950/80 text-[10px] font-black">
+                            Format ROI
+                          </span>
+                        </div>
+                        <EChartComponent option={organicData.contentFormatOption} style={{ height: '300px', width: '100%' }} />
+                      </div>
+                    </div>
+
                     {/* ========================================================================= */}
                     {/* FULL-WIDTH CONTENT LEADERBOARD SECTION WITH CUSTOM VISUAL DATEPICKER */}
                     {/* ========================================================================= */}
@@ -1163,7 +1293,7 @@
                               onClick={() => setLeaderboardView('list')}
                               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
                                 leaderboardView === 'list'
-                                  ? 'bg-[#111113] dark:bg-white text-white dark:text-[#111113] shadow-sm'
+                                  ? 'bg-[#111113] dark:bg-[#ffffff] text-white dark:text-[#111113] shadow-sm'
                                   : 'text-gray-500 hover:text-[#111113] dark:hover:text-white'
                               }`}
                               title="Table View (List)"
@@ -1783,7 +1913,7 @@
                           value={newClientForm.metaBusinessId} 
                           onChange={(e) => setNewClientForm({...newClientForm, metaBusinessId: e.target.value})}
                           placeholder="MB-984120" 
-                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
+                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-[#161618] border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
                         />
                       </div>
                       <div>
@@ -1793,7 +1923,7 @@
                           value={newClientForm.metaAdAccountId} 
                           onChange={(e) => setNewClientForm({...newClientForm, metaAdAccountId: e.target.value})}
                           placeholder="act_1048201" 
-                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
+                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-[#161618] border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
                         />
                       </div>
                       <div>
@@ -1803,7 +1933,7 @@
                           value={newClientForm.googleAdsId} 
                           onChange={(e) => setNewClientForm({...newClientForm, googleAdsId: e.target.value})}
                           placeholder="492-108-9410" 
-                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
+                          className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-[#161618] border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange"
                         />
                       </div>
                     </div>
