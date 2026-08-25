@@ -614,12 +614,9 @@
       }, [organicPlatform, leaderboardStartDate, leaderboardEndDate, mult, darkMode]);
 
       // TAB 2: Meta Ads Data
-      const metaAdsData = useMemo(() => ({
-        spend: `$${(4850.00 * mult).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-        roas: '4.25x',
-        cpa: `$${(14.20).toFixed(2)}`,
-        conversions: `${Math.round(341 * mult)} Leads`,
-        efficiencyOption: {
+      const metaAdsData = useMemo(() => {
+        // Efficiency Option (Composed Chart)
+        const efficiencyOption = {
           tooltip: { trigger: 'axis' },
           legend: { data: ['Daily Spend ($)', 'Blended ROAS (x)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
           grid: { top: 30, bottom: 40, left: 15, right: 15, containLabel: true },
@@ -632,10 +629,12 @@
             { name: 'Daily Spend ($)', type: 'bar', barWidth: '35%', data: [210, 240, 280, 310, 290, 340, 420, 390, 450, 480, 460, 520].map(v => Math.round(v * mult)), itemStyle: { color: darkMode ? '#3F3F46' : '#111113', borderRadius: [4, 4, 0, 0] } },
             { name: 'Blended ROAS (x)', type: 'line', yAxisIndex: 1, data: [4.8, 4.6, 4.3, 3.9, 4.2, 4.5, 3.8, 4.1, 4.4, 4.2, 4.5, 4.3], smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
           ]
-        },
-        fatigueOption: {
+        };
+
+        // Ad Fatigue Tracker (Dual Line Chart with MarkPoint pin on Fatigue)
+        const fatigueOption = {
           tooltip: { trigger: 'axis' },
-          legend: { data: ['Ad Frequency', 'CTR Link (%)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
+          legend: { data: ['Frequency (x)', 'CTR Link (%)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
           grid: { top: 30, bottom: 40, left: 15, right: 15, containLabel: true },
           xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
           yAxis: [
@@ -643,11 +642,34 @@
             { type: 'value', name: 'CTR (%)', min: 0, max: 5, axisLabel: { color: '#059669', fontSize: 10, formatter: '{value}%' } }
           ],
           series: [
-            { name: 'Ad Frequency', type: 'line', data: [1.4, 1.7, 2.1, 2.4, 2.8, 3.1, 3.4, 3.7, 4.0, 4.2, 4.5, 4.8], smooth: true, lineStyle: { width: 3, color: '#EF4444' }, itemStyle: { color: '#EF4444' } },
-            { name: 'CTR Link (%)', type: 'line', yAxisIndex: 1, data: [3.8, 3.6, 3.4, 3.1, 2.8, 2.4, 2.1, 1.8, 1.5, 1.3, 1.1, 0.9], smooth: true, lineStyle: { width: 3, color: '#059669' }, itemStyle: { color: '#059669' } }
+            { 
+              name: 'Frequency (x)', 
+              type: 'line', 
+              data: [1.4, 1.7, 2.1, 2.4, 2.8, 3.1, 3.4, 3.7, 4.0, 4.2, 4.5, 4.8], 
+              smooth: true, 
+              lineStyle: { width: 3, color: '#EF4444' }, 
+              itemStyle: { color: '#EF4444' },
+              markPoint: {
+                symbol: 'pin',
+                symbolSize: 45,
+                data: [{ name: 'Fatigue Threshold', value: '3.0x Fatigue', xAxis: 5, yAxis: 3.1 }],
+                itemStyle: { color: '#EF4444' }
+              }
+            },
+            { 
+              name: 'CTR Link (%)', 
+              type: 'line', 
+              yAxisIndex: 1, 
+              data: [3.8, 3.6, 3.4, 3.1, 2.8, 2.4, 2.1, 1.8, 1.5, 1.3, 1.1, 0.9], 
+              smooth: true, 
+              lineStyle: { width: 3, color: '#059669' }, 
+              itemStyle: { color: '#059669' } 
+            }
           ]
-        },
-        funnelOption: {
+        };
+
+        // Funnel Leakage (Grouped Bar Chart)
+        const funnelOption = {
           tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
           legend: { data: ['Outbound Link Clicks', 'Verified Landing Page Views'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
           grid: { top: 20, bottom: 45, left: 15, right: 15, containLabel: true },
@@ -657,14 +679,52 @@
             { name: 'Outbound Link Clicks', type: 'bar', barWidth: '35%', data: [1240, 1480, 1620, 1850].map(v => Math.round(v * mult)), itemStyle: { color: '#1877F2', borderRadius: [4, 4, 0, 0] } },
             { name: 'Verified Landing Page Views', type: 'bar', barWidth: '35%', data: [940, 1120, 1210, 1380].map(v => Math.round(v * mult)), itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } }
           ]
-        },
-        ads: [
-          { id: 1, name: 'Ljetni Popust 20% Video', placement: 'IG Reels', spend: 1420.00, ctr: 3.42, cpa: 12.40, hookRate: 44.2, status: 'Active' },
-          { id: 2, name: 'Retargeting Napuštene Košarice', placement: 'FB Feed', spend: 1180.00, ctr: 2.85, cpa: 14.10, hookRate: 38.5, status: 'Active' },
-          { id: 3, name: 'Lookalike 1% KUPCI Karusel', placement: 'IG Feed', spend: 950.00, ctr: 2.41, cpa: 16.80, hookRate: 31.0, status: 'Active' },
-          { id: 4, name: 'Ad 4: Klijent Review Video', placement: 'IG Stories', spend: 460.00, ctr: 0.90, cpa: 22.40, hookRate: 28.4, status: 'Active' }
-        ]
-      }), [mult, darkMode]);
+        };
+
+        // Advantage+ Audience Breakdown (Donut Chart)
+        const audienceBreakdownOption = {
+          tooltip: { 
+            trigger: 'item', 
+            formatter: '{b}: <strong>${c}</strong> ({d}%)' 
+          },
+          legend: { 
+            bottom: 0, 
+            textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } 
+          },
+          series: [{
+            name: 'Advantage+ Audience Breakdown',
+            type: 'pie',
+            radius: ['45%', '72%'],
+            avoidLabelOverlap: false,
+            itemStyle: { borderRadius: 10, borderColor: darkMode ? '#161618' : '#ffffff', borderWidth: 2 },
+            data: [
+              { value: Math.round(3298.00 * mult), name: 'New Customers (Acquisition)', itemStyle: { color: '#FF5F00' } },
+              { value: Math.round(1552.00 * mult), name: 'Existing Customers (Retargeting)', itemStyle: { color: '#1877F2' } }
+            ]
+          }]
+        };
+
+        // Ads Data with Thumbnails for Creative Leaderboard Table
+        const ads = [
+          { id: 1, name: 'Ljetni Popust 20% Video', thumb: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&fit=crop', placement: 'IG Reels', spend: 1420.00 * mult, cpa: 12.40, hookRate: 44.2, status: 'Active' },
+          { id: 2, name: 'Retargeting Napuštene Košarice', thumb: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&fit=crop', placement: 'FB Feed', spend: 1180.00 * mult, cpa: 14.10, hookRate: 38.5, status: 'Active' },
+          { id: 3, name: 'Lookalike 1% KUPCI Karusel', thumb: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&fit=crop', placement: 'IG Feed', spend: 950.00 * mult, cpa: 16.80, hookRate: 31.0, status: 'Active' },
+          { id: 4, name: 'Ad 4: Klijent Review Video', thumb: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&fit=crop', placement: 'IG Stories', spend: 460.00 * mult, cpa: 22.40, hookRate: 28.4, status: 'Active' },
+          { id: 5, name: 'Flash Sale Promo Banner', thumb: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&fit=crop', placement: 'FB Stories', spend: 840.00 * mult, cpa: 18.20, hookRate: 36.1, status: 'Paused' }
+        ];
+
+        return {
+          spend: `$${(4850.00 * mult).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+          roas: '4.25x',
+          cpa: `$${(14.20).toFixed(2)}`,
+          conversions: `${Math.round(341 * mult)} Leads`,
+          efficiencyOption,
+          fatigueOption,
+          funnelOption,
+          audienceBreakdownOption,
+          ads
+        };
+      }, [mult, darkMode]);
 
       // TAB 3: Google Ads Data
       const googleAdsData = useMemo(() => ({
@@ -1427,117 +1487,171 @@
 
                   </div>
                 ) : clientTab === 'meta-ads' ? (
-                  /* TAB 2: META ADS */
+                  /* ========================================================================= */
+                  /* TAB 2: META ADS (FULLY IMPLEMENTED ACCORDING TO SPECIFICATIONS) */
+                  /* ========================================================================= */
                   <div className="space-y-6">
+                    
+                    {/* TOP SECTION: 4 PROMINENT KPI CARDS */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                      
+                      {/* KPI 1: Total Ad Spend */}
                       <div className="z-card-dark rounded-[2rem] p-5 flex flex-col justify-between shadow-xl">
                         <div className="flex justify-between items-start mb-2">
                           <div className="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-xs">
                             <i className="fa-brands fa-meta"></i>
                           </div>
-                          <span className="z-badge-orange text-[10px] px-2.5 py-0.5 uppercase">+5.4%</span>
+                          <span className="z-badge-orange text-[10px] px-2.5 py-0.5 uppercase">+5.4% vs last period</span>
                         </div>
                         <div>
-                          <span className="text-[11px] font-extrabold uppercase text-white/70 block mb-1">Total Spend</span>
+                          <span className="text-[11px] font-extrabold uppercase text-white/70 block mb-1">Total Ad Spend</span>
                           <h3 className="text-2xl font-black text-white">{metaAdsData.spend}</h3>
-                          <p className="text-[10px] text-white/60 font-bold mt-1">FB + IG Kombinirano</p>
+                          <p className="text-[10px] text-white/60 font-bold mt-1">FB & IG Combined Ad Spend</p>
                         </div>
                       </div>
 
+                      {/* KPI 2: Blended ROAS */}
                       <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
                         <div className="flex justify-between items-start mb-2">
                           <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center text-xs">
                             <i className="fa-solid fa-chart-line"></i>
                           </div>
-                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black">+0.4x</span>
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 text-[10px] font-black">+12% vs last period</span>
                         </div>
                         <div>
                           <span className="text-[11px] font-extrabold uppercase text-gray-400 block mb-1">Blended ROAS</span>
                           <h3 className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{metaAdsData.roas}</h3>
-                          <p className="text-[10px] text-gray-400 font-bold mt-1">Return on Ad Spend</p>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">Return on Ad Spend Target: 4.0x</p>
                         </div>
                       </div>
 
+                      {/* KPI 3: Avg. CPA */}
                       <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
                         <div className="flex justify-between items-start mb-2">
                           <div className="w-8 h-8 rounded-full bg-orange-100 text-zorange flex items-center justify-center text-xs">
                             <i className="fa-solid fa-sack-dollar"></i>
                           </div>
-                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black">-8.5%</span>
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 text-[10px] font-black">-8.5% vs last period</span>
                         </div>
                         <div>
-                          <span className="text-[11px] font-extrabold uppercase text-gray-400 block mb-1">Meta CPA</span>
+                          <span className="text-[11px] font-extrabold uppercase text-gray-400 block mb-1">Avg. CPA</span>
                           <h3 className="text-2xl font-black text-[#111113] dark:text-white">{metaAdsData.cpa}</h3>
-                          <p className="text-[10px] text-gray-400 font-bold mt-1">Target: $16.00</p>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">Cost Per Acquisition Target: $15.00</p>
                         </div>
                       </div>
 
+                      {/* KPI 4: Total Conversions */}
                       <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
                         <div className="flex justify-between items-start mb-2">
                           <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs">
                             <i className="fa-solid fa-bullseye"></i>
                           </div>
-                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black">+15.2%</span>
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 text-[10px] font-black">+15.2% vs last period</span>
                         </div>
                         <div>
                           <span className="text-[11px] font-extrabold uppercase text-gray-400 block mb-1">Total Conversions</span>
                           <h3 className="text-2xl font-black text-[#111113] dark:text-white">{metaAdsData.conversions}</h3>
-                          <p className="text-[10px] text-gray-400 font-bold mt-1">FB & IG Konverzije</p>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">Verified Conversions (Leads/Sales)</p>
                         </div>
                       </div>
+
                     </div>
 
+                    {/* MAIN CHARTS SECTION (2-COLUMN GRID) */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                      <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
-                        <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">Efficiency Trend (Spend vs. ROAS)</h4>
-                        <EChartComponent option={metaAdsData.efficiencyOption} style={{ height: '280px', width: '100%' }} />
+                      
+                      {/* Chart 1: Efficiency Trend (Spend vs ROAS) */}
+                      <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                        <div className="flex justify-between items-center mb-3">
+                          <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider">Efficiency Trend (Spend vs. ROAS)</h4>
+                          <span className="text-[10px] font-black text-gray-400 uppercase">Dual-Axis Scale</span>
+                        </div>
+                        <EChartComponent option={metaAdsData.efficiencyOption} style={{ height: '290px', width: '100%' }} />
                       </div>
 
-                      <div className="lg:col-span-5 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
-                        <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">Ad Fatigue Tracker (Frequency vs CTR)</h4>
-                        <EChartComponent option={metaAdsData.fatigueOption} style={{ height: '280px', width: '100%' }} />
+                      {/* Chart 2: Ad Fatigue Tracker (Frequency vs CTR) */}
+                      <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                        <div className="flex justify-between items-center mb-3">
+                          <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider">Ad Fatigue Tracker (Frequency vs CTR)</h4>
+                          <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[10px] font-black">Fatigue Warning</span>
+                        </div>
+                        <EChartComponent option={metaAdsData.fatigueOption} style={{ height: '290px', width: '100%' }} />
                       </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                      {/* Chart 3: Funnel Leakage */}
                       <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
                         <div className="flex justify-between items-center mb-3">
                           <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider">Funnel Leakage</h4>
                           <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-black">24.1% Drop-off Rate</span>
                         </div>
-                        <EChartComponent option={metaAdsData.funnelOption} style={{ height: '250px', width: '100%' }} />
+                        <EChartComponent option={metaAdsData.funnelOption} style={{ height: '290px', width: '100%' }} />
                       </div>
 
+                      {/* Chart 4: Advantage+ Audience Breakdown */}
                       <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
-                        <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">Creative Leaderboard</h4>
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-left text-xs">
-                            <thead>
-                              <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-black uppercase">
-                                <th className="py-2.5 px-2">Oglas</th>
-                                <th className="py-2.5 px-2">Spend</th>
-                                <th className="py-2.5 px-2">CPA</th>
-                                <th className="py-2.5 px-2">Hook Rate</th>
-                                <th className="py-2.5 px-2">Status</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
-                              {metaAdsData.ads.map(ad => (
-                                <tr key={ad.id}>
-                                  <td className="py-3 px-2 text-[#111113] dark:text-white font-black">{ad.name}</td>
-                                  <td className="py-3 px-2">${ad.spend.toFixed(2)}</td>
-                                  <td className="py-3 px-2">${ad.cpa.toFixed(2)}</td>
-                                  <td className="py-3 px-2 text-zorange font-black">{ad.hookRate}%</td>
-                                  <td className="py-3 px-2">
-                                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-black">Active</span>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                        <div className="flex justify-between items-center mb-3">
+                          <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider">Advantage+ Audience Breakdown</h4>
+                          <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-black">Acquisition Split</span>
                         </div>
+                        <EChartComponent option={metaAdsData.audienceBreakdownOption} style={{ height: '290px', width: '100%' }} />
+                      </div>
+
+                    </div>
+
+                    {/* FULL-WIDTH BOTTOM SECTION: CREATIVE LEADERBOARD DATA TABLE */}
+                    <div className="w-full min-w-0 z-card-white dark:bg-[#161618] rounded-[2rem] p-7 shadow-xs border border-gray-200 dark:border-gray-800 space-y-4">
+                      <div className="flex justify-between items-center pb-2 border-b border-gray-100 dark:border-gray-800">
+                        <div>
+                          <h3 className="text-lg font-black text-[#111113] dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <i className="fa-solid fa-rectangle-ad text-zorange"></i> Creative Leaderboard
+                          </h3>
+                          <p className="text-xs text-gray-500 font-semibold mt-0.5">Rang lista oglasa i performansi po utrošku, CPA i Hook Rate metrikama</p>
+                        </div>
+                        <span className="text-xs font-bold text-gray-400">{metaAdsData.ads.length} Aktivnih Oglasa</span>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead>
+                            <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-black uppercase">
+                              <th className="py-3.5 px-3">Ad Name & Placement</th>
+                              <th className="py-3.5 px-3">Ad Spend</th>
+                              <th className="py-3.5 px-3">CPA ($)</th>
+                              <th className="py-3.5 px-3">Hook Rate (%)</th>
+                              <th className="py-3.5 px-3">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
+                            {metaAdsData.ads.map(ad => (
+                              <tr key={ad.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                <td className="py-3.5 px-3 flex items-center gap-3">
+                                  <img src={ad.thumb} className="w-11 h-11 rounded-xl object-cover shadow-xs border border-gray-200 dark:border-gray-700" />
+                                  <div>
+                                    <span className="text-[#111113] dark:text-white font-black block">{ad.name}</span>
+                                    <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 text-[9px] font-black uppercase mt-0.5 inline-block">
+                                      {ad.placement}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="py-3.5 px-3 text-[#111113] dark:text-white font-black">${ad.spend.toFixed(2)}</td>
+                                <td className="py-3.5 px-3 text-gray-700 dark:text-gray-300">${ad.cpa.toFixed(2)}</td>
+                                <td className="py-3.5 px-3 text-zorange font-black text-sm">{ad.hookRate}%</td>
+                                <td className="py-3.5 px-3">
+                                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
+                                    ad.status === 'Active' 
+                                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' 
+                                      : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                                  }`}>
+                                    {ad.status === 'Active' ? '✓ Active' : '⏸ Paused'}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
+
                   </div>
                 ) : (
                   /* TAB 3: GOOGLE ADS */
