@@ -466,6 +466,39 @@ const enrichClientWithAdvancedAnalytics = (client) => {
     }
   };
 
+  client.strategicDecisionMetrics = {
+    reachImpressions: {
+      days,
+      newAudience: [2400, 2800, 3100, 3900, 4800, 4200, 3500, 3900, 4600, 5100, 5800, 4900, 4300, 4600, 4900, 4100, 3800, 4300, 4700, 4400, 4100, 4600, 4900, 5200, 4700],
+      existingFollowers: [1100, 1200, 1150, 1400, 1600, 1500, 1300, 1400, 1700, 1800, 1900, 1600, 1400, 1500, 1600, 1350, 1250, 1400, 1550, 1450, 1350, 1500, 1600, 1750, 1550],
+      decisionNote: 'Visoki udjel novih korisnika (72%) zahvaljujući Reels video vizualima u 18-21h intervalu.'
+    },
+    err: {
+      days,
+      errRates: [4.2, 4.8, 4.5, 5.9, 7.2, 6.4, 5.1, 5.6, 6.8, 7.4, 8.4, 6.7, 5.8, 6.2, 6.5, 5.4, 4.9, 5.8, 6.3, 5.9, 5.5, 6.1, 6.6, 7.1, 6.4],
+      industryAvg: [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5],
+      decisionNote: 'ERR po dosegu iznosi prosječno 6.2% (natprosječno visoko u odnosu na standard 2.5%).'
+    },
+    savesShares: {
+      posts: ['Nagradni Natječaj', 'Ljetni Popust 20%', 'Marketing Vodič', 'Outfit Tjedna', 'Radno Vrijeme'],
+      saves: [420, 310, 260, 190, 25],
+      shares: [164, 82, 45, 93, 6],
+      decisionNote: 'Marketing Vodič i Popust imaju najveći omjer spremanja, što šalje najjači organski signal algoritmu.'
+    },
+    followerGrowth: {
+      days,
+      newFollowers: [42, 55, 48, 62, 85, 78, 51, 59, 74, 89, 112, 76, 58, 64, 71, 49, 43, 57, 68, 61, 52, 66, 73, 82, 70],
+      unfollows: [8, 11, 9, 12, 15, 14, 10, 11, 13, 16, 18, 14, 11, 12, 13, 10, 9, 11, 12, 11, 10, 12, 13, 15, 12],
+      decisionNote: 'Neto prirast pratitelja iznosi +1,380 novih korisnika uz nisku stopu napuštanja (odlaska).'
+    },
+    profileVisits: {
+      days,
+      visits: [180, 210, 195, 260, 340, 310, 240, 275, 330, 390, 480, 360, 290, 315, 340, 270, 240, 295, 335, 305, 280, 325, 355, 395, 350],
+      websiteTaps: [45, 58, 51, 72, 98, 88, 62, 74, 92, 115, 142, 102, 78, 86, 94, 71, 63, 81, 93, 84, 75, 90, 99, 112, 96],
+      decisionNote: '28.5% posjetitelja profila klikne na link u opisu (bio) i prelazi u prodajni lijevak.'
+    }
+  };
+
   const publishedCount = client.publishedPosts !== undefined ? client.publishedPosts : 5;
   const maxCount = client.maxPosts || 8;
   const remainingCount = Math.max(0, maxCount - publishedCount);

@@ -455,44 +455,98 @@
 
         </div>
 
-        <!-- FULL ADVANCED DECISION ANALYTICS ROW -->
+        <!-- STRATEGIC CONTENT DECISION CHARTS (STRATEŠKI MARKETINŠKI POKAZATELJI) -->
+        <div class="mb-4 mt-6">
+          <h3 class="text-xl font-black text-[#111113] uppercase tracking-wider flex items-center gap-2 mb-1">
+            <i class="fa-solid fa-chart-line text-zorange"></i> Strateške Marketinške Analize & Odluke
+          </h3>
+          <p class="text-xs text-gray-500 font-bold mb-6">Dubinski uvid u doseg novih korisnika, stope angažmana po dosegu, algoritamske signale i prodajne konverzije</p>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-          <!-- Blended MER & Revenue Trend Chart -->
-          <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7 shadow-sm border border-black/5">
-            <div class="flex items-center justify-between mb-4">
-              <h4 class="text-sm font-black text-[#111113] uppercase tracking-wider">Blended MER & Zbirni Prihod Trend</h4>
-              <span class="text-xs text-gray-500 font-bold">Meta + Google + TikTok</span>
+          <!-- 1. Reach & Impressions (Novi korisnici vs Postojeća publika) -->
+          <div class="lg:col-span-7 z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 flex flex-col justify-between">
+            <div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
+                <div>
+                  <h4 class="text-base font-black text-[#111113] uppercase tracking-wider">Reach & Impressions (Doseg i Impresije)</h4>
+                  <p class="text-xs text-gray-500 font-semibold">Novi korisnici u odnosu na postojeću publiku</p>
+                </div>
+                <span class="z-badge-orange text-[10px] px-3 py-1 text-white shadow-xs self-start sm:self-auto">72% Novi Doseg</span>
+              </div>
+              <div id="chart-reach-impressions" class="w-full" style="height: 280px;"></div>
             </div>
-            <div id="advanced-chart-blended" class="w-full" style="height: 300px;"></div>
+            <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+              💡 <strong>Odluka:</strong> <%= client.strategicDecisionMetrics.reachImpressions.decisionNote %>
+            </div>
           </div>
 
-          <!-- Dayparting Heatmap -->
-          <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7 shadow-sm border border-black/5">
-            <div class="flex items-center justify-between mb-4">
-              <h4 class="text-sm font-black text-[#111113] uppercase tracking-wider">Dayparting Toplinska Mapa (Vrijeme Konverzija)</h4>
-              <span class="text-xs text-gray-500 font-bold">Dani i sati visoke konverzije</span>
+          <!-- 2. Engagement Rate po Dosegu (ERR %) -->
+          <div class="lg:col-span-5 z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 flex flex-col justify-between">
+            <div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
+                <div>
+                  <h4 class="text-base font-black text-[#111113] uppercase tracking-wider">Engagement Rate po Dosegu (ERR %)</h4>
+                  <p class="text-xs text-gray-500 font-semibold">Točniji pokazatelj od engagementa po broju pratitelja</p>
+                </div>
+                <span class="z-badge-black text-[10px] px-3 py-1 shadow-xs self-start sm:self-auto">ERR: 6.2% Prosjek</span>
+              </div>
+              <div id="chart-err-rate" class="w-full" style="height: 280px;"></div>
             </div>
-            <div id="advanced-chart-dayparting" class="w-full" style="height: 300px;"></div>
+            <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+              🎯 <strong>Uvid:</strong> <%= client.strategicDecisionMetrics.err.decisionNote %>
+            </div>
           </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-          <!-- Creative Fatigue Chart -->
-          <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7 shadow-sm border border-black/5">
-            <div class="flex items-center justify-between mb-4">
-              <h4 class="text-sm font-black text-[#111113] uppercase tracking-wider">Analiza Zamora Kreativnih Materijala</h4>
-              <span class="text-xs text-gray-500 font-bold">Frekvencija vs CTR vs CPA</span>
+          <!-- 3. Saves & Shares (Spremanja i Dijeljenja) -->
+          <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 flex flex-col justify-between">
+            <div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
+                <div>
+                  <h4 class="text-base font-black text-[#111113] uppercase tracking-wider">Saves & Shares (Spremanja i Dijeljenja)</h4>
+                  <p class="text-xs text-gray-500 font-semibold">Ključni signali za algoritam i vrijednost sadržaja</p>
+                </div>
+                <span class="z-badge-black text-[10px] px-3 py-1 shadow-xs self-start sm:self-auto">Algoritamski Signal</span>
+              </div>
+              <div id="chart-saves-shares" class="w-full" style="height: 280px;"></div>
             </div>
-            <div id="advanced-chart-fatigue" class="w-full" style="height: 300px;"></div>
+            <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+              📌 <strong>Analiza:</strong> <%= client.strategicDecisionMetrics.savesShares.decisionNote %>
+            </div>
           </div>
 
-          <!-- LTV:CAC & Cohort Retention Chart -->
-          <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7 shadow-sm border border-black/5">
-            <div class="flex items-center justify-between mb-4">
-              <h4 class="text-sm font-black text-[#111113] uppercase tracking-wider">LTV : CAC Omjer & Zadržavanje Korisnika</h4>
-              <span class="text-xs text-gray-500 font-bold">Kohorta zadržavanja po mjesecima</span>
+          <!-- 4. Follower Growth Rate & Unfollows -->
+          <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 flex flex-col justify-between">
+            <div>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
+                <div>
+                  <h4 class="text-base font-black text-[#111113] uppercase tracking-wider">Follower Growth Rate & Unfollows</h4>
+                  <p class="text-xs text-gray-500 font-semibold">Trend rasta i pada baze umjesto fiksnog broja</p>
+                </div>
+                <span class="z-badge-green text-[10px] px-3 py-1 shadow-xs self-start sm:self-auto">Neto +1,380 Pratitelja</span>
+              </div>
+              <div id="chart-follower-growth" class="w-full" style="height: 280px;"></div>
             </div>
-            <div id="advanced-chart-ltv" class="w-full" style="height: 300px;"></div>
+            <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+              📈 <strong>Trend:</strong> <%= client.strategicDecisionMetrics.followerGrowth.decisionNote %>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Profile Visits & Website Taps -->
+        <div class="z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 mb-8">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
+            <div>
+              <h4 class="text-base font-black text-[#111113] uppercase tracking-wider">Profile Visits & Website Taps (Prijelaz u Namjeru Kupi)</h4>
+              <p class="text-xs text-gray-500 font-semibold">Konverzija iz pasivnog gledatelja u namjeru istraživanja ponude i klika na link</p>
+            </div>
+            <span class="z-badge-orange text-[10px] px-3.5 py-1 text-white shadow-xs self-start sm:self-auto">28.5% Click-Through na Bio Link</span>
+          </div>
+          <div id="chart-profile-visits" class="w-full" style="height: 280px;"></div>
+          <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+            🛒 <strong>Konverzija:</strong> <%= client.strategicDecisionMetrics.profileVisits.decisionNote %>
           </div>
         </div>
 
@@ -833,81 +887,98 @@
         });
       }
 
-      /* ----------------------------------------------------
-         ADVANCED DECISION ANALYTICS SETUP
-         ---------------------------------------------------- */
-      const advancedData = <%- JSON.stringify(client.advancedAnalytics) %>;
+    // Strategic Decision Charts
+    let chartReachImpressions, chartErrRate, chartSavesShares, chartFollowerGrowth, chartProfileVisits;
 
-      const blendedElem = document.getElementById('advanced-chart-blended');
-      if (blendedElem) {
-        blendedChart = echarts.init(blendedElem);
-        blendedChart.setOption({
-          tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
-          legend: { data: ['Prihod ($)', 'Blended MER (x)'], bottom: '0', textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 12 } },
-          grid: { left: '3%', right: '3%', bottom: '10%', containLabel: true },
-          xAxis: { type: 'category', data: advancedData.blended.days, axisLine: { lineStyle: { color: 'rgba(0,0,0,0.1)' } }, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 } },
-          yAxis: [
-            { type: 'value', name: 'Prihod ($)', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 }, splitLine: { lineStyle: { color: 'rgba(0,0,0,0.05)' } } },
-            { type: 'value', name: 'MER (x)', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 }, splitLine: { show: false } }
-          ],
-          series: [
-            { name: 'Prihod ($)', type: 'bar', data: advancedData.blended.revenueDaily, itemStyle: { color: '#111113', borderRadius: [4, 4, 0, 0] } },
-            { name: 'Blended MER (x)', type: 'line', yAxisIndex: 1, data: advancedData.blended.merDaily, smooth: true, symbol: 'circle', symbolSize: 6, lineStyle: { width: 3 }, itemStyle: { color: '#FF5F00' } }
-          ]
-        });
-      }
+    /* ----------------------------------------------------
+       STRATEGIC DECISION CHARTS ECHARTS SETUP
+       ---------------------------------------------------- */
+    const decData = <%- JSON.stringify(client.strategicDecisionMetrics) %>;
 
-      const daypartingElem = document.getElementById('advanced-chart-dayparting');
-      if (daypartingElem) {
-        daypartingChart = echarts.init(daypartingElem);
-        daypartingChart.setOption({
-          tooltip: { position: 'top' },
-          grid: { top: '5%', bottom: '12%', left: '10%', right: '5%' },
-          xAxis: { type: 'category', data: advancedData.dayparting.hours, splitArea: { show: true }, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 700, fontSize: 11 } },
-          yAxis: { type: 'category', data: advancedData.dayparting.days, splitArea: { show: true }, axisLabel: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
-          visualMap: { min: 0, max: 25, calculable: true, orient: 'horizontal', left: 'center', bottom: '0', inRange: { color: ['#F3F4F6', '#FF5F00'] } },
-          series: [{ type: 'heatmap', data: advancedData.dayparting.data, label: { show: true, fontSize: 10, fontFamily: 'Urbanist', fontWeight: 'bold' } }]
-        });
-      }
+    // 1. Reach & Impressions (New vs Existing Audience)
+    const reachImpElem = document.getElementById('chart-reach-impressions');
+    if (reachImpElem) {
+      chartReachImpressions = echarts.init(reachImpElem);
+      chartReachImpressions.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        legend: { data: ['Novi Korisnici (Doseg)', 'Postojeći Pratitelji'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
+        grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+        xAxis: { type: 'category', data: decData.reachImpressions.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+        yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+        series: [
+          { name: 'Novi Korisnici (Doseg)', type: 'bar', stack: 'total', data: decData.reachImpressions.newAudience, itemStyle: { color: '#FF5F00' } },
+          { name: 'Postojeći Pratitelji', type: 'bar', stack: 'total', data: decData.reachImpressions.existingFollowers, itemStyle: { color: '#111113', borderRadius: [4, 4, 0, 0] } }
+        ]
+      });
+    }
 
-      const fatigueElem = document.getElementById('advanced-chart-fatigue');
-      if (fatigueElem) {
-        fatigueChart = echarts.init(fatigueElem);
-        fatigueChart.setOption({
-          tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
-          legend: { data: ['Frekvencija prikaza', 'CTR (%)', 'CPA ($)'], bottom: '0', textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 12 } },
-          grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-          xAxis: { type: 'category', data: advancedData.creativeFatigue.adNames, axisLabel: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11, interval: 0, rotate: 15 } },
-          yAxis: [
-            { type: 'value', name: 'Stopa / Frekvencija', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 } },
-            { type: 'value', name: 'CPA ($)', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 }, splitLine: { show: false } }
-          ],
-          series: [
-            { name: 'Frekvencija prikaza', type: 'bar', data: advancedData.creativeFatigue.frequency, itemStyle: { color: '#E5E7EB', borderRadius: [4, 4, 0, 0] } },
-            { name: 'CTR (%)', type: 'line', data: advancedData.creativeFatigue.ctr, smooth: true, lineStyle: { width: 3 }, itemStyle: { color: '#111113' } },
-            { name: 'CPA ($)', type: 'line', yAxisIndex: 1, data: advancedData.creativeFatigue.cpa, smooth: true, lineStyle: { width: 3, type: 'dashed' }, itemStyle: { color: '#FF5F00' } }
-          ]
-        });
-      }
+    // 2. Engagement Rate po Dosegu (ERR %)
+    const errElem = document.getElementById('chart-err-rate');
+    if (errElem) {
+      chartErrRate = echarts.init(errElem);
+      chartErrRate.setOption({
+        tooltip: { trigger: 'axis' },
+        legend: { data: ['ERR po Dosegu (%)', 'Prosjek Industrije (2.5%)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
+        grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+        xAxis: { type: 'category', data: decData.err.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+        yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10, formatter: '{value}%' } },
+        series: [
+          { name: 'ERR po Dosegu (%)', type: 'line', data: decData.err.errRates, smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } },
+          { name: 'Prosjek Industrije (2.5%)', type: 'line', data: decData.err.industryAvg, lineStyle: { width: 2, type: 'dashed', color: '#6B7280' }, itemStyle: { color: '#6B7280' } }
+        ]
+      });
+    }
 
-      const ltvElem = document.getElementById('advanced-chart-ltv');
-      if (ltvElem) {
-        ltvChart = echarts.init(ltvElem);
-        ltvChart.setOption({
-          tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
-          legend: { data: ['Korisnička vrijednost (LTV)', 'Zadržavanje (Retention %)'], bottom: '0', textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 12 } },
-          grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-          xAxis: { type: 'category', data: advancedData.ltvCac.retentionMonths, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 700, fontSize: 11 } },
-          yAxis: [
-            { type: 'value', name: 'Vrijednost ($)', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 } },
-            { type: 'value', name: 'Zadržavanje (%)', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontWeight: 600, fontSize: 11 }, splitLine: { show: false } }
-          ],
-          series: [
-            { name: 'Korisnička vrijednost (LTV)', type: 'bar', data: [14.5, 24.0, 38.5, 48.0, 54.0, 72.5], itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } },
-            { name: 'Zadržavanje (Retention %)', type: 'line', yAxisIndex: 1, data: advancedData.ltvCac.retentionRates, smooth: true, symbol: 'circle', symbolSize: 6, lineStyle: { width: 3 }, itemStyle: { color: '#111113' } }
-          ]
-        });
-      }
+    // 3. Saves & Shares (Spremanja i Dijeljenja)
+    const savesElem = document.getElementById('chart-saves-shares');
+    if (savesElem) {
+      chartSavesShares = echarts.init(savesElem);
+      chartSavesShares.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        legend: { data: ['Spremanja (Saves)', 'Dijeljenja (Shares)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
+        grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+        xAxis: { type: 'category', data: decData.savesShares.posts, axisLabel: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 10, rotate: 10 } },
+        yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+        series: [
+          { name: 'Spremanja (Saves)', type: 'bar', data: decData.savesShares.saves, itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } },
+          { name: 'Dijeljenja (Shares)', type: 'bar', data: decData.savesShares.shares, itemStyle: { color: '#111113', borderRadius: [4, 4, 0, 0] } }
+        ]
+      });
+    }
+
+    // 4. Follower Growth Rate & Unfollows
+    const followerElem = document.getElementById('chart-follower-growth');
+    if (followerElem) {
+      chartFollowerGrowth = echarts.init(followerElem);
+      chartFollowerGrowth.setOption({
+        tooltip: { trigger: 'axis' },
+        legend: { data: ['Novi Pratitelji', 'Nisu više pratitelji (Unfollows)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
+        grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+        xAxis: { type: 'category', data: decData.followerGrowth.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+        yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+        series: [
+          { name: 'Novi Pratitelji', type: 'bar', data: decData.followerGrowth.newFollowers, itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } },
+          { name: 'Nisu više pratitelji (Unfollows)', type: 'bar', data: decData.followerGrowth.unfollows, itemStyle: { color: '#EF4444', borderRadius: [4, 4, 0, 0] } }
+        ]
+      });
+    }
+
+    // 5. Profile Visits & Website Taps
+    const profVisElem = document.getElementById('chart-profile-visits');
+    if (profVisElem) {
+      chartProfileVisits = echarts.init(profVisElem);
+      chartProfileVisits.setOption({
+        tooltip: { trigger: 'axis' },
+        legend: { data: ['Posjete Profilu', 'Klikovi na Web Link (Bio Taps)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
+        grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+        xAxis: { type: 'category', data: decData.profileVisits.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+        yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
+        series: [
+          { name: 'Posjete Profilu', type: 'line', data: decData.profileVisits.visits, smooth: true, lineStyle: { width: 3, color: '#111113' }, itemStyle: { color: '#111113' } },
+          { name: 'Klikovi na Web Link (Bio Taps)', type: 'line', data: decData.profileVisits.websiteTaps, smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
+        ]
+      });
+    }
 
       /* ----------------------------------------------------
          SOCIAL MEDIA ECHARTS SETUP
@@ -1064,6 +1135,12 @@
       if (subscribersBarChart) subscribersBarChart.resize();
       if (revenueHighlightedChart) revenueHighlightedChart.resize();
 
+      if (chartReachImpressions) chartReachImpressions.resize();
+      if (chartErrRate) chartErrRate.resize();
+      if (chartSavesShares) chartSavesShares.resize();
+      if (chartFollowerGrowth) chartFollowerGrowth.resize();
+      if (chartProfileVisits) chartProfileVisits.resize();
+
       if (efficiencyChart) efficiencyChart.resize();
       if (platformsChart) platformsChart.resize();
       if (audienceChart) audienceChart.resize();
@@ -1075,11 +1152,6 @@
 
       if (tiktokEfficiencyChart) tiktokEfficiencyChart.resize();
       if (tiktokVideosChart) tiktokVideosChart.resize();
-
-      if (blendedChart) blendedChart.resize();
-      if (fatigueChart) fatigueChart.resize();
-      if (daypartingChart) daypartingChart.resize();
-      if (ltvChart) ltvChart.resize();
 
       if (socialPlatformsChart) socialPlatformsChart.resize();
       if (socialFormatsChart) socialFormatsChart.resize();
@@ -1128,10 +1200,12 @@
             if (revenueSparklineChart) revenueSparklineChart.resize();
             if (subscribersBarChart) subscribersBarChart.resize();
             if (revenueHighlightedChart) revenueHighlightedChart.resize();
-            if (blendedChart) blendedChart.resize();
-            if (fatigueChart) fatigueChart.resize();
-            if (daypartingChart) daypartingChart.resize();
-            if (ltvChart) ltvChart.resize();
+
+            if (chartReachImpressions) chartReachImpressions.resize();
+            if (chartErrRate) chartErrRate.resize();
+            if (chartSavesShares) chartSavesShares.resize();
+            if (chartFollowerGrowth) chartFollowerGrowth.resize();
+            if (chartProfileVisits) chartProfileVisits.resize();
           }, 50);
         }
       }
