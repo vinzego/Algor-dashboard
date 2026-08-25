@@ -92,13 +92,13 @@
 
     // --- SKELETON LOADER COMPONENT ---
     const SkeletonCard = () => (
-      <div class="z-card-white dark:bg-[#161618] rounded-[2rem] p-6 animate-pulse flex flex-col justify-between h-[270px]">
-        <div class="flex justify-between items-center">
-          <div class="w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
-          <div class="w-12 h-4 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+      <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-6 animate-pulse flex flex-col justify-between h-[270px]">
+        <div className="flex justify-between items-center">
+          <div className="w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+          <div className="w-12 h-4 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
         </div>
-        <div class="w-full h-24 bg-gray-100 dark:bg-gray-800 rounded-2xl my-2"></div>
-        <div class="w-32 h-6 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+        <div className="w-full h-24 bg-gray-100 dark:bg-gray-800 rounded-2xl my-2"></div>
+        <div className="w-32 h-6 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
       </div>
     );
 
@@ -354,287 +354,285 @@
       };
 
       return (
-        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
           
-          <!-- TOP HEADER WITH CONTROLS & NAVIGATION -->
-          <header class="mb-8">
-            <!-- TOP BAR: BRAND + SELECTORS + THEME TOGGLE -->
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-gray-200 dark:border-gray-800">
+          {/* TOP HEADER WITH CONTROLS & NAVIGATION */}
+          <header className="mb-8">
+            {/* TOP BAR: BRAND + SELECTORS + THEME TOGGLE */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-gray-200 dark:border-gray-800">
               
-              <!-- Brand Logo & Tenant Badge -->
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-[#111113] text-white flex items-center justify-center font-black text-lg shadow-md border border-white/10">
-                  <i class="fa-solid fa-bolt-lightning text-zorange"></i>
+              {/* Brand Logo & Tenant Badge */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#111113] text-white flex items-center justify-center font-black text-lg shadow-md border border-white/10">
+                  <i className="fa-solid fa-bolt-lightning text-zorange"></i>
                 </div>
                 <div>
-                  <h1 class="text-2xl font-black tracking-tight text-[#111113] dark:text-white flex items-center gap-1.5">
-                    ZELLIFY<span class="text-zorange">.</span>
-                    <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange border border-orange-200 dark:border-orange-900">Agency Edition</span>
+                  <h1 className="text-2xl font-black tracking-tight text-[#111113] dark:text-white flex items-center gap-1.5">
+                    ZELLIFY<span className="text-zorange">.</span>
+                    <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange border border-orange-200 dark:border-orange-900">Agency Edition</span>
                   </h1>
-                  <p class="text-xs text-gray-500 font-semibold">Client Marketing Analytics System</p>
+                  <p className="text-xs text-gray-500 font-semibold">Client Marketing Analytics System</p>
                 </div>
               </div>
 
-              <!-- Center Capsule Navigation Switcher (Instagram Organic vs Meta Ads Performance) -->
-              <div class="z-pill-nav flex items-center gap-1 self-start lg:self-auto">
+              {/* Center Capsule Navigation Switcher (Instagram Organic vs Meta Ads Performance) */}
+              <div className="z-pill-nav flex items-center gap-1 self-start lg:self-auto">
                 <button 
                   onClick={() => setActiveView('instagram')} 
-                  class={`px-5 py-2.5 text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center gap-2 ${
+                  className={`px-5 py-2.5 text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center gap-2 ${
                     activeView === 'instagram' 
                       ? 'bg-white text-[#111113] rounded-full shadow-md' 
                       : 'text-white/80 hover:text-white'
                   }`}
                 >
-                  <i class="fa-brands fa-instagram text-pink-500 text-sm"></i>
+                  <i className="fa-brands fa-instagram text-pink-500 text-sm"></i>
                   Instagram Organic
                 </button>
                 <button 
                   onClick={() => setActiveView('meta-ads')} 
-                  class={`px-5 py-2.5 text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center gap-2 ${
+                  className={`px-5 py-2.5 text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center gap-2 ${
                     activeView === 'meta-ads' 
                       ? 'bg-white text-[#111113] rounded-full shadow-md' 
                       : 'text-white/80 hover:text-white'
                   }`}
                 >
-                  <i class="fa-brands fa-meta text-blue-500 text-sm"></i>
+                  <i className="fa-brands fa-meta text-blue-500 text-sm"></i>
                   Meta Ads Performance
                 </button>
               </div>
 
-              <!-- Right Dropdowns & Theme Toggle -->
-              <div class="flex items-center gap-3 flex-wrap">
-                <!-- Account Selector -->
-                <div class="relative flex items-center gap-1.5 bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 rounded-full px-4 py-2 shadow-xs text-xs font-bold">
-                  <i class="fa-solid fa-building text-zorange"></i>
-                  <span class="text-gray-400 font-medium">Klijent:</span>
+              {/* Right Dropdowns & Theme Toggle */}
+              <div className="flex items-center gap-3 flex-wrap">
+                {/* Account Selector */}
+                <div className="relative flex items-center gap-1.5 bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 rounded-full px-4 py-2 shadow-xs text-xs font-bold">
+                  <i className="fa-solid fa-building text-zorange"></i>
+                  <span className="text-gray-400 font-medium">Klijent:</span>
                   <select 
                     value={selectedAccount} 
                     onChange={handleAccountChange} 
-                    class="bg-transparent font-black text-[#111113] dark:text-white focus:outline-none cursor-pointer pr-2"
+                    className="bg-transparent font-black text-[#111113] dark:text-white focus:outline-none cursor-pointer pr-2"
                   >
                     {ACCOUNTS.map(acc => (
-                      <option key={acc.id} value={acc.id} class="bg-white dark:bg-[#161618] text-[#111113] dark:text-white">
+                      <option key={acc.id} value={acc.id} className="bg-white dark:bg-[#161618] text-[#111113] dark:text-white">
                         {acc.name} ({acc.package})
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <!-- Global Date Range Picker -->
-                <div class="relative flex items-center gap-1.5 bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 rounded-full px-4 py-2 shadow-xs text-xs font-bold">
-                  <i class="fa-solid fa-calendar-days text-zorange"></i>
+                {/* Global Date Range Picker */}
+                <div className="relative flex items-center gap-1.5 bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 rounded-full px-4 py-2 shadow-xs text-xs font-bold">
+                  <i className="fa-solid fa-calendar-days text-zorange"></i>
                   <select 
                     value={dateRange} 
                     onChange={handleDateChange} 
-                    class="bg-transparent font-black text-[#111113] dark:text-white focus:outline-none cursor-pointer"
+                    className="bg-transparent font-black text-[#111113] dark:text-white focus:outline-none cursor-pointer"
                   >
                     {DATE_RANGES.map(d => (
-                      <option key={d.id} value={d.id} class="bg-white dark:bg-[#161618] text-[#111113] dark:text-white">
+                      <option key={d.id} value={d.id} className="bg-white dark:bg-[#161618] text-[#111113] dark:text-white">
                         {d.label}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <!-- Light / Dark Theme Switcher Button -->
+                {/* Light / Dark Theme Switcher Button */}
                 <button 
                   onClick={() => setDarkMode(!darkMode)} 
-                  class="w-9 h-9 rounded-full bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 text-[#111113] dark:text-white flex items-center justify-center shadow-xs hover:border-zorange transition-colors"
+                  className="w-9 h-9 rounded-full bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 text-[#111113] dark:text-white flex items-center justify-center shadow-xs hover:border-zorange transition-colors"
                   title="Promijeni temu"
                 >
-                  <i class={`fa-solid ${darkMode ? 'fa-sun text-amber-400' : 'fa-moon text-indigo-600'} text-sm`}></i>
+                  <i className={`fa-solid ${darkMode ? 'fa-sun text-amber-400' : 'fa-moon text-indigo-600'} text-sm`}></i>
                 </button>
               </div>
 
             </div>
           </header>
 
-          <!-- MAIN DASHBOARD CONTENT AREA -->
+          {/* MAIN DASHBOARD CONTENT AREA */}
           <main>
             {isLoading ? (
-              <!-- SKELETON LOADING STATE -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              /* SKELETON LOADING STATE */
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <SkeletonCard />
                 <SkeletonCard />
                 <SkeletonCard />
                 <SkeletonCard />
               </div>
             ) : activeView === 'instagram' ? (
-              <!-- ========================================== -->
-              <!-- PAGE 1: INSTAGRAM ORGANIC VIEW             -->
-              <!-- ========================================== -->
-              <section class="space-y-8">
+              /* PAGE 1: INSTAGRAM ORGANIC VIEW */
+              <section className="space-y-8">
                 
-                <!-- TOP 5 KPI CARDS ROW -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-                  <!-- CARD 1: Total Reach -->
-                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div class="flex justify-between items-start mb-2">
-                      <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange flex items-center justify-center text-xs">
-                        <i class="fa-solid fa-users"></i>
+                {/* TOP 5 KPI CARDS ROW */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+                  {/* CARD 1: Total Reach */}
+                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange flex items-center justify-center text-xs">
+                        <i className="fa-solid fa-users"></i>
                       </div>
-                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
                         {instagramData.reachChange}
                       </span>
                     </div>
                     <div>
-                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Total Reach</span>
-                      <h3 class="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.reach}</h3>
-                      <p class="text-[10px] text-gray-400 font-bold mt-1">Jedinstveni računi dosegnuti</p>
+                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Total Reach</span>
+                      <h3 className="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.reach}</h3>
+                      <p className="text-[10px] text-gray-400 font-bold mt-1">Jedinstveni računi dosegnuti</p>
                     </div>
                   </div>
 
-                  <!-- CARD 2: Total Impressions -->
-                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div class="flex justify-between items-start mb-2">
-                      <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 text-[#111113] dark:text-white flex items-center justify-center text-xs">
-                        <i class="fa-solid fa-eye"></i>
+                  {/* CARD 2: Total Impressions */}
+                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 text-[#111113] dark:text-white flex items-center justify-center text-xs">
+                        <i className="fa-solid fa-eye"></i>
                       </div>
-                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
                         {instagramData.impressionsChange}
                       </span>
                     </div>
                     <div>
-                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Total Impressions</span>
-                      <h3 class="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.impressions}</h3>
-                      <p class="text-[10px] text-gray-400 font-bold mt-1">Ukupan broj prikazivanja</p>
+                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Total Impressions</span>
+                      <h3 className="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.impressions}</h3>
+                      <p className="text-[10px] text-gray-400 font-bold mt-1">Ukupan broj prikazivanja</p>
                     </div>
                   </div>
 
-                  <!-- CARD 3: Avg. ERR % -->
-                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div class="flex justify-between items-start mb-2">
-                      <div class="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-950/60 text-pink-600 flex items-center justify-center text-xs">
-                        <i class="fa-solid fa-fire"></i>
+                  {/* CARD 3: Avg. ERR % */}
+                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-950/60 text-pink-600 flex items-center justify-center text-xs">
+                        <i className="fa-solid fa-fire"></i>
                       </div>
-                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
                         {instagramData.errChange}
                       </span>
                     </div>
                     <div>
-                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Avg. ERR %</span>
-                      <h3 class="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.err}</h3>
-                      <p class="text-[10px] text-gray-400 font-bold mt-1">Interakcije / Doseg * 100</p>
+                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Avg. ERR %</span>
+                      <h3 className="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.err}</h3>
+                      <p className="text-[10px] text-gray-400 font-bold mt-1">Interakcije / Doseg * 100</p>
                     </div>
                   </div>
 
-                  <!-- CARD 4: Net Follower Growth -->
-                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div class="flex justify-between items-start mb-2">
-                      <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center text-xs">
-                        <i class="fa-solid fa-user-plus"></i>
+                  {/* CARD 4: Net Follower Growth */}
+                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center text-xs">
+                        <i className="fa-solid fa-user-plus"></i>
                       </div>
-                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
                         {instagramData.followersChange}
                       </span>
                     </div>
                     <div>
-                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Net Follower Growth</span>
-                      <h3 class="text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">{instagramData.netFollowers}</h3>
-                      <p class="text-[10px] text-gray-400 font-bold mt-1">Novi pratitelji u razdoblju</p>
+                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Net Follower Growth</span>
+                      <h3 className="text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">{instagramData.netFollowers}</h3>
+                      <p className="text-[10px] text-gray-400 font-bold mt-1">Novi pratitelji u razdoblju</p>
                     </div>
                   </div>
 
-                  <!-- CARD 5: Profile Visits & Bio Taps -->
-                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div class="flex justify-between items-start mb-2">
-                      <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center text-xs">
-                        <i class="fa-solid fa-link"></i>
+                  {/* CARD 5: Profile Visits & Bio Taps */}
+                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center text-xs">
+                        <i className="fa-solid fa-link"></i>
                       </div>
-                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
                         {instagramData.visitsChange}
                       </span>
                     </div>
                     <div>
-                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Visits / Bio Link</span>
-                      <h3 class="text-xl lg:text-2xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.profileVisits}</h3>
-                      <p class="text-[10px] text-zorange font-bold mt-1">Bio Link Taps: {instagramData.websiteTaps}</p>
+                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Visits / Bio Link</span>
+                      <h3 className="text-xl lg:text-2xl font-black text-[#111113] dark:text-white tracking-tight">{instagramData.profileVisits}</h3>
+                      <p className="text-[10px] text-zorange font-bold mt-1">Bio Link Taps: {instagramData.websiteTaps}</p>
                     </div>
                   </div>
                 </div>
 
-                <!-- CHARTS ROW 1: REACH TREND & ENGAGEMENT BREAKDOWN -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  <!-- CHART 1: Reach & Impressions Trend -->
-                  <div class="lg:col-span-7 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                {/* CHARTS ROW 1: REACH TREND & ENGAGEMENT BREAKDOWN */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  {/* CHART 1: Reach & Impressions Trend */}
+                  <div className="lg:col-span-7 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
-                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Reach & Impressions Trend</h4>
-                        <p class="text-xs text-gray-500 font-semibold">Dnevni omjer dosegnutih jedinstvenih korisnika i ukupnih impresija</p>
+                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Reach & Impressions Trend</h4>
+                        <p className="text-xs text-gray-500 font-semibold">Dnevni omjer dosegnutih jedinstvenih korisnika i ukupnih impresija</p>
                       </div>
-                      <span class="z-badge-orange text-[10px] px-3 py-1 text-white shadow-xs">Daily Live Data</span>
+                      <span className="z-badge-orange text-[10px] px-3 py-1 text-white shadow-xs">Daily Live Data</span>
                     </div>
                     <EChartComponent option={instagramData.reachTrendOption} style={{ height: '300px', width: '100%' }} />
                   </div>
 
-                  <!-- CHART 2: Engagement Breakdown (Saves & Shares vs Likes & Comments) -->
-                  <div class="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                  {/* CHART 2: Engagement Breakdown (Saves & Shares vs Likes & Comments) */}
+                  <div className="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
-                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Engagement Breakdown</h4>
-                        <p class="text-xs text-gray-500 font-semibold">Saves & Shares (Core Signal) vs. Likes & Comments</p>
+                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Engagement Breakdown</h4>
+                        <p className="text-xs text-gray-500 font-semibold">Saves & Shares (Core Signal) vs. Likes & Comments</p>
                       </div>
-                      <span class="z-badge-black text-[10px] px-3 py-1 shadow-xs">Stacked Bar</span>
+                      <span className="z-badge-black text-[10px] px-3 py-1 shadow-xs">Stacked Bar</span>
                     </div>
                     <EChartComponent option={instagramData.engagementOption} style={{ height: '300px', width: '100%' }} />
                   </div>
                 </div>
 
-                <!-- CHARTS ROW 2: FOLLOWER GROWTH & TOP PERFORMING POSTS TABLE -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  <!-- CHART 3: Follower Growth vs. Unfollows -->
-                  <div class="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                {/* CHARTS ROW 2: FOLLOWER GROWTH & TOP PERFORMING POSTS TABLE */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  {/* CHART 3: Follower Growth vs. Unfollows */}
+                  <div className="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
-                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Followers vs. Unfollows</h4>
-                        <p class="text-xs text-gray-500 font-semibold">Novi pratitelji (+), unfollows (-) i neto trend rasta</p>
+                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Followers vs. Unfollows</h4>
+                        <p className="text-xs text-gray-500 font-semibold">Novi pratitelji (+), unfollows (-) i neto trend rasta</p>
                       </div>
-                      <span class="z-badge-green text-[10px] px-3 py-1 shadow-xs">Growth Rate</span>
+                      <span className="z-badge-green text-[10px] px-3 py-1 shadow-xs">Growth Rate</span>
                     </div>
                     <EChartComponent option={instagramData.growthOption} style={{ height: '300px', width: '100%' }} />
                   </div>
 
-                  <!-- TABLE 4: Top Performing Posts / Reels -->
-                  <div class="lg:col-span-7 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs overflow-hidden">
-                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                  {/* TABLE 4: Top Performing Posts / Reels */}
+                  <div className="lg:col-span-7 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs overflow-hidden">
+                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
-                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Top Performing Posts & Reels</h4>
-                        <p class="text-xs text-gray-500 font-semibold">Kliknite na zaglavlja stupaca za razvrstavanje (sorting)</p>
+                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Top Performing Posts & Reels</h4>
+                        <p className="text-xs text-gray-500 font-semibold">Kliknite na zaglavlja stupaca za razvrstavanje (sorting)</p>
                       </div>
-                      <span class="text-xs font-bold text-gray-400">{sortedPosts.length} Objava</span>
+                      <span className="text-xs font-bold text-gray-400">{sortedPosts.length} Objava</span>
                     </div>
 
-                    <div class="overflow-x-auto">
-                      <table class="w-full text-left text-xs">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs">
                         <thead>
-                          <tr class="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-extrabold uppercase tracking-wider">
-                            <th class="py-3 px-2">Kreativa</th>
-                            <th class="py-3 px-2">Tip</th>
-                            <th onClick={() => handlePostSort('reach')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                          <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-extrabold uppercase tracking-wider">
+                            <th className="py-3 px-2">Kreativa</th>
+                            <th className="py-3 px-2">Tip</th>
+                            <th onClick={() => handlePostSort('reach')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
                               Reach {postSortKey === 'reach' && (postSortDir === 'asc' ? '↑' : '↓')}
                             </th>
-                            <th onClick={() => handlePostSort('err')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                            <th onClick={() => handlePostSort('err')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
                               ERR % {postSortKey === 'err' && (postSortDir === 'asc' ? '↑' : '↓')}
                             </th>
-                            <th onClick={() => handlePostSort('saves')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                            <th onClick={() => handlePostSort('saves')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
                               Saves {postSortKey === 'saves' && (postSortDir === 'asc' ? '↑' : '↓')}
                             </th>
-                            <th onClick={() => handlePostSort('shares')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                            <th onClick={() => handlePostSort('shares')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
                               Shares {postSortKey === 'shares' && (postSortDir === 'asc' ? '↑' : '↓')}
                             </th>
                           </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
+                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
                           {sortedPosts.map(post => {
                             const errVal = (((post.likes + post.comments + post.saves + post.shares) / post.reach) * 100).toFixed(1);
                             return (
-                              <tr key={post.id} class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                <td class="py-3 px-2 flex items-center gap-3">
-                                  <img src={post.thumb} class="w-10 h-10 rounded-xl object-cover shadow-xs" />
-                                  <span class="truncate max-w-[180px] text-[#111113] dark:text-white font-black">{post.caption}</span>
+                              <tr key={post.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                <td className="py-3 px-2 flex items-center gap-3">
+                                  <img src={post.thumb} className="w-10 h-10 rounded-xl object-cover shadow-xs" />
+                                  <span className="truncate max-w-[180px] text-[#111113] dark:text-white font-black">{post.caption}</span>
                                 </td>
-                                <td class="py-3 px-2">
-                                  <span class={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${
+                                <td className="py-3 px-2">
+                                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${
                                     post.type === 'Reel' 
                                       ? 'bg-pink-100 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300' 
                                       : post.type === 'Carousel'
@@ -644,10 +642,10 @@
                                     {post.type}
                                   </span>
                                 </td>
-                                <td class="py-3 px-2 text-[#111113] dark:text-white">{post.reach.toLocaleString()}</td>
-                                <td class="py-3 px-2 text-zorange font-black">{errVal}%</td>
-                                <td class="py-3 px-2 text-gray-700 dark:text-gray-300">{post.saves}</td>
-                                <td class="py-3 px-2 text-gray-700 dark:text-gray-300">{post.shares}</td>
+                                <td className="py-3 px-2 text-[#111113] dark:text-white">{post.reach.toLocaleString()}</td>
+                                <td className="py-3 px-2 text-zorange font-black">{errVal}%</td>
+                                <td className="py-3 px-2 text-gray-700 dark:text-gray-300">{post.saves}</td>
+                                <td className="py-3 px-2 text-gray-700 dark:text-gray-300">{post.shares}</td>
                               </tr>
                             );
                           })}
@@ -659,125 +657,123 @@
 
               </section>
             ) : (
-              <!-- ========================================== -->
-              <!-- PAGE 2: META ADS PERFORMANCE VIEW          -->
-              <!-- ========================================== -->
-              <section class="space-y-8">
+              /* PAGE 2: META ADS PERFORMANCE VIEW */
+              <section className="space-y-8">
                 
-                <!-- TOP 5 KPI CARDS ROW -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-                  <!-- CARD 1: Total Ad Spend -->
-                  <div class="z-card-dark rounded-[2rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-2">
-                      <div class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-xs">
-                        <i class="fa-brands fa-meta"></i>
+                {/* TOP 5 KPI CARDS ROW */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+                  {/* CARD 1: Total Ad Spend */}
+                  <div className="z-card-dark rounded-[2rem] p-5 flex flex-col justify-between shadow-xl relative overflow-hidden">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-xs">
+                        <i className="fa-brands fa-meta"></i>
                       </div>
-                      <span class="z-badge-orange text-[10px] px-2.5 py-0.5 uppercase shadow-xs">
+                      <span className="z-badge-orange text-[10px] px-2.5 py-0.5 uppercase shadow-xs">
                         {metaAdsData.spendChange}
                       </span>
                     </div>
                     <div>
-                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-white/70 block mb-1">Total Ad Spend</span>
-                      <h3 class="text-2xl lg:text-3xl font-black text-white tracking-tight">{metaAdsData.spend}</h3>
-                      <p class="text-[10px] text-white/60 font-bold mt-1">FB + IG Kombinirano</p>
+                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-white/70 block mb-1">Total Ad Spend</span>
+                      <h3 className="text-2xl lg:text-3xl font-black text-white tracking-tight">{metaAdsData.spend}</h3>
+                      <p className="text-[10px] text-white/60 font-bold mt-1">FB + IG Kombinirano</p>
                     </div>
                   </div>
 
-                  <!-- CARD 2: Blended ROAS -->
-                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div class="flex justify-between items-start mb-2">
-                      <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center text-xs">
-                        <i class="fa-solid fa-chart-line"></i>
+                  {/* CARD 2: Blended ROAS */}
+                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center text-xs">
+                        <i className="fa-solid fa-chart-line"></i>
                       </div>
-                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
                         {metaAdsData.roasChange}
                       </span>
                     </div>
                     <div>
-                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Blended ROAS</span>
-                      <h3 class="text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">{metaAdsData.roas}</h3>
-                      <p class="text-[10px] text-gray-400 font-bold mt-1">Return on Ad Spend</p>
+                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Blended ROAS</span>
+                      <h3 className="text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">{metaAdsData.roas}</h3>
+                      <p className="text-[10px] text-gray-400 font-bold mt-1">Return on Ad Spend</p>
                     </div>
                   </div>
 
-                  <!-- CARD 3: Cost Per Result (CPA) -->
-                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div class="flex justify-between items-start mb-2">
-                      <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange flex items-center justify-center text-xs">
-                        <i class="fa-solid fa-sack-dollar"></i>
+                  {/* CARD 3: Cost Per Result (CPA) */}
+                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange flex items-center justify-center text-xs">
+                        <i className="fa-solid fa-sack-dollar"></i>
                       </div>
-                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
                         {metaAdsData.cpaChange}
                       </span>
                     </div>
                     <div>
-                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Meta CPA</span>
-                      <h3 class="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{metaAdsData.cpa}</h3>
-                      <p class="text-[10px] text-gray-400 font-bold mt-1">Cost Per Lead / Purchase</p>
+                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Meta CPA</span>
+                      <h3 className="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{metaAdsData.cpa}</h3>
+                      <p className="text-[10px] text-gray-400 font-bold mt-1">Cost Per Lead / Purchase</p>
                     </div>
                   </div>
 
-                  <!-- CARD 4: Total Conversions -->
-                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div class="flex justify-between items-start mb-2">
-                      <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center text-xs">
-                        <i class="fa-solid fa-bullseye"></i>
+                  {/* CARD 4: Total Conversions */}
+                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center text-xs">
+                        <i className="fa-solid fa-bullseye"></i>
                       </div>
-                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
                         {metaAdsData.conversionsChange}
                       </span>
                     </div>
                     <div>
-                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Total Conversions</span>
-                      <h3 class="text-xl lg:text-2xl font-black text-[#111113] dark:text-white tracking-tight">{metaAdsData.conversions}</h3>
-                      <p class="text-[10px] text-gray-400 font-bold mt-1">FB & IG Konverzije</p>
+                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Total Conversions</span>
+                      <h3 className="text-xl lg:text-2xl font-black text-[#111113] dark:text-white tracking-tight">{metaAdsData.conversions}</h3>
+                      <p className="text-[10px] text-gray-400 font-bold mt-1">FB & IG Konverzije</p>
                     </div>
                   </div>
 
-                  <!-- CARD 5: Overall CTR (Link) -->
-                  <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
-                    <div class="flex justify-between items-start mb-2">
-                      <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-600 flex items-center justify-center text-xs">
-                        <i class="fa-solid fa-[#111113]"></i>
-                        <i class="fa-solid fa-arrow-pointer text-xs"></i>
+                  {/* CARD 5: Overall CTR (Link) */}
+                  <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-600 flex items-center justify-center text-xs">
+                        <i className="fa-solid fa-[#111113]"></i>
+                        <i className="fa-solid fa-arrow-pointer text-xs"></i>
                       </div>
-                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 text-[10px] font-black shadow-2xs">
                         {metaAdsData.ctrChange}
                       </span>
                     </div>
                     <div>
-                      <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Overall CTR (Link)</span>
-                      <h3 class="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{metaAdsData.ctr}</h3>
-                      <p class="text-[10px] text-gray-400 font-bold mt-1">Outbound Link CTR</p>
+                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Overall CTR (Link)</span>
+                      <h3 className="text-2xl lg:text-3xl font-black text-[#111113] dark:text-white tracking-tight">{metaAdsData.ctr}</h3>
+                      <p className="text-[10px] text-gray-400 font-bold mt-1">Outbound Link CTR</p>
                     </div>
                   </div>
                 </div>
 
-                <!-- CHARTS ROW 1: SPEND VS ROAS & AD FATIGUE WITH WARNING BADGE -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  <!-- CHART 1: Spend vs ROAS Trend (Dual Y-Axis) -->
-                  <div class="lg:col-span-7 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                {/* CHARTS ROW 1: SPEND VS ROAS & AD FATIGUE WITH WARNING BADGE */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  {/* CHART 1: Spend vs ROAS Trend (Dual Y-Axis) */}
+                  <div className="lg:col-span-7 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
-                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Spend vs. ROAS Trend</h4>
-                        <p class="text-xs text-gray-500 font-semibold">Usporedba dnevne potrošnje i efikasnosti povrata (Dual Y-Axis)</p>
+                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Spend vs. ROAS Trend</h4>
+                        <p className="text-xs text-gray-500 font-semibold">Usporedba dnevne potrošnje i efikasnosti povrata (Dual Y-Axis)</p>
                       </div>
-                      <span class="z-badge-orange text-[10px] px-3 py-1 text-white shadow-xs">Scaling Check</span>
+                      <span className="z-badge-orange text-[10px] px-3 py-1 text-white shadow-xs">Scaling Check</span>
                     </div>
                     <EChartComponent option={metaAdsData.spendRoasOption} style={{ height: '300px', width: '100%' }} />
                   </div>
 
-                  <!-- CHART 2: Creative Health & Ad Fatigue (Frequency vs CTR) WITH WARNING BADGE -->
-                  <div class="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                  {/* CHART 2: Creative Health & Ad Fatigue (Frequency vs CTR) WITH WARNING BADGE */}
+                  <div className="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
-                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider flex items-center gap-2">
+                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider flex items-center gap-2">
                           Creative Health & Fatigue
                         </h4>
-                        <p class="text-xs text-gray-500 font-semibold">Korelacija frekvencije i CTR klika s upozorenjem</p>
+                        <p className="text-xs text-gray-500 font-semibold">Korelacija frekvencije i CTR klika s upozorenjem</p>
                       </div>
-                      <span class="px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 text-[10px] font-black border border-rose-200 dark:border-rose-900 shadow-2xs flex items-center gap-1.5">
-                        <i class="fa-solid fa-triangle-exclamation text-xs animate-bounce"></i>
+                      <span className="px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 text-[10px] font-black border border-rose-200 dark:border-rose-900 shadow-2xs flex items-center gap-1.5">
+                        <i className="fa-solid fa-triangle-exclamation text-xs animate-bounce"></i>
                         Frequency &gt; 3.0 Warning
                       </span>
                     </div>
@@ -785,104 +781,104 @@
                   </div>
                 </div>
 
-                <!-- CHARTS ROW 2: FUNNEL LEAKAGE & VIDEO RETENTION & PLACEMENTS -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  <!-- CHART 3: Funnel Leakage (Link Clicks vs Landing Page Views) -->
-                  <div class="lg:col-span-4 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                {/* CHARTS ROW 2: FUNNEL LEAKAGE & VIDEO RETENTION & PLACEMENTS */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  {/* CHART 3: Funnel Leakage (Link Clicks vs Landing Page Views) */}
+                  <div className="lg:col-span-4 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
-                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Funnel Leakage</h4>
-                        <p class="text-xs text-gray-500 font-semibold">Link Clicks vs. Landing Page Views</p>
+                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Funnel Leakage</h4>
+                        <p className="text-xs text-gray-500 font-semibold">Link Clicks vs. Landing Page Views</p>
                       </div>
-                      <span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 text-[10px] font-black">
+                      <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 text-[10px] font-black">
                         24.1% Drop-off Rate
                       </span>
                     </div>
                     <EChartComponent option={metaAdsData.funnelOption} style={{ height: '270px', width: '100%' }} />
-                    <div class="mt-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 rounded-xl p-3 text-[11px] font-bold text-amber-900 dark:text-amber-200">
+                    <div className="mt-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 rounded-xl p-3 text-[11px] font-bold text-amber-900 dark:text-amber-200">
                       ⚠️ Gubitak veći od 20% ukazuje na sporo učitavanje odredišne stranice ili tehnički problem piksela.
                     </div>
                   </div>
 
-                  <!-- CHART 4: Video Creative Retention (Hook Rate vs Hold Rate) -->
-                  <div class="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                  {/* CHART 4: Video Creative Retention (Hook Rate vs Hold Rate) */}
+                  <div className="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
-                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Video Retention</h4>
-                        <p class="text-xs text-gray-500 font-semibold">Hook Rate (3s / Impr.) vs. Hold Rate (ThruPlays / 3s)</p>
+                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Video Retention</h4>
+                        <p className="text-xs text-gray-500 font-semibold">Hook Rate (3s / Impr.) vs. Hold Rate (ThruPlays / 3s)</p>
                       </div>
-                      <span class="z-badge-black text-[10px] px-3 py-1 shadow-xs">Video Funnel</span>
+                      <span className="z-badge-black text-[10px] px-3 py-1 shadow-xs">Video Funnel</span>
                     </div>
                     <EChartComponent option={metaAdsData.retentionOption} style={{ height: '310px', width: '100%' }} />
                   </div>
 
-                  <!-- CHART 5: Platform & Placement Breakdown -->
-                  <div class="lg:col-span-3 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
-                    <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                  {/* CHART 5: Platform & Placement Breakdown */}
+                  <div className="lg:col-span-3 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
-                        <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Placements</h4>
-                        <p class="text-xs text-gray-500 font-semibold">Raspodjela potrošnje po plasmanu</p>
+                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Placements</h4>
+                        <p className="text-xs text-gray-500 font-semibold">Raspodjela potrošnje po plasmanu</p>
                       </div>
                     </div>
                     <EChartComponent option={metaAdsData.placementOption} style={{ height: '310px', width: '100%' }} />
                   </div>
                 </div>
 
-                <!-- TABLE 6: Top Ad Creatives Leaderboard -->
-                <div class="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs overflow-hidden">
-                  <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
+                {/* TABLE 6: Top Ad Creatives Leaderboard */}
+                <div className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs overflow-hidden">
+                  <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                     <div>
-                      <h4 class="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Top Ad Creatives Leaderboard</h4>
-                      <p class="text-xs text-gray-500 font-semibold">Detaljna analitika pojedinačnih oglasa po trošku, ROAS-u i retenciji</p>
+                      <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Top Ad Creatives Leaderboard</h4>
+                      <p className="text-xs text-gray-500 font-semibold">Detaljna analitika pojedinačnih oglasa po trošku, ROAS-u i retenciji</p>
                     </div>
-                    <span class="text-xs font-bold text-gray-400">{sortedAds.length} Aktivna Oglasa</span>
+                    <span className="text-xs font-bold text-gray-400">{sortedAds.length} Aktivna Oglasa</span>
                   </div>
 
-                  <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
                       <thead>
-                        <tr class="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-extrabold uppercase tracking-wider">
-                          <th class="py-3 px-2">Naziv Oglasa</th>
-                          <th class="py-3 px-2">Plasman</th>
-                          <th onClick={() => handleAdSort('spend')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                        <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-extrabold uppercase tracking-wider">
+                          <th className="py-3 px-2">Naziv Oglasa</th>
+                          <th className="py-3 px-2">Plasman</th>
+                          <th onClick={() => handleAdSort('spend')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
                             Spend ($) {adSortKey === 'spend' && (adSortDir === 'asc' ? '↑' : '↓')}
                           </th>
-                          <th onClick={() => handleAdSort('ctr')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                          <th onClick={() => handleAdSort('ctr')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
                             CTR Link % {adSortKey === 'ctr' && (adSortDir === 'asc' ? '↑' : '↓')}
                           </th>
-                          <th onClick={() => handleAdSort('cpa')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                          <th onClick={() => handleAdSort('cpa')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
                             CPA ($) {adSortKey === 'cpa' && (adSortDir === 'asc' ? '↑' : '↓')}
                           </th>
-                          <th onClick={() => handleAdSort('roas')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                          <th onClick={() => handleAdSort('roas')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
                             ROAS {adSortKey === 'roas' && (adSortDir === 'asc' ? '↑' : '↓')}
                           </th>
-                          <th onClick={() => handleAdSort('hookRate')} class="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
+                          <th onClick={() => handleAdSort('hookRate')} className="py-3 px-2 cursor-pointer hover:text-zorange transition-colors">
                             Hook Rate % {adSortKey === 'hookRate' && (adSortDir === 'asc' ? '↑' : '↓')}
                           </th>
-                          <th class="py-3 px-2">Status</th>
+                          <th className="py-3 px-2">Status</th>
                         </tr>
                       </thead>
-                      <tbody class="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
+                      <tbody className="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
                         {sortedAds.map(ad => (
-                          <tr key={ad.id} class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                            <td class="py-3.5 px-2 text-[#111113] dark:text-white font-black">{ad.name}</td>
-                            <td class="py-3.5 px-2">
-                              <span class="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[10px] font-black">
+                          <tr key={ad.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                            <td className="py-3.5 px-2 text-[#111113] dark:text-white font-black">{ad.name}</td>
+                            <td className="py-3.5 px-2">
+                              <span className="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[10px] font-black">
                                 {ad.placement}
                               </span>
                             </td>
-                            <td class="py-3.5 px-2 text-[#111113] dark:text-white">${ad.spend.toFixed(2)}</td>
-                            <td class="py-3.5 px-2 text-zorange font-black">{ad.ctr}%</td>
-                            <td class="py-3.5 px-2 text-gray-700 dark:text-gray-300">${ad.cpa.toFixed(2)}</td>
-                            <td class="py-3.5 px-2 text-emerald-600 dark:text-emerald-400 font-black">{ad.roas}x</td>
-                            <td class="py-3.5 px-2 text-pink-600 dark:text-pink-400">{ad.hookRate}%</td>
-                            <td class="py-3.5 px-2">
-                              <span class={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase flex items-center gap-1 w-max ${
+                            <td className="py-3.5 px-2 text-[#111113] dark:text-white">${ad.spend.toFixed(2)}</td>
+                            <td className="py-3.5 px-2 text-zorange font-black">{ad.ctr}%</td>
+                            <td className="py-3.5 px-2 text-gray-700 dark:text-gray-300">${ad.cpa.toFixed(2)}</td>
+                            <td className="py-3.5 px-2 text-emerald-600 dark:text-emerald-400 font-black">{ad.roas}x</td>
+                            <td className="py-3.5 px-2 text-pink-600 dark:text-pink-400">{ad.hookRate}%</td>
+                            <td className="py-3.5 px-2">
+                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase flex items-center gap-1 w-max ${
                                 ad.status === 'Active'
                                   ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300'
                                   : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
                               }`}>
-                                <span class={`w-1.5 h-1.5 rounded-full ${ad.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`}></span>
+                                <span className={`w-1.5 h-1.5 rounded-full ${ad.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`}></span>
                                 {ad.status}
                               </span>
                             </td>
