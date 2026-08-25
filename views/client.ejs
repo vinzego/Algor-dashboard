@@ -849,39 +849,8 @@
                 </div>
               </div>
 
-              {/* Right Controls */}
+              {/* Right Controls: Dark Mode, Alerts Bell, AI Assistant */}
               <div className="flex items-center gap-3 flex-wrap">
-                <div className="relative flex items-center gap-1 bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-full px-3.5 py-1.5 text-xs font-bold">
-                  <i className="fa-solid fa-building text-zorange text-xs"></i>
-                  <select 
-                    value={isHomeView ? 'HOME' : selectedAccount} 
-                    onChange={handleAccountChange} 
-                    className="bg-transparent font-black text-[#111113] dark:text-white focus:outline-none cursor-pointer pr-1"
-                  >
-                    <option value="HOME" className="bg-white dark:bg-[#161618] font-bold">🏢 Pregled Svih Klijenata (Home)</option>
-                    {clientsList.map(acc => (
-                      <option key={acc.id} value={acc.id} className="bg-white dark:bg-[#161618]">
-                        {acc.name} ({acc.package || 'Enterprise'})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="relative flex items-center gap-1 bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-full px-3.5 py-1.5 text-xs font-bold">
-                  <i className="fa-solid fa-calendar-days text-zorange text-xs"></i>
-                  <select 
-                    value={dateRange} 
-                    onChange={handleDateChange} 
-                    className="bg-transparent font-black text-[#111113] dark:text-white focus:outline-none cursor-pointer"
-                  >
-                    {DATE_RANGES.map(d => (
-                      <option key={d.id} value={d.id} className="bg-white dark:bg-[#161618]">
-                        {d.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
                 <button 
                   onClick={() => setDarkMode(!darkMode)} 
                   className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[#111113] dark:text-white flex items-center justify-center hover:border-zorange transition-colors"
