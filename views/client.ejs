@@ -114,9 +114,11 @@
       const [isLoading, setIsLoading] = useState(false);
       const [darkMode, setDarkMode] = useState(false);
 
-      // Leaderboard view toggle & popover date picker state
+      // Leaderboard view toggle & custom date picker states (Default: This Month)
       const [leaderboardView, setLeaderboardView] = useState('list'); // 'list' (Table) | 'grid' (Gallery)
-      const [leaderboardDatePreset, setLeaderboardDatePreset] = useState('this_month');
+      const [leaderboardStartDate, setLeaderboardStartDate] = useState('2026-08-01');
+      const [leaderboardEndDate, setLeaderboardEndDate] = useState('2026-08-31');
+      const [datePickerMode, setDatePickerMode] = useState('month'); // 'month' | 'single' | 'range'
       const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
       // AI Sidebar State
@@ -155,16 +157,6 @@
         fbPageId: '',
         igProfileId: ''
       });
-
-      // Table Sorting states
-      const [postSortKey, setPostSortKey] = useState('reach');
-      const [postSortDir, setPostSortDir] = useState('desc');
-
-      const [adSortKey, setAdSortKey] = useState('spend');
-      const [adSortDir, setAdSortDir] = useState('desc');
-
-      const [searchTermSortKey, setSearchTermSortKey] = useState('clicks');
-      const [searchTermSortDir, setSearchTermSortDir] = useState('desc');
 
       // Negative Keywords list
       const [negativeKeywords, setNegativeKeywords] = useState(['besplatno', 'torrent', 'rabljeno']);
@@ -205,6 +197,26 @@
       const openClientDashboard = (clientId) => {
         setSelectedAccount(clientId);
         setIsHomeView(false);
+      };
+
+      // Set Preset Date Filters for Top Performing Content
+      const applyDatePreset = (presetKey) => {
+        setDatePickerMode(presetKey);
+        if (presetKey === 'month') {
+          setLeaderboardStartDate('2026-08-01');
+          setLeaderboardEndDate('2026-08-31');
+          setIsCalendarOpen(false);
+        } else if (presetKey === '7d') {
+          setLeaderboardStartDate('2026-08-18');
+          setLeaderboardEndDate('2026-08-25');
+          setIsCalendarOpen(false);
+        } else if (presetKey === 'single') {
+          setLeaderboardStartDate('2026-08-20');
+          setLeaderboardEndDate('2026-08-20');
+        } else if (presetKey === 'range') {
+          setLeaderboardStartDate('2026-08-10');
+          setLeaderboardEndDate('2026-08-22');
+        }
       };
 
       // --- ADD NEW CLIENT HANDLER ---
@@ -449,17 +461,26 @@
           ]
         };
 
-        // Table & Gallery Posts Data with Platform Branding
+        // Complete Mock Posts Array with isoDate for date filtering
         const allPosts = [
-          { id: 1, platform: 'instagram', icon: 'fa-brands fa-instagram text-pink-500', thumb: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&fit=crop', caption: 'Ljetni popust 20% na sve usluge! 🚀', type: 'Reel', datePublished: '22. Aug 2026', reach: 42100, err: '7.8%', coreActionLabel: 'Saves', coreActionValue: 890 },
-          { id: 2, platform: 'facebook', icon: 'fa-brands fa-facebook text-blue-600', thumb: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&fit=crop', caption: 'Objava novog vodiča za poslovne klijente 📈', type: 'Link Post', datePublished: '20. Aug 2026', reach: 38400, err: '6.9%', coreActionLabel: 'Shares', coreActionValue: 720 },
-          { id: 3, platform: 'instagram', icon: 'fa-brands fa-instagram text-pink-500', thumb: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&fit=crop', caption: 'Vodič kroz marketing strategiju 📊', type: 'Carousel', datePublished: '18. Aug 2026', reach: 31400, err: '6.5%', coreActionLabel: 'Saves', coreActionValue: 1120 },
-          { id: 4, platform: 'facebook', icon: 'fa-brands fa-facebook text-blue-600', thumb: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&fit=crop', caption: 'Kako doći do više konverzija uz Meta Ads? 💡', type: 'Video Post', datePublished: '15. Aug 2026', reach: 29800, err: '5.8%', coreActionLabel: 'Shares', coreActionValue: 540 }
+          { id: 1, platform: 'instagram', icon: 'fa-brands fa-instagram text-pink-500', thumb: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&fit=crop', caption: 'Ljetni popust 20% na sve usluge! 🚀', type: 'Reel', isoDate: '2026-08-22', datePublished: '22. Aug 2026', reach: 42100, err: '7.8%', coreActionLabel: 'Saves', coreActionValue: 890 },
+          { id: 2, platform: 'facebook', icon: 'fa-brands fa-facebook text-blue-600', thumb: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&fit=crop', caption: 'Objava novog vodiča za poslovne klijente 📈', type: 'Link Post', isoDate: '2026-08-20', datePublished: '20. Aug 2026', reach: 38400, err: '6.9%', coreActionLabel: 'Shares', coreActionValue: 720 },
+          { id: 3, platform: 'instagram', icon: 'fa-brands fa-instagram text-pink-500', thumb: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&fit=crop', caption: 'Vodič kroz marketing strategiju 📊', type: 'Carousel', isoDate: '2026-08-18', datePublished: '18. Aug 2026', reach: 31400, err: '6.5%', coreActionLabel: 'Saves', coreActionValue: 1120 },
+          { id: 4, platform: 'facebook', icon: 'fa-brands fa-facebook text-blue-600', thumb: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&fit=crop', caption: 'Kako doći do više konverzija uz Meta Ads? 💡', type: 'Video Post', isoDate: '2026-08-15', datePublished: '15. Aug 2026', reach: 29800, err: '5.8%', coreActionLabel: 'Shares', coreActionValue: 540 },
+          { id: 5, platform: 'instagram', icon: 'fa-brands fa-instagram text-pink-500', thumb: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&fit=crop', caption: 'Priča iza našeg najnovijeg projekta 🔥', type: 'Single Image', isoDate: '2026-08-08', datePublished: '08. Aug 2026', reach: 19800, err: '5.1%', coreActionLabel: 'Saves', coreActionValue: 310 },
+          { id: 6, platform: 'facebook', icon: 'fa-brands fa-facebook text-blue-600', thumb: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&fit=crop', caption: 'Najava nagradnog natječaja za pratitelje 🎁', type: 'Image Post', isoDate: '2026-08-02', datePublished: '02. Aug 2026', reach: 25400, err: '6.1%', coreActionLabel: 'Shares', coreActionValue: 430 }
         ];
 
-        const posts = isComb 
-          ? allPosts 
-          : allPosts.filter(p => p.platform === organicPlatform);
+        // Platform Filter
+        let platformPosts = isComb ? allPosts : allPosts.filter(p => p.platform === organicPlatform);
+
+        // Date Picker Single / Range Filter (Default: Month 2026-08-01 to 2026-08-31)
+        const posts = platformPosts.filter(post => {
+          if (!leaderboardStartDate && !leaderboardEndDate) return true;
+          if (leaderboardStartDate && !leaderboardEndDate) return post.isoDate === leaderboardStartDate;
+          if (!leaderboardStartDate && leaderboardEndDate) return post.isoDate === leaderboardEndDate;
+          return post.isoDate >= leaderboardStartDate && post.isoDate <= leaderboardEndDate;
+        });
 
         return {
           reach: reachVal.toLocaleString(),
@@ -473,7 +494,7 @@
           audienceHealthOption,
           posts
         };
-      }, [organicPlatform, mult, darkMode]);
+      }, [organicPlatform, leaderboardStartDate, leaderboardEndDate, mult, darkMode]);
 
       // TAB 2: Meta Ads Data
       const metaAdsData = useMemo(() => ({
@@ -875,8 +896,6 @@
 
                     {/* TOP 4 DYNAMIC KPI CARDS */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                      
-                      {/* CARD 1: Total Reach (with Organic vs Paid ratio if Facebook) */}
                       <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
                         <div className="flex justify-between items-start mb-2">
                           <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange flex items-center justify-center text-xs">
@@ -899,7 +918,6 @@
                         </div>
                       </div>
 
-                      {/* CARD 2: Engagement Rate (ERR) */}
                       <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
                         <div className="flex justify-between items-start mb-2">
                           <div className="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-950/60 text-pink-600 flex items-center justify-center text-xs">
@@ -914,7 +932,6 @@
                         </div>
                       </div>
 
-                      {/* CARD 3: Audience Growth (Dynamic Label) */}
                       <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
                         <div className="flex justify-between items-start mb-2">
                           <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center text-xs">
@@ -929,7 +946,6 @@
                         </div>
                       </div>
 
-                      {/* CARD 4: Conversion Actions (Dynamic Label) */}
                       <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
                         <div className="flex justify-between items-start mb-2">
                           <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center text-xs">
@@ -943,7 +959,6 @@
                           <p className="text-[10px] text-zorange font-bold mt-1">Akcije posjetitelja</p>
                         </div>
                       </div>
-
                     </div>
 
                     {/* CHARTS ROW 1: REACH VS IMPRESSIONS & DYNAMIC ENGAGEMENT BREAKDOWN */}
@@ -972,7 +987,7 @@
                     </div>
 
                     {/* ========================================================================= */}
-                    {/* FULL-WIDTH CONTENT LEADERBOARD SECTION (TABLE VIEW VS GALLERY GRID VIEW) */}
+                    {/* FULL-WIDTH CONTENT LEADERBOARD SECTION WITH SINGLE/RANGE DATE PICKER */}
                     {/* ========================================================================= */}
                     <div className="w-full min-w-0 z-card-white dark:bg-[#161618] rounded-[2rem] p-7 shadow-xs border border-gray-200 dark:border-gray-800 space-y-6">
                       
@@ -983,13 +998,13 @@
                             <i className="fa-solid fa-trophy text-zorange"></i> Top Performing Content
                           </h3>
                           <p className="text-xs text-gray-500 font-semibold mt-0.5">
-                            Pregled i usporedba najuspješnijih objava s ključnim metrikama angažmana
+                            Pregled i usporedba najuspješnijih objava s mogućnošću odabira pojedinačnog datuma ili raspona (od-do)
                           </p>
                         </div>
 
                         <div className="flex items-center gap-3 flex-wrap">
                           
-                          {/* Modern Date Picker Popover Dropdown */}
+                          {/* MODERN DATE PICKER DROPDOWN & POPOVER MODAL */}
                           <div className="relative">
                             <button 
                               onClick={() => setIsCalendarOpen(!isCalendarOpen)}
@@ -997,39 +1012,101 @@
                             >
                               <i className="fa-solid fa-calendar-days text-zorange"></i>
                               <span>
-                                {leaderboardDatePreset === '7d' ? 'Zadnjih 7 dana' : leaderboardDatePreset === 'last_month' ? 'Prošli Mjesec' : 'Ovaj Mjesec'}
+                                {datePickerMode === 'single'
+                                  ? `Datum: ${leaderboardStartDate}`
+                                  : datePickerMode === 'range'
+                                  ? `${leaderboardStartDate} do ${leaderboardEndDate}`
+                                  : datePickerMode === '7d'
+                                  ? 'Zadnjih 7 dana'
+                                  : 'Ovaj Mjesec (01.08. - 31.08.)'}
                               </span>
                               <i className="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
                             </button>
 
-                            {/* Calendar Popover */}
+                            {/* Calendar Popover Modal */}
                             {isCalendarOpen && (
-                              <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-2xl z-50 space-y-3">
+                              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-[#161618] border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-2xl z-50 space-y-4">
                                 <div className="flex justify-between items-center border-b border-gray-100 dark:border-gray-800 pb-2">
-                                  <span className="text-xs font-black text-[#111113] dark:text-white">Odabir Razdoblja</span>
-                                  <button onClick={() => setIsCalendarOpen(false)} className="text-gray-400 text-xs font-bold">✕</button>
+                                  <span className="text-xs font-black text-[#111113] dark:text-white flex items-center gap-1.5">
+                                    <i className="fa-solid fa-calendar text-zorange"></i> Odabir Datuma Objave
+                                  </span>
+                                  <button onClick={() => setIsCalendarOpen(false)} className="text-gray-400 text-xs font-bold hover:text-gray-600">✕</button>
                                 </div>
-                                
-                                <div className="grid grid-cols-1 gap-1 text-xs font-bold">
+
+                                {/* Preset Mode Selection Tabs */}
+                                <div className="grid grid-cols-3 gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl text-[10px] font-bold text-center">
                                   <button 
-                                    onClick={() => { setLeaderboardDatePreset('7d'); setIsCalendarOpen(false); }} 
-                                    className={`px-3 py-2 rounded-xl text-left transition-colors ${leaderboardDatePreset === '7d' ? 'bg-orange-100 text-zorange dark:bg-orange-950/80' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                                    onClick={() => applyDatePreset('month')}
+                                    className={`py-1.5 rounded-lg transition-colors ${datePickerMode === 'month' ? 'bg-white dark:bg-[#161618] text-[#111113] dark:text-white font-black shadow-xs' : 'text-gray-500'}`}
                                   >
-                                    📅 Zadnjih 7 dana (Last 7 Days)
+                                    Ovaj Mjesec
                                   </button>
                                   <button 
-                                    onClick={() => { setLeaderboardDatePreset('this_month'); setIsCalendarOpen(false); }} 
-                                    className={`px-3 py-2 rounded-xl text-left transition-colors ${leaderboardDatePreset === 'this_month' ? 'bg-orange-100 text-zorange dark:bg-orange-950/80' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                                    onClick={() => applyDatePreset('single')}
+                                    className={`py-1.5 rounded-lg transition-colors ${datePickerMode === 'single' ? 'bg-white dark:bg-[#161618] text-[#111113] dark:text-white font-black shadow-xs' : 'text-gray-500'}`}
                                   >
-                                    📅 Ovaj Mjesec (This Month)
+                                    Jedan Datum
                                   </button>
                                   <button 
-                                    onClick={() => { setLeaderboardDatePreset('last_month'); setIsCalendarOpen(false); }} 
-                                    className={`px-3 py-2 rounded-xl text-left transition-colors ${leaderboardDatePreset === 'last_month' ? 'bg-orange-100 text-zorange dark:bg-orange-950/80' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                                    onClick={() => applyDatePreset('range')}
+                                    className={`py-1.5 rounded-lg transition-colors ${datePickerMode === 'range' ? 'bg-white dark:bg-[#161618] text-[#111113] dark:text-white font-black shadow-xs' : 'text-gray-500'}`}
                                   >
-                                    📅 Prošli Mjesec (Last Month)
+                                    Od - Do Raspon
                                   </button>
                                 </div>
+
+                                {/* Input Controls */}
+                                <div className="space-y-3 pt-1">
+                                  {datePickerMode === 'single' ? (
+                                    <div>
+                                      <label className="text-[11px] font-bold text-gray-500 block mb-1">Odaberite Točan Datum Objave:</label>
+                                      <input 
+                                        type="date" 
+                                        value={leaderboardStartDate} 
+                                        onChange={(e) => { setLeaderboardStartDate(e.target.value); setLeaderboardEndDate(e.target.value); }}
+                                        className="w-full px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange text-[#111113] dark:text-white"
+                                      />
+                                    </div>
+                                  ) : (
+                                    <div className="grid grid-cols-2 gap-2">
+                                      <div>
+                                        <label className="text-[10px] font-bold text-gray-500 block mb-1">Od Datuma (From):</label>
+                                        <input 
+                                          type="date" 
+                                          value={leaderboardStartDate} 
+                                          onChange={(e) => setLeaderboardStartDate(e.target.value)}
+                                          className="w-full px-2.5 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange text-[#111113] dark:text-white"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-[10px] font-bold text-gray-500 block mb-1">Do Datuma (To):</label>
+                                        <input 
+                                          type="date" 
+                                          value={leaderboardEndDate} 
+                                          onChange={(e) => setLeaderboardEndDate(e.target.value)}
+                                          className="w-full px-2.5 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold focus:outline-none focus:border-zorange text-[#111113] dark:text-white"
+                                        />
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Modal Actions */}
+                                <div className="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-800">
+                                  <button 
+                                    onClick={() => applyDatePreset('month')}
+                                    className="text-[11px] font-bold text-gray-400 hover:text-[#111113] dark:hover:text-white"
+                                  >
+                                    Resetiraj (Ovaj Mjesec)
+                                  </button>
+                                  <button 
+                                    onClick={() => setIsCalendarOpen(false)}
+                                    className="px-4 py-1.5 rounded-xl bg-zorange text-white text-xs font-black uppercase tracking-wider hover:bg-zorangehover transition-colors shadow-xs"
+                                  >
+                                    Primijeni Datum
+                                  </button>
+                                </div>
+
                               </div>
                             )}
                           </div>
@@ -1063,8 +1140,25 @@
                         </div>
                       </div>
 
-                      {/* STATE A: TABLE VIEW (LIST) */}
-                      {leaderboardView === 'list' ? (
+                      {/* POSTS FILTERING RESULTS & EMPTY STATE */}
+                      {organicData.posts.length === 0 ? (
+                        <div className="text-center py-12 space-y-3 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700">
+                          <div className="w-12 h-12 rounded-full bg-orange-100 text-zorange mx-auto flex items-center justify-center text-lg">
+                            <i className="fa-solid fa-calendar-xmark"></i>
+                          </div>
+                          <h4 className="text-base font-black text-[#111113] dark:text-white">Nema objava u odabranom datumu / razdoblju</h4>
+                          <p className="text-xs text-gray-500 font-semibold max-w-sm mx-auto">
+                            Odabrali ste datum ({leaderboardStartDate} do {leaderboardEndDate}). Pokušajte odabrati drugi datum ili ovaj mjesec.
+                          </p>
+                          <button 
+                            onClick={() => applyDatePreset('month')}
+                            className="px-4 py-2 rounded-full bg-zorange text-white text-xs font-black uppercase tracking-wider hover:bg-zorangehover transition-colors"
+                          >
+                            Prikaži sve objave za ovaj mjesec
+                          </button>
+                        </div>
+                      ) : leaderboardView === 'list' ? (
+                        /* STATE A: TABLE VIEW (LIST) */
                         <div className="overflow-x-auto">
                           <table className="w-full text-left text-xs">
                             <thead>
@@ -1073,7 +1167,7 @@
                                 <th className="py-3 px-3">Platforma</th>
                                 <th className="py-3 px-3">Tekst Objave</th>
                                 <th className="py-3 px-3">Tip Objave</th>
-                                <th className="py-3 px-3">Datum</th>
+                                <th className="py-3 px-3">Datum Objave</th>
                                 <th className="py-3 px-3">Reach</th>
                                 <th className="py-3 px-3">ERR %</th>
                                 <th className="py-3 px-3">Core Action</th>
@@ -1097,7 +1191,7 @@
                                   <td className="py-3.5 px-3">
                                     <span className="px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 text-[10px] font-black">{post.type}</span>
                                   </td>
-                                  <td className="py-3.5 px-3 text-gray-400">{post.datePublished || '22. Aug 2026'}</td>
+                                  <td className="py-3.5 px-3 text-gray-400">{post.datePublished}</td>
                                   <td className="py-3.5 px-3 text-[#111113] dark:text-white">{post.reach.toLocaleString()}</td>
                                   <td className="py-3.5 px-3 text-zorange font-black">{post.err}</td>
                                   <td className="py-3.5 px-3">
@@ -1130,6 +1224,7 @@
 
                               <div className="relative z-10 space-y-2 text-white">
                                 <p className="text-xs font-black truncate drop-shadow-sm">{post.caption}</p>
+                                <span className="text-[10px] text-gray-300 block">{post.datePublished}</span>
                                 
                                 <div className="grid grid-cols-3 gap-1 pt-2 border-t border-white/20 text-[10px]">
                                   <div>
