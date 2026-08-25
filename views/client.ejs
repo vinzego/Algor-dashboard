@@ -757,10 +757,10 @@
           <p class="text-xs text-gray-500 font-bold mb-6">Financijski kompas, frekvencija prikaza, hook rate i konverzijski tok vaših Meta oglašivačkih kampanja</p>
 
           <!-- GRID ROW 1: ROAS vs CPA & CTR (Link vs All) -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6 w-full">
             <!-- 1. ROAS / CPA Chart -->
-            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
-              <div>
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between w-full">
+              <div class="w-full">
                 <div class="flex items-center justify-between gap-2 mb-2">
                   <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
                     <i class="fa-solid fa-chart-line text-zorange"></i> 1. ROAS & Cost per Result (CPA)
@@ -772,14 +772,14 @@
                 <p class="text-xs text-gray-500 font-medium mb-3">Profitabilnost oglasa: ROAS (povrat na uloženo) u odnosu na trošak po konverziji (CPA).</p>
                 <div id="meta-chart-roas-cpa" class="w-full h-[280px]"></div>
               </div>
-              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 💡 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.roasCpa.decisionNote %>
               </div>
             </div>
 
             <!-- 2. CTR (Link) vs CTR (All) Chart -->
-            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
-              <div>
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between w-full">
+              <div class="w-full">
                 <div class="flex items-center justify-between gap-2 mb-2">
                   <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
                     <i class="fa-solid fa-arrow-pointer text-zorange"></i> 2. CTR (Link) vs CTR (All)
@@ -791,17 +791,17 @@
                 <p class="text-xs text-gray-500 font-medium mb-3">Relevantnost poruke: Odvajanje klika na web link od općih lajkova i komentara.</p>
                 <div id="meta-chart-ctr-link-all" class="w-full h-[280px]"></div>
               </div>
-              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 🎯 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.ctrLinkAll.decisionNote %>
               </div>
             </div>
           </div>
 
           <!-- GRID ROW 2: CPC & CPM & FREQUENCY -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6 w-full">
             <!-- 3. CPC & CPM Chart -->
-            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
-              <div>
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between w-full">
+              <div class="w-full">
                 <div class="flex items-center justify-between gap-2 mb-2">
                   <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
                     <i class="fa-solid fa-coins text-zorange"></i> 3. CPC & CPM (Aukcijski Trošak)
@@ -813,14 +813,14 @@
                 <p class="text-xs text-gray-500 font-medium mb-3">Trošak po kliku (CPC) i trošak na 1.000 impresija (CPM) na Meta aukcijama.</p>
                 <div id="meta-chart-cpc-cpm" class="w-full h-[280px]"></div>
               </div>
-              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 💰 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.cpcCpm.decisionNote %>
               </div>
             </div>
 
             <!-- 4. Frequency (Frekvencija) Chart -->
-            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
-              <div>
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between w-full">
+              <div class="w-full">
                 <div class="flex items-center justify-between gap-2 mb-2">
                   <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
                     <i class="fa-solid fa-rotate-right text-zorange"></i> 4. Frekvencija Prikaza (Ad Fatigue)
@@ -832,17 +832,17 @@
                 <p class="text-xs text-gray-500 font-medium mb-3">Prosječan broj prikazivanja oglasa istoj osobi (Signal za zamjenu na ~3-4x).</p>
                 <div id="meta-chart-frequency" class="w-full h-[280px]"></div>
               </div>
-              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 ⚠️ <strong>Odluka:</strong> <%= client.metaDecisionMetrics.frequency.decisionNote %>
               </div>
             </div>
           </div>
 
           <!-- GRID ROW 3: HOOK RATE & HOLD RATE & LANDING PAGE VIEWS VS LINK CLICKS -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6 w-full">
             <!-- 5. Hook Rate & Hold Rate Chart -->
-            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
-              <div>
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between w-full">
+              <div class="w-full">
                 <div class="flex items-center justify-between gap-2 mb-2">
                   <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
                     <i class="fa-solid fa-film text-zorange"></i> 5. Hook Rate & Hold Rate (Video)
@@ -854,14 +854,14 @@
                 <p class="text-xs text-gray-500 font-medium mb-3">Hook (prve 3 sec) vs Hold (ThruPlay zadržavanje pažnje do poruke).</p>
                 <div id="meta-chart-hook-hold" class="w-full h-[280px]"></div>
               </div>
-              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 🎬 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.hookHoldRate.decisionNote %>
               </div>
             </div>
 
             <!-- 6. Landing Page Views vs Link Clicks Chart -->
-            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
-              <div>
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between w-full">
+              <div class="w-full">
                 <div class="flex items-center justify-between gap-2 mb-2">
                   <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
                     <i class="fa-solid fa-laptop-code text-zorange"></i> 6. Landing Page Views vs Link Clicks
@@ -873,17 +873,17 @@
                 <p class="text-xs text-gray-500 font-medium mb-3">Stopa napuštanja prije učitavanja (Gubitak > 20-25% znači sporo web mjesto).</p>
                 <div id="meta-chart-landing-clicks" class="w-full h-[280px]"></div>
               </div>
-              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 ⚡ <strong>Odluka:</strong> <%= client.metaDecisionMetrics.landingVsClicks.decisionNote %>
               </div>
             </div>
           </div>
 
           <!-- GRID ROW 4: CONVERSION RATE & CAC -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6 w-full">
             <!-- 7. Conversion Rate (CR) Chart -->
-            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
-              <div>
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between w-full">
+              <div class="w-full">
                 <div class="flex items-center justify-between gap-2 mb-2">
                   <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
                     <i class="fa-solid fa-bullseye text-zorange"></i> 7. Conversion Rate (CR %)
@@ -895,14 +895,14 @@
                 <p class="text-xs text-gray-500 font-medium mb-3">Postotak posjetitelja koji dovrše kupnju, upit ili prijavu na stranici.</p>
                 <div id="meta-chart-conversion-rate" class="w-full h-[280px]"></div>
               </div>
-              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 🛒 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.conversionRate.decisionNote %>
               </div>
             </div>
 
             <!-- 8. CAC (Customer Acquisition Cost) Chart -->
-            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between">
-              <div>
+            <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-6 shadow-xs border border-black/5 flex flex-col justify-between w-full">
+              <div class="w-full">
                 <div class="flex items-center justify-between gap-2 mb-2">
                   <h4 class="font-black text-base text-[#111113] flex items-center gap-2 uppercase tracking-wide">
                     <i class="fa-solid fa-user-plus text-zorange"></i> 8. Customer Acquisition Cost (CAC)
@@ -914,7 +914,7 @@
                 <p class="text-xs text-gray-500 font-medium mb-3">Ukupni trošak oglašavanja podijeljen s brojem novih kupaca/klijenata.</p>
                 <div id="meta-chart-cac" class="w-full h-[280px]"></div>
               </div>
-              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+              <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 💵 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.cacLtv.decisionNote %>
               </div>
             </div>
@@ -1342,11 +1342,21 @@
       }
 
       /* ----------------------------------------------------
-         META ECHARTS SETUP
+         META ECHARTS SETUP (LAZY INIT WHEN VISIBLE)
          ---------------------------------------------------- */
-      // Meta Ads Card 1: Gauge (Potrošnja Meta Ads)
       let metaCardGaugeChart, metaCardSparkChart, metaCardBarChart;
-      const metaGaugeElem = document.getElementById('meta-card-gauge-spend');
+      let chartMetaRoasCpa, chartMetaCtrLinkAll, chartMetaCpcCpm, chartMetaFrequency, chartMetaHookHold, chartMetaLandingClicks, chartMetaConversionRate, chartMetaCac;
+      let metaChartsInitialized = false;
+
+      function initMetaCharts() {
+        if (metaChartsInitialized) {
+          resizeMetaCharts();
+          return;
+        }
+        metaChartsInitialized = true;
+
+        // Meta Ads Card 1: Gauge (Potrošnja Meta Ads)
+        const metaGaugeElem = document.getElementById('meta-card-gauge-spend');
       if (metaGaugeElem) {
         metaCardGaugeChart = echarts.init(metaGaugeElem);
         metaCardGaugeChart.setOption({
@@ -1553,6 +1563,22 @@
           ]
         });
       }
+    }
+
+    function resizeMetaCharts() {
+      if (metaCardGaugeChart) metaCardGaugeChart.resize();
+      if (metaCardSparkChart) metaCardSparkChart.resize();
+      if (metaCardBarChart) metaCardBarChart.resize();
+
+      if (chartMetaRoasCpa) chartMetaRoasCpa.resize();
+      if (chartMetaCtrLinkAll) chartMetaCtrLinkAll.resize();
+      if (chartMetaCpcCpm) chartMetaCpcCpm.resize();
+      if (chartMetaFrequency) chartMetaFrequency.resize();
+      if (chartMetaHookHold) chartMetaHookHold.resize();
+      if (chartMetaLandingClicks) chartMetaLandingClicks.resize();
+      if (chartMetaConversionRate) chartMetaConversionRate.resize();
+      if (chartMetaCac) chartMetaCac.resize();
+    }
 
       /* ----------------------------------------------------
          GOOGLE ECHARTS SETUP
@@ -1704,28 +1730,12 @@
         
         if (panelMeta) {
           panelMeta.classList.remove('hidden');
-          const resizeMeta = () => {
-            if (metaCardGaugeChart) metaCardGaugeChart.resize();
-            if (metaCardSparkChart) metaCardSparkChart.resize();
-            if (metaCardBarChart) metaCardBarChart.resize();
+          panelMeta.classList.remove('opacity-0', 'scale-95');
+          panelMeta.classList.add('opacity-100', 'scale-100');
 
-            if (chartMetaRoasCpa) chartMetaRoasCpa.resize();
-            if (chartMetaCtrLinkAll) chartMetaCtrLinkAll.resize();
-            if (chartMetaCpcCpm) chartMetaCpcCpm.resize();
-            if (chartMetaFrequency) chartMetaFrequency.resize();
-            if (chartMetaHookHold) chartMetaHookHold.resize();
-            if (chartMetaLandingClicks) chartMetaLandingClicks.resize();
-            if (chartMetaConversionRate) chartMetaConversionRate.resize();
-            if (chartMetaCac) chartMetaCac.resize();
-          };
-
-          setTimeout(() => {
-            panelMeta.classList.remove('opacity-0', 'scale-95');
-            panelMeta.classList.add('opacity-100', 'scale-100');
-            resizeMeta();
-          }, 50);
-          setTimeout(resizeMeta, 150);
-          setTimeout(resizeMeta, 350);
+          initMetaCharts();
+          setTimeout(resizeMetaCharts, 50);
+          setTimeout(resizeMetaCharts, 250);
         }
       }
       
