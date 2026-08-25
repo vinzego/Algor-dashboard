@@ -30,6 +30,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Apache ECharts CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <!-- Flatpickr Custom Modern Datepicker CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/hr.js"></script>
 </head>
 <body class="bg-[#F4F5F7] min-h-screen relative pb-16 text-[#111113]">
 
@@ -605,28 +609,25 @@
               </div>
             </div>
 
-            <!-- 2. Prominent Large Date Selector Dropdown (Odabir Datuma - Big & High Contrast) -->
+            <!-- 2. Prominent Large Modern Custom Date Range Picker (Flatpickr ZELLIFY Theme) -->
             <div class="flex items-center gap-3 flex-wrap">
               <span class="text-xs font-black text-[#111113] uppercase tracking-wider flex items-center gap-1.5">
                 <i class="fa-solid fa-calendar-days text-zorange"></i> Odabir Datuma:
               </span>
               
               <div class="flex items-center gap-2 flex-wrap">
-                <!-- Start Date Input -->
-                <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl shadow-2xs border border-gray-300">
-                  <span class="text-xs font-black text-gray-500 uppercase">Od:</span>
-                  <input type="date" id="filter-date-start" onchange="applyFilters()" class="text-sm font-black text-[#111113] bg-transparent focus:outline-none cursor-pointer" />
-                </div>
-                
-                <!-- End Date Input -->
-                <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl shadow-2xs border border-gray-300">
-                  <span class="text-xs font-black text-gray-500 uppercase">Do:</span>
-                  <input type="date" id="filter-date-end" onchange="applyFilters()" class="text-sm font-black text-[#111113] bg-transparent focus:outline-none cursor-pointer" />
+                <!-- Flatpickr Range Trigger Input -->
+                <div class="flex items-center gap-2.5 bg-white px-4 py-2 rounded-2xl shadow-xs border border-gray-300 hover:border-zorange transition-colors cursor-pointer group">
+                  <i class="fa-solid fa-calendar text-zorange text-base group-hover:scale-110 transition-transform"></i>
+                  <span class="text-xs font-black text-gray-500 uppercase">Razdoblje:</span>
+                  <input type="text" id="date-range-picker" placeholder="Odaberi datume..." class="text-sm font-black text-[#111113] bg-transparent focus:outline-none cursor-pointer w-56" readonly />
+                  <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
                 </div>
 
-                <!-- Presets -->
-                <button onclick="setDatePreset('month')" class="px-3.5 py-2 rounded-xl bg-white text-[#111113] border border-gray-200 hover:bg-zorange hover:text-white hover:border-zorange transition-colors text-xs font-black shadow-2xs">Tekući Mjesec</button>
-                <button onclick="setDatePreset('all')" class="px-3.5 py-2 rounded-xl bg-white text-gray-600 border border-gray-200 hover:bg-black hover:text-white hover:border-black transition-colors text-xs font-extrabold shadow-2xs">Sve</button>
+                <!-- Preset Buttons -->
+                <button onclick="setDatePreset('month')" class="px-3.5 py-2 rounded-2xl bg-white text-[#111113] border border-gray-300 hover:bg-zorange hover:text-white hover:border-zorange transition-all text-xs font-black shadow-xs">Tekući Mjesec</button>
+                <button onclick="setDatePreset('7days')" class="px-3.5 py-2 rounded-2xl bg-white text-gray-700 border border-gray-300 hover:bg-black hover:text-white hover:border-black transition-all text-xs font-black shadow-xs">Zadnjih 7 Dana</button>
+                <button onclick="setDatePreset('all')" class="px-3.5 py-2 rounded-2xl bg-white text-gray-500 border border-gray-300 hover:bg-black hover:text-white hover:border-black transition-all text-xs font-bold shadow-xs">Sve Objave</button>
               </div>
             </div>
 
@@ -1457,42 +1458,51 @@
 
     // Active platform filter state
     let activePlatformFilter = 'all';
+    let pickerInstance = null;
 
-    // Initialize Date Filter (Default: First day to last day of current month)
+    // Initialize Modern Flatpickr Date Picker (Default: Current Month)
     function initDateFilter() {
       const now = new Date();
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
-      
       const firstDay = `${year}-${month}-01`;
       const lastDayNum = new Date(year, now.getMonth() + 1, 0).getDate();
       const lastDay = `${year}-${month}-${String(lastDayNum).padStart(2, '0')}`;
 
-      const startDateInput = document.getElementById('filter-date-start');
-      const endDateInput = document.getElementById('filter-date-end');
-      if (startDateInput && endDateInput) {
-        startDateInput.value = firstDay;
-        endDateInput.value = lastDay;
-      }
+      pickerInstance = flatpickr("#date-range-picker", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d.m.Y.",
+        defaultDate: [firstDay, lastDay],
+        locale: flatpickr.l10ns.hr || "hr",
+        onChange: function(selectedDates, dateStr, instance) {
+          applyFilters();
+        }
+      });
+
       applyFilters();
     }
 
     // Set Date Range Presets
     function setDatePreset(preset) {
-      const startDateInput = document.getElementById('filter-date-start');
-      const endDateInput = document.getElementById('filter-date-end');
-      if (!startDateInput || !endDateInput) return;
+      if (!pickerInstance) return;
 
       if (preset === 'month') {
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
+        const firstDay = `${year}-${month}-01`;
         const lastDayNum = new Date(year, now.getMonth() + 1, 0).getDate();
-        startDateInput.value = `${year}-${month}-01`;
-        endDateInput.value = `${year}-${month}-${String(lastDayNum).padStart(2, '0')}`;
+        const lastDay = `${year}-${month}-${String(lastDayNum).padStart(2, '0')}`;
+        pickerInstance.setDate([firstDay, lastDay]);
+      } else if (preset === '7days') {
+        const today = new Date();
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(today.getDate() - 7);
+        pickerInstance.setDate([sevenDaysAgo, today]);
       } else if (preset === 'all') {
-        startDateInput.value = '';
-        endDateInput.value = '';
+        pickerInstance.clear();
       }
       applyFilters();
     }
@@ -1516,8 +1526,19 @@
 
     // Apply combined Platform & Date filters to Table and Gallery
     function applyFilters() {
-      const startDateVal = document.getElementById('filter-date-start')?.value || '';
-      const endDateVal = document.getElementById('filter-date-end')?.value || '';
+      let startDateVal = '';
+      let endDateVal = '';
+
+      if (pickerInstance && pickerInstance.selectedDates.length > 0) {
+        const d1 = pickerInstance.selectedDates[0];
+        startDateVal = d1.toISOString().split('T')[0];
+        if (pickerInstance.selectedDates.length > 1) {
+          const d2 = pickerInstance.selectedDates[1];
+          endDateVal = d2.toISOString().split('T')[0];
+        } else {
+          endDateVal = startDateVal; // single date selected
+        }
+      }
 
       // Filter Table Rows
       const tableRows = document.querySelectorAll('.post-row-item');
