@@ -52,20 +52,20 @@
         
         <!-- Navigation Links -->
         <div class="hidden md:flex items-center gap-8">
-          <a href="#" class="text-sm font-semibold text-brand-dark border-b-2 border-brand-green pb-0.5 transition-colors">Nadzorna ploča</a>
-          <a href="#" class="text-sm font-medium text-brand-dark/60 hover:text-brand-dark transition-colors">Klijenti</a>
-          <a href="#" class="text-sm font-medium text-brand-dark/60 hover:text-brand-dark transition-colors">Izvještaji</a>
-          <a href="#" class="text-sm font-medium text-brand-dark/60 hover:text-brand-dark transition-colors">Postavke</a>
+          <a href="#" class="text-sm font-bold text-brand-dark border-b-2 border-brand-green pb-0.5 transition-colors">Nadzorna ploča</a>
+          <a href="#" class="text-sm font-bold text-brand-dark/75 hover:text-brand-dark transition-colors">Klijenti</a>
+          <a href="#" class="text-sm font-bold text-brand-dark/75 hover:text-brand-dark transition-colors">Izvještaji</a>
+          <a href="#" class="text-sm font-bold text-brand-dark/75 hover:text-brand-dark transition-colors">Postavke</a>
         </div>
         
         <!-- User Info / Profile -->
         <div class="flex items-center gap-3">
           <div class="hidden sm:block text-right">
-            <p class="text-xs font-bold text-brand-dark">Vinko</p>
-            <p class="text-[10px] text-brand-dark/50">Administrator</p>
+            <p class="text-sm font-bold text-brand-dark">Vinko</p>
+            <p class="text-xs font-bold text-brand-dark/70">Administrator</p>
           </div>
-          <div class="w-9 h-9 rounded-full bg-brand-dark/5 flex items-center justify-center border border-brand-dark/10">
-            <i class="fa-solid fa-user text-brand-dark/80 text-sm"></i>
+          <div class="w-9 h-9 rounded-full bg-brand-dark/10 flex items-center justify-center border border-brand-dark/15">
+            <i class="fa-solid fa-user text-brand-dark text-sm"></i>
           </div>
         </div>
       </nav>
@@ -75,14 +75,14 @@
     <main class="mt-12">
       <!-- Top Action Bar (without greeting) -->
       <div class="flex justify-between items-center mb-8">
-        <h2 class="text-sm uppercase tracking-wider text-brand-dark/50 font-bold">Klijenti i sustavi</h2>
+        <h2 class="text-xs md:text-sm uppercase tracking-wider text-brand-dark/80 font-black">Klijenti i sustavi</h2>
         <div class="flex gap-3 items-center">
           <div class="glass-panel px-4 py-1.5 rounded-full flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-xs text-brand-dark/80 font-bold">Svi sustavi aktivni</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs md:text-sm text-brand-dark font-extrabold">Svi sustavi aktivni</span>
           </div>
-          <button onclick="openModal()" class="glass-panel px-4 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-brand-dark hover:bg-brand-dark hover:text-white transition-all duration-300 shadow-sm border border-brand-dark/10">
-            <i class="fa-solid fa-plus text-[10px]"></i> Dodaj klijenta
+          <button onclick="openModal()" class="glass-panel px-4 py-1.5 rounded-full flex items-center gap-2 text-xs md:text-sm font-extrabold text-brand-dark hover:bg-brand-dark hover:text-white transition-all duration-300 shadow-sm border border-brand-dark/15">
+            <i class="fa-solid fa-plus text-xs"></i> Dodaj klijenta
           </button>
         </div>
       </div>
@@ -91,25 +91,25 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <% clients.forEach(client => { %>
           <!-- Client Card -->
-          <a href="/client/<%= client.id %>" class="glass-panel glass-panel-hover rounded-[2rem] p-7 flex flex-col justify-between h-[420px] relative overflow-hidden group block shadow-sm">
+          <a href="/client/<%= client.id %>" class="glass-panel glass-panel-hover rounded-[2rem] p-7 flex flex-col justify-between h-[430px] relative overflow-hidden group block shadow-md">
             
             <!-- Card Header -->
             <div>
               <div class="flex justify-between items-start mb-4">
                 <!-- Client Initials Icon -->
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg border <%= client.accentClass %> <%= client.bgAccentClass %> transition-all duration-300 group-hover:scale-110 shadow-sm">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-extrabold text-lg border <%= client.accentClass %> <%= client.bgAccentClass %> transition-all duration-300 group-hover:scale-110 shadow-sm">
                   <%= client.logo %>
                 </div>
                 
                 <!-- Package & Status Badges -->
                 <div class="flex flex-col items-end gap-1.5">
-                  <span class="px-2.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border shadow-sm
-                    <%= client.package === 'Ultra' ? 'bg-gradient-to-tr from-brand-pink/20 to-brand-cyan/20 border-brand-pink/40 text-brand-dark' : '' %>
-                    <%= client.package === 'Pro' ? 'bg-brand-cyan/15 text-brand-dark border-brand-cyan/35' : '' %>
-                    <%= client.package === 'Start' ? 'bg-brand-dark/5 text-brand-dark/50 border-brand-dark/10' : '' %>">
+                  <span class="px-2.5 py-1 rounded text-xs font-black uppercase tracking-wider border shadow-sm
+                    <%= client.package === 'Ultra' ? 'bg-gradient-to-tr from-brand-pink/30 to-brand-cyan/30 border-brand-pink/50 text-brand-dark' : '' %>
+                    <%= client.package === 'Pro' ? 'bg-brand-cyan/25 text-brand-dark border-brand-cyan/50' : '' %>
+                    <%= client.package === 'Start' ? 'bg-brand-dark/10 text-brand-dark border-brand-dark/20' : '' %>">
                     <%= client.package %>
                   </span>
-                  <span class="px-2.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider <%= client.status === 'Active' ? 'bg-emerald-500/10 text-emerald-800' : 'bg-brand-dark/5 text-brand-dark/30' %>">
+                  <span class="px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider <%= client.status === 'Active' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' : 'bg-brand-dark/10 text-brand-dark/60 border border-brand-dark/15' %>">
                     <%= client.status === 'Active' ? 'Aktivno' : 'Neaktivno' %>
                   </span>
                 </div>
@@ -118,54 +118,51 @@
               <h2 class="text-2xl font-bold text-brand-dark group-hover:text-brand-dark transition-colors duration-300"><%= client.name %></h2>
               
               <!-- Monthly Posts Tracker -->
-              <div class="mt-3.5 bg-brand-dark/5 rounded-2xl p-3 border border-brand-dark/5">
-                <div class="flex justify-between items-center text-[9px] text-brand-dark/50 font-bold mb-1">
+              <div class="mt-3.5 bg-brand-dark/5 rounded-2xl p-3.5 border border-brand-dark/10">
+                <div class="flex justify-between items-center text-xs text-brand-dark/80 font-bold mb-1.5">
                   <span>Objave u tekućem mjesecu:</span>
-                  <span><%= client.publishedPosts %> / <%= client.maxPosts %></span>
+                  <span class="text-brand-dark font-extrabold"><%= client.publishedPosts %> / <%= client.maxPosts %></span>
                 </div>
-                <div class="w-full bg-brand-dark/10 rounded-full h-1 overflow-hidden">
+                <div class="w-full bg-brand-dark/10 rounded-full h-2 overflow-hidden">
                   <% const pct = Math.min((client.publishedPosts / client.maxPosts) * 100, 100); %>
-                  <div class="bg-brand-dark h-1 rounded-full" style="width: <%= pct %>%; background-color: <%= client.accentColor === '#DAF4AA' ? '#689F38' : (client.accentColor === '#FFFFFF' ? '#122022' : client.accentColor) %>"></div>
+                  <div class="bg-brand-dark h-2 rounded-full" style="width: <%= pct %>%; background-color: <%= client.accentColor === '#DAF4AA' ? '#558B2F' : (client.accentColor === '#FFFFFF' ? '#122022' : client.accentColor) %>"></div>
                 </div>
               </div>
             </div>
 
             <!-- Stats Middle Section -->
-            <div class="grid grid-cols-2 gap-y-3.5 py-3 border-y border-brand-dark/5 my-3.5">
+            <div class="grid grid-cols-2 gap-y-3.5 py-3.5 border-y border-brand-dark/10 my-3.5">
               <div>
-                <p class="text-[10px] uppercase tracking-wider text-brand-dark/40 font-bold">Doseg (Reach)</p>
-                <p class="text-lg font-extrabold text-brand-dark mt-0.5"><%= client.stats.reach %></p>
+                <p class="text-xs uppercase tracking-wider text-brand-dark/70 font-bold">Doseg (Reach)</p>
+                <p class="text-xl font-black text-brand-dark mt-0.5"><%= client.stats.reach %></p>
               </div>
               <div>
-                <p class="text-[10px] uppercase tracking-wider text-brand-dark/40 font-bold">Prikazi</p>
-                <p class="text-lg font-extrabold text-brand-dark mt-0.5"><%= client.stats.impressions %></p>
+                <p class="text-xs uppercase tracking-wider text-brand-dark/70 font-bold">Prikazi</p>
+                <p class="text-xl font-black text-brand-dark mt-0.5"><%= client.stats.impressions %></p>
               </div>
               <div>
-                <p class="text-[10px] uppercase tracking-wider text-brand-dark/40 font-bold">CTR</p>
-                <p class="text-lg font-extrabold text-brand-dark mt-0.5"><%= client.stats.ctr %></p>
+                <p class="text-xs uppercase tracking-wider text-brand-dark/70 font-bold">CTR</p>
+                <p class="text-xl font-black text-brand-dark mt-0.5"><%= client.stats.ctr %></p>
               </div>
               <div>
-                <p class="text-[10px] uppercase tracking-wider text-brand-dark/40 font-bold">Budžet</p>
-                <p class="text-lg font-extrabold mt-0.5" style="color: <%= client.accentColor === '#DAF4AA' ? '#689F38' : (client.accentColor === '#FFFFFF' ? '#122022' : client.accentColor) %>"><%= client.stats.spend %></p>
+                <p class="text-xs uppercase tracking-wider text-brand-dark/70 font-bold">Budžet</p>
+                <p class="text-xl font-black mt-0.5" style="color: <%= client.accentColor === '#DAF4AA' ? '#33691E' : (client.accentColor === '#FFFFFF' ? '#122022' : client.accentColor) %>"><%= client.stats.spend %></p>
               </div>
             </div>
 
             <!-- Card Action Footer -->
             <div class="flex items-center justify-between">
-              <!-- Icons of active platforms based on package -->
+              <!-- Icons of active marketing channels (All unlocked 360°) -->
               <div class="flex items-center gap-1.5">
-                <span class="w-6 h-6 rounded bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-[10px] text-brand-dark/60 shadow-sm" title="Meta Ads"><i class="fa-brands fa-facebook-f"></i></span>
-                <% if (client.package === 'Pro' || client.package === 'Ultra') { %>
-                  <span class="w-6 h-6 rounded bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-[10px] text-brand-dark/60 shadow-sm" title="Google Ads"><i class="fa-brands fa-google"></i></span>
-                <% } %>
-                <% if (client.package === 'Ultra') { %>
-                  <span class="w-6 h-6 rounded bg-brand-dark/5 border border-brand-dark/10 flex items-center justify-center text-[10px] text-brand-dark/60 shadow-sm" title="TikTok Ads"><i class="fa-brands fa-tiktok"></i></span>
-                <% } %>
+                <span class="w-7 h-7 rounded bg-brand-dark/5 border border-brand-dark/15 flex items-center justify-center text-xs text-blue-600 shadow-sm" title="Meta Ads"><i class="fa-brands fa-facebook-f"></i></span>
+                <span class="w-7 h-7 rounded bg-brand-dark/5 border border-brand-dark/15 flex items-center justify-center text-xs text-rose-500 shadow-sm" title="Google Ads (PMax)"><i class="fa-brands fa-google"></i></span>
+                <span class="w-7 h-7 rounded bg-brand-dark/5 border border-brand-dark/15 flex items-center justify-center text-xs text-black shadow-sm" title="TikTok Video Ads"><i class="fa-brands fa-tiktok"></i></span>
+                <span class="w-7 h-7 rounded bg-brand-dark/5 border border-brand-dark/15 flex items-center justify-center text-xs text-emerald-700 shadow-sm" title="Objave & Sadržaj"><i class="fa-solid fa-photo-film"></i></span>
               </div>
               
               <div class="flex items-center gap-1.5 group-hover:translate-x-1 transition-transform duration-300">
-                <span class="text-xs font-semibold text-brand-dark/60 group-hover:text-brand-dark transition-colors">Detalji</span>
-                <button class="w-8 h-8 rounded-full flex items-center justify-center bg-brand-dark/5 border border-brand-dark/10 text-brand-dark transition-all duration-300 group-hover:border-transparent" style="background-color: <%= client.status === 'Active' ? (client.accentColor === '#DAF4AA' ? '#DAF4AA' : client.accentColor) + '30' : '' %>; color: <%= client.status === 'Active' ? (client.accentColor === '#DAF4AA' ? '#558B2F' : (client.accentColor === '#FFFFFF' ? '#122022' : client.accentColor)) : 'rgba(18, 32, 34, 0.4)' %>">
+                <span class="text-xs font-bold text-brand-dark group-hover:text-brand-dark transition-colors">Detalji</span>
+                <button class="w-8 h-8 rounded-full flex items-center justify-center bg-brand-dark/10 border border-brand-dark/15 text-brand-dark font-extrabold transition-all duration-300 group-hover:border-transparent" style="background-color: <%= client.status === 'Active' ? (client.accentColor === '#DAF4AA' ? '#DAF4AA' : client.accentColor) + '50' : '' %>; color: <%= client.status === 'Active' ? (client.accentColor === '#DAF4AA' ? '#33691E' : (client.accentColor === '#FFFFFF' ? '#122022' : client.accentColor)) : 'rgba(18, 32, 34, 0.6)' %>">
                   <i class="fa-solid fa-arrow-right text-xs"></i>
                 </button>
               </div>

@@ -403,6 +403,211 @@ const clients = [
   }
 ];
 
+// Helper to enrich clients with advanced analytics data
+const enrichClientWithAdvancedAnalytics = (client) => {
+  if (client.advancedAnalytics) return client;
+
+  const days = client.chartData ? client.chartData.days : generateDaysList();
+  
+  // Calculate blended stats
+  const metaSpend = parseFloat((client.metaStats?.totalSpend || '$0').replace(/[^0-9.]/g, '')) || 2850;
+  const googleSpend = parseFloat((client.googleStats?.totalSpend || '$0').replace(/[^0-9.]/g, '')) || 550;
+  const tiktokSpend = client.package === 'Ultra' ? 300 : 0;
+  const totalSpendVal = metaSpend + googleSpend + tiktokSpend;
+  const totalRevenueVal = Math.round(totalSpendVal * 4.4);
+  const blendedMerVal = (totalRevenueVal / totalSpendVal).toFixed(2);
+  const totalConvsVal = Math.round(totalSpendVal / 14.5);
+
+  const spendDaily = days.map((_, i) => Math.round(totalSpendVal / days.length + (Math.sin(i * 0.8) * 18)));
+  const revenueDaily = spendDaily.map((s, i) => Math.round(s * (3.9 + Math.cos(i * 0.5) * 0.7)));
+  const merDaily = spendDaily.map((s, i) => (revenueDaily[i] / s).toFixed(2));
+
+  client.advancedAnalytics = {
+    blended: {
+      totalSpend: `$${totalSpendVal.toLocaleString()}`,
+      totalRevenue: `$${totalRevenueVal.toLocaleString()}`,
+      blendedMer: `${blendedMerVal}x`,
+      totalConversions: totalConvsVal,
+      days,
+      spendDaily,
+      revenueDaily,
+      merDaily
+    },
+    creativeFatigue: {
+      adNames: ['Kreativa 1 - Popust 20%', 'Kreativa 2 - Video Demo', 'Kreativa 3 - UGC Recenzija', 'Kreativa 4 - Karusel Banner', 'Kreativa 5 - Static Promo'],
+      frequency: [1.2, 2.1, 3.4, 4.8, 6.2],
+      ctr: [5.2, 4.4, 3.1, 1.8, 0.9],
+      cpa: [11.5, 13.8, 18.2, 26.5, 38.0],
+      statuses: ['Optimalno', 'Dobro', 'Blagi zamor', 'Visok zamor', 'Zamijeni vizual']
+    },
+    dayparting: {
+      days: ['Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub', 'Ned'],
+      hours: ['00-03h', '03-06h', '06-09h', '09-12h', '12-15h', '15-18h', '18-21h', '21-24h'],
+      data: [
+        [0,0,2],[0,1,1],[0,2,4],[0,3,8],[0,4,9],[0,5,12],[0,6,15],[0,7,8],
+        [1,0,1],[1,1,1],[1,2,5],[1,3,10],[1,4,12],[1,5,16],[1,6,22],[1,7,12],
+        [2,0,2],[2,1,0],[2,2,4],[2,3,9],[2,4,11],[2,5,14],[2,6,18],[2,7,10],
+        [3,0,1],[3,1,1],[3,2,6],[3,3,11],[3,4,13],[3,5,18],[3,6,24],[3,7,14],
+        [4,0,3],[4,1,2],[4,2,5],[4,3,8],[4,4,10],[4,5,15],[4,6,19],[4,7,11],
+        [5,0,4],[5,1,2],[5,2,3],[5,3,6],[5,4,8],[5,5,11],[5,6,14],[5,7,9],
+        [6,0,3],[6,1,1],[6,2,4],[6,3,7],[6,4,9],[6,5,13],[6,6,20],[6,7,15]
+      ],
+      peakPeriod: 'Četvrtak & Utorak (18:00 - 21:00h)'
+    },
+    ltvCac: {
+      cac: `$${(totalSpendVal / totalConvsVal).toFixed(2)}`,
+      ltv3m: '$38.50',
+      ltv6m: '$54.00',
+      ltv12m: '$72.50',
+      ltvCacRatio: `${(72.50 / (totalSpendVal / totalConvsVal)).toFixed(2)}x`,
+      paybackDays: '38 dana',
+      retentionMonths: ['M1', 'M2', 'M3', 'M4', 'M5', 'M6'],
+      retentionRates: [100, 45, 36, 32, 29, 27]
+    }
+  };
+
+  const publishedCount = client.publishedPosts !== undefined ? client.publishedPosts : 5;
+  const maxCount = client.maxPosts || 8;
+  const remainingCount = Math.max(0, maxCount - publishedCount);
+
+  client.socialMediaStats = {
+    monthlyPublished: publishedCount,
+    monthlyTarget: maxCount,
+    monthlyRemaining: remainingCount,
+    progressPercent: Math.min(Math.round((publishedCount / maxCount) * 100), 100),
+    totalImpressions: '124,500',
+    totalReach: '98,200',
+    totalEngagements: '1,840',
+    avgEngagementRate: '5.2%',
+    platformViews: [
+      { name: 'Instagram', value: 68400, color: '#E1306C' },
+      { name: 'Facebook', value: 34100, color: '#1877F2' },
+      { name: 'TikTok', value: 22000, color: '#000000' }
+    ],
+    formatPerformanceNames: ['Reels / Video', 'Karusel objave', 'Jednostruke slike'],
+    formatPerformanceValues: [34200, 24800, 14500],
+    creatives: [
+      {
+        id: 1,
+        title: 'Nagradni natječaj - Osvoji ljetni paket',
+        date: '18. Kolovoza 2026.',
+        platform: 'Instagram & Facebook',
+        platformIcon: 'fa-brands fa-instagram text-pink-600',
+        type: 'Reel / Karusel',
+        imageUrl: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=600&auto=format&fit=crop&q=80',
+        impressions: '42,100',
+        reach: '36,500',
+        likes: 480,
+        comments: 164,
+        shares: 88,
+        engagementRate: '8.4%',
+        rank: 'top',
+        badge: 'Najbolja objava 🏆',
+        badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+        note: 'Vrhunska udica u prvih 3 sekunde i nagradni mehanizam donijeli su rekordnih 164 komentara i viralan doseg.'
+      },
+      {
+        id: 2,
+        title: 'Ljetni popust 20% na sve usluge',
+        date: '12. Kolovoza 2026.',
+        platform: 'Instagram & TikTok',
+        platformIcon: 'fa-brands fa-tiktok text-black',
+        type: 'Promo Slika / Video',
+        imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80',
+        impressions: '31,400',
+        reach: '28,200',
+        likes: 340,
+        comments: 82,
+        shares: 41,
+        engagementRate: '6.1%',
+        rank: 'top',
+        badge: 'Visoka konverzija ⭐',
+        badgeClass: 'bg-cyan-100 text-cyan-900 border-cyan-300',
+        note: 'Najveći broj spremanja objava i klikova na link u bio profilu.'
+      },
+      {
+        id: 3,
+        title: 'Vodič za napredni digitalni marketing',
+        date: '08. Kolovoza 2026.',
+        platform: 'Facebook & Instagram',
+        platformIcon: 'fa-brands fa-facebook text-blue-600',
+        type: 'Edukativni Karusel',
+        imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&auto=format&fit=crop&q=80',
+        impressions: '22,800',
+        reach: '19,500',
+        likes: 280,
+        comments: 45,
+        shares: 19,
+        engagementRate: '4.5%',
+        rank: 'normal',
+        badge: 'Stabilan doseg',
+        badgeClass: 'bg-brand-dark/10 text-brand-dark border-brand-dark/20',
+        note: 'Dobro zadržavanje korisnika (swiping kroz svih 7 slajdova karusela).'
+      },
+      {
+        id: 4,
+        title: 'Trending Reel - Outfit tjedna',
+        date: '04. Kolovoza 2026.',
+        platform: 'TikTok & Reels',
+        platformIcon: 'fa-brands fa-tiktok text-black',
+        type: 'Short Video / Reel',
+        imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop&q=80',
+        impressions: '18,500',
+        reach: '15,200',
+        likes: 210,
+        comments: 93,
+        shares: 32,
+        engagementRate: '3.9%',
+        rank: 'normal',
+        badge: 'Trending Zvuk 🎵',
+        badgeClass: 'bg-purple-100 text-purple-900 border-purple-300',
+        note: 'Dobar prijem kod mlađe publike uz korištenje popularnog zvučnog zapisa.'
+      },
+      {
+        id: 5,
+        title: 'Obavijest o novom radnom vremenu',
+        date: '01. Kolovoza 2026.',
+        platform: 'Facebook',
+        platformIcon: 'fa-brands fa-facebook text-blue-600',
+        type: 'Informativna Statika',
+        imageUrl: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&auto=format&fit=crop&q=80',
+        impressions: '9,700',
+        reach: '8,100',
+        likes: 42,
+        comments: 6,
+        shares: 2,
+        engagementRate: '1.2%',
+        rank: 'bottom',
+        badge: 'Najlošija objava ⚠️',
+        badgeClass: 'bg-amber-100 text-amber-900 border-amber-300',
+        note: 'Nizak organski doseg i niska interakcija. Savjet: Informativne objave kombinirati s dinamikom u Storyjima ili kratkim videozapisom.'
+      }
+    ]
+  };
+
+  client.executiveHealthCheck = {
+    overallHealth: 'Vrlo dobro (88/100)',
+    goodHighlights: [
+      { title: 'Google Performance Max izvrsnost', desc: 'PMax kampanja ostvaruje visoki ROAS od 4.8x uz stabilan trošak po konverziji.' },
+      { title: 'Instagram Reels viralan doseg', desc: 'Organski doseg je porastao za +28%, a nagradni Reels ima natprosječnu stopu angažmana od 8.4%.' },
+      { title: 'Zdrav LTV : CAC omjer', desc: 'Dugoročni povrat na korisnika iznosi 4.97x, što je znatno iznad targeta od 3.0x.' }
+    ],
+    criticalIssues: [
+      { title: 'Zamor Meta Ads Kreative #4', type: 'rose', desc: 'Frekvencija prikaza dosegnula je 4.8x, uzrokujući pad CTR-a s 5.2% na 1.8% i porast CPA.' },
+      { title: 'Google Search - Ograničeno budžetom', type: 'amber', desc: 'Izgubljeno je 21% potencijalnih konverzija zbog dosizanja dnevnog limita proračuna.' }
+    ],
+    actionFixes: [
+      { title: 'Zamijeni Meta Kreativu #4 s novim video Reel vizualom', impact: 'Trenutačni pad CPA-a za ~20% i osvježenje publike.' },
+      { title: 'Preusmjeri $150 iz neaktivnih oglasa u PMax Asset Grupu B', impact: '+15% više konverzija uz isti ukupni trošak.' }
+    ]
+  };
+
+  return client;
+};
+
+// Enrich existing clients
+clients.forEach(c => enrichClientWithAdvancedAnalytics(c));
+
 // Main Dashboard route
 app.get('/', (req, res) => {
   res.render('index', {
@@ -416,6 +621,9 @@ app.get('/client/:id', (req, res) => {
   if (!client) {
     return res.status(404).send('Client not found');
   }
+
+  // Ensure advanced analytics data is attached
+  enrichClientWithAdvancedAnalytics(client);
 
   res.render('client', {
     client,
