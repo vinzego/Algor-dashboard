@@ -600,7 +600,7 @@
       </section>
 
       <!-- SECTION 2: META ADS -->
-      <section id="panel-meta" class="hidden transition-all duration-300 opacity-0 scale-95">
+      <section id="panel-meta" class="hidden">
         
         <!-- META ADS TOP 4 HERO CARDS (EXACT SAME ZELLIFY DASHBOARD CARD DESIGN) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -924,7 +924,7 @@
       </section>
 
       <!-- SECTION 3: GOOGLE ADS (PMAX FOCUS) -->
-      <section id="panel-google" class="hidden transition-all duration-300 opacity-0 scale-95">
+      <section id="panel-google" class="hidden">
         <div class="grid grid-cols-1 sm:grid-cols-12 gap-5 mb-8">
           <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
             <p class="text-xs font-bold text-gray-500 uppercase">Google Ads Potrošnja</p>
@@ -961,7 +961,7 @@
       </section>
 
       <!-- SECTION 4: TIKTOK ADS -->
-      <section id="panel-tiktok" class="hidden transition-all duration-300 opacity-0 scale-95">
+      <section id="panel-tiktok" class="hidden">
         <div class="grid grid-cols-1 sm:grid-cols-12 gap-5 mb-8">
           <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
             <p class="text-xs font-bold text-gray-500 uppercase">TikTok Potrošnja</p>
@@ -998,7 +998,7 @@
       </section>
 
       <!-- SECTION 5: OBJAVE & SADRŽAJ (SOCIAL MEDIA VISUAL GALLERY) -->
-      <section id="panel-social" class="hidden transition-all duration-300 opacity-0 scale-95">
+      <section id="panel-social" class="hidden">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
           <div class="lg:col-span-6 z-card-white rounded-[2rem] p-7">
             <h4 class="text-sm font-black text-[#111113] uppercase mb-3">Pregledi po Platformama</h4>
@@ -1566,18 +1566,43 @@
     }
 
     function resizeMetaCharts() {
-      if (metaCardGaugeChart) metaCardGaugeChart.resize();
-      if (metaCardSparkChart) metaCardSparkChart.resize();
-      if (metaCardBarChart) metaCardBarChart.resize();
+      const ids = [
+        { id: 'meta-card-gauge-spend', chart: metaCardGaugeChart, h: 100 },
+        { id: 'meta-card-sparkline-cpa', chart: metaCardSparkChart, h: 60 },
+        { id: 'meta-card-bar-leads', chart: metaCardBarChart, h: 100 },
+        { id: 'meta-chart-roas-cpa', chart: chartMetaRoasCpa, h: 280 },
+        { id: 'meta-chart-ctr-link-all', chart: chartMetaCtrLinkAll, h: 280 },
+        { id: 'meta-chart-cpc-cpm', chart: chartMetaCpcCpm, h: 280 },
+        { id: 'meta-chart-frequency', chart: chartMetaFrequency, h: 280 },
+        { id: 'meta-chart-hook-hold', chart: chartMetaHookHold, h: 280 },
+        { id: 'meta-chart-landing-clicks', chart: chartMetaLandingClicks, h: 280 },
+        { id: 'meta-chart-conversion-rate', chart: chartMetaConversionRate, h: 280 },
+        { id: 'meta-chart-cac', chart: chartMetaCac, h: 280 }
+      ];
 
-      if (chartMetaRoasCpa) chartMetaRoasCpa.resize();
-      if (chartMetaCtrLinkAll) chartMetaCtrLinkAll.resize();
-      if (chartMetaCpcCpm) chartMetaCpcCpm.resize();
-      if (chartMetaFrequency) chartMetaFrequency.resize();
-      if (chartMetaHookHold) chartMetaHookHold.resize();
-      if (chartMetaLandingClicks) chartMetaLandingClicks.resize();
-      if (chartMetaConversionRate) chartMetaConversionRate.resize();
-      if (chartMetaCac) chartMetaCac.resize();
+      ids.forEach(item => {
+        const el = document.getElementById(item.id);
+        if (el) {
+          el.style.width = '100%';
+          const parent = el.parentElement;
+          const parentWidth = parent ? parent.clientWidth : 0;
+          if (item.chart) {
+            if (parentWidth > 50) {
+              item.chart.resize({ width: parentWidth, height: item.h });
+            } else {
+              item.chart.resize();
+            }
+          }
+        }
+      });
+    }
+
+    if (typeof ResizeObserver !== 'undefined') {
+      const metaObserver = new ResizeObserver(() => {
+        resizeMetaCharts();
+      });
+      const pMeta = document.getElementById('panel-meta');
+      if (pMeta) metaObserver.observe(pMeta);
     }
 
       /* ----------------------------------------------------
@@ -1688,11 +1713,7 @@
       // Helper reset all panels
       const panels = [panelAdvanced, panelMeta, panelGoogle, panelTiktok, panelSocial];
       panels.forEach(p => {
-        if (p) {
-          p.classList.add('hidden');
-          p.classList.remove('opacity-100', 'scale-100');
-          p.classList.add('opacity-0', 'scale-95');
-        }
+        if (p) p.classList.add('hidden');
       });
 
       // Reset all navigation buttons
@@ -1707,20 +1728,16 @@
         
         if (panelAdvanced) {
           panelAdvanced.classList.remove('hidden');
-          setTimeout(() => {
-            panelAdvanced.classList.remove('opacity-0', 'scale-95');
-            panelAdvanced.classList.add('opacity-100', 'scale-100');
-            if (mfrGaugeChart) mfrGaugeChart.resize();
-            if (revenueSparklineChart) revenueSparklineChart.resize();
-            if (subscribersBarChart) subscribersBarChart.resize();
-            if (revenueHighlightedChart) revenueHighlightedChart.resize();
+          if (mfrGaugeChart) mfrGaugeChart.resize();
+          if (revenueSparklineChart) revenueSparklineChart.resize();
+          if (subscribersBarChart) subscribersBarChart.resize();
+          if (revenueHighlightedChart) revenueHighlightedChart.resize();
 
-            if (chartReachImpressions) chartReachImpressions.resize();
-            if (chartErrRate) chartErrRate.resize();
-            if (chartSavesShares) chartSavesShares.resize();
-            if (chartFollowerGrowth) chartFollowerGrowth.resize();
-            if (chartProfileVisits) chartProfileVisits.resize();
-          }, 50);
+          if (chartReachImpressions) chartReachImpressions.resize();
+          if (chartErrRate) chartErrRate.resize();
+          if (chartSavesShares) chartSavesShares.resize();
+          if (chartFollowerGrowth) chartFollowerGrowth.resize();
+          if (chartProfileVisits) chartProfileVisits.resize();
         }
       }
 
@@ -1730,12 +1747,10 @@
         
         if (panelMeta) {
           panelMeta.classList.remove('hidden');
-          panelMeta.classList.remove('opacity-0', 'scale-95');
-          panelMeta.classList.add('opacity-100', 'scale-100');
-
           initMetaCharts();
-          setTimeout(resizeMetaCharts, 50);
-          setTimeout(resizeMetaCharts, 250);
+          resizeMetaCharts();
+          requestAnimationFrame(resizeMetaCharts);
+          setTimeout(resizeMetaCharts, 100);
         }
       }
       
@@ -1745,12 +1760,8 @@
 
         if (panelGoogle) {
           panelGoogle.classList.remove('hidden');
-          setTimeout(() => {
-            panelGoogle.classList.remove('opacity-0', 'scale-95');
-            panelGoogle.classList.add('opacity-100', 'scale-100');
-            if (googleEfficiencyChart) googleEfficiencyChart.resize();
-            if (googleNetworksChart) googleNetworksChart.resize();
-          }, 50);
+          if (googleEfficiencyChart) googleEfficiencyChart.resize();
+          if (googleNetworksChart) googleNetworksChart.resize();
         }
       }
       
@@ -1760,27 +1771,19 @@
 
         if (panelTiktok) {
           panelTiktok.classList.remove('hidden');
-          setTimeout(() => {
-            panelTiktok.classList.remove('opacity-0', 'scale-95');
-            panelTiktok.classList.add('opacity-100', 'scale-100');
-            if (tiktokEfficiencyChart) tiktokEfficiencyChart.resize();
-            if (tiktokVideosChart) tiktokVideosChart.resize();
-          }, 50);
+          if (tiktokEfficiencyChart) tiktokEfficiencyChart.resize();
+          if (tiktokVideosChart) tiktokVideosChart.resize();
         }
       }
 
-      // 5. Social Media (Objave & Sadržaj)
+      // 5. Objave & Sadržaj (Social Media Visual Gallery)
       else if (platform === 'social') {
         if (btnSocial) btnSocial.className = 'z-pill-nav-item-active px-5 py-2 text-xs transition-all duration-200';
 
         if (panelSocial) {
           panelSocial.classList.remove('hidden');
-          setTimeout(() => {
-            panelSocial.classList.remove('opacity-0', 'scale-95');
-            panelSocial.classList.add('opacity-100', 'scale-100');
-            if (socialPlatformsChart) socialPlatformsChart.resize();
-            if (socialFormatsChart) socialFormatsChart.resize();
-          }, 50);
+          if (socialPlatformsChart) socialPlatformsChart.resize();
+          if (socialFormatsChart) socialFormatsChart.resize();
         }
       }
     }
