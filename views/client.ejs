@@ -601,27 +601,152 @@
 
       <!-- SECTION 2: META ADS -->
       <section id="panel-meta" class="hidden transition-all duration-300 opacity-0 scale-95">
-        <div class="grid grid-cols-1 sm:grid-cols-12 gap-5 mb-8">
-          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
-            <p class="text-xs font-bold text-gray-500 uppercase">Potrošnja Meta Ads</p>
-            <h3 class="text-3xl font-black text-[#111113] mt-2"><%= client.metaStats.totalSpend %></h3>
-            <p class="text-xs text-emerald-600 font-bold mt-2">Optimalno iskorišteno</p>
+        
+        <!-- META ADS TOP 4 HERO CARDS (EXACT SAME ZELLIFY DASHBOARD CARD DESIGN) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          
+          <!-- CARD 1: DARK HERO CARD (Potrošnja Meta Ads) -->
+          <div class="z-card-dark rounded-[2rem] p-6 flex flex-col justify-between h-[270px] relative overflow-hidden shadow-xl">
+            <div class="flex justify-between items-center z-10">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white text-xs">
+                  <i class="fa-brands fa-meta"></i>
+                </div>
+                <span class="text-xs font-extrabold uppercase tracking-wider text-white/90">Potrošnja Meta Ads</span>
+              </div>
+              <span class="z-badge-orange text-[10px] px-2.5 py-1 uppercase shadow-xs">+6.2% Optimalno</span>
+            </div>
+
+            <!-- Middle Half-Donut Gauge Meter -->
+            <div class="relative w-full h-[120px] flex items-center justify-center my-1 z-10">
+              <div id="meta-card-gauge-spend" class="w-full h-full"></div>
+              <div class="absolute bottom-2 text-center">
+                <span class="text-xs font-bold text-white/70 block">Budžet: $5,000</span>
+                <span class="text-base font-black text-zorange">82% Iskorišteno</span>
+              </div>
+            </div>
+
+            <div class="z-10">
+              <span class="text-[10px] uppercase font-bold text-white/60 block">Ukupno Uloženo na FB & IG</span>
+              <h3 class="text-3xl font-black text-white tracking-tight"><%= client.metaStats.totalSpend %></h3>
+            </div>
           </div>
-          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
-            <p class="text-xs font-bold text-gray-500 uppercase">Meta CPA (Trošak po konverziji)</p>
-            <h3 class="text-3xl font-black text-[#111113] mt-2"><%= client.metaStats.cpa %></h3>
-            <p class="text-xs text-emerald-600 font-bold mt-2">↓ <%= client.metaStats.cpaTrend.value %> pad troška</p>
+
+          <!-- CARD 2: WHITE LINE SPARKLINE CARD (Meta CPA - Trošak po konverziji) -->
+          <div class="z-card-white z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[270px]">
+            <div class="flex justify-between items-start">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-zorange text-xs">
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div>
+                  <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500 block">Meta CPA</span>
+                  <span class="text-[10px] text-gray-400 font-bold">Trošak po Konverziji</span>
+                </div>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black shadow-2xs flex items-center gap-1">
+                📉 <%= client.metaStats.cpaTrend.value %>
+              </span>
+            </div>
+
+            <!-- ECharts Sparkline Trend -->
+            <div id="meta-card-sparkline-cpa" class="w-full h-[95px]"></div>
+
+            <div class="flex items-center justify-between border-t border-gray-100 pt-2.5">
+              <div>
+                <h3 class="text-3xl font-black text-[#111113] tracking-tight"><%= client.metaStats.cpa %></h3>
+                <p class="text-[10px] text-emerald-600 font-bold">Ispod ciljanog maks. ($16.00)</p>
+              </div>
+              <div class="text-right text-[10px] font-bold space-y-0.5">
+                <p class="text-pink-600 flex items-center justify-end gap-1"><i class="fa-brands fa-instagram"></i> CPA: $13.80</p>
+                <p class="text-blue-600 flex items-center justify-end gap-1"><i class="fa-brands fa-facebook-f"></i> CPA: $14.90</p>
+              </div>
+            </div>
           </div>
-          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
-            <p class="text-xs font-bold text-gray-500 uppercase">Ostvareni Upiti (Leads)</p>
-            <h3 class="text-3xl font-black text-[#111113] mt-2"><%= client.metaStats.resultsValue %></h3>
-            <p class="text-xs text-gray-500 font-bold mt-2">Facebook & Instagram</p>
+
+          <!-- CARD 3: WHITE LIST CARD (Top Meta Kampanje) -->
+          <div class="z-card-white z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[270px]">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[#111113] text-xs">
+                  <i class="fa-solid fa-rectangle-ad"></i>
+                </div>
+                <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500">Top Meta Kampanje</span>
+              </div>
+              <button class="text-gray-400 hover:text-black transition-colors"><i class="fa-solid fa-ellipsis"></i></button>
+            </div>
+
+            <!-- List of Campaigns -->
+            <div class="space-y-2.5 my-2">
+              <div class="flex items-center justify-between text-xs font-bold">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-7 h-7 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-black text-xs">IG</div>
+                  <div>
+                    <p class="text-[#111113] font-black leading-tight">Retargeting Proizvodi</p>
+                    <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live (4.8x ROAS)</p>
+                  </div>
+                </div>
+                <span class="text-[10px] font-black text-[#111113]">$1.82k</span>
+              </div>
+
+              <div class="flex items-center justify-between text-xs font-bold">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-xs">FB</div>
+                  <div>
+                    <p class="text-[#111113] font-black leading-tight">Ljetni Popust Video</p>
+                    <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live (3.9x ROAS)</p>
+                  </div>
+                </div>
+                <span class="text-[10px] font-black text-[#111113]">$1.45k</span>
+              </div>
+
+              <div class="flex items-center justify-between text-xs font-bold">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-7 h-7 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-black text-xs">LAL</div>
+                  <div>
+                    <p class="text-[#111113] font-black leading-tight">Lookalike 1% KUPCI</p>
+                    <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live (3.2x ROAS)</p>
+                  </div>
+                </div>
+                <span class="text-[10px] font-black text-[#111113]">$1.18k</span>
+              </div>
+            </div>
+
+            <!-- Capsule Search Input -->
+            <div class="bg-gray-100 rounded-full px-3.5 py-1.5 flex items-center gap-2">
+              <i class="fa-solid fa-magnifying-glass text-xs text-gray-400"></i>
+              <input type="text" placeholder="Pretraži Meta kampanje..." class="bg-transparent text-xs font-medium text-[#111113] placeholder-gray-400 focus:outline-none w-full" />
+            </div>
           </div>
-          <div class="z-card-white rounded-[1.75rem] p-6 sm:col-span-6 lg:col-span-3">
-            <p class="text-xs font-bold text-gray-500 uppercase">Organski Doseg (Reach)</p>
-            <h3 class="text-3xl font-black text-[#111113] mt-2"><%= client.metaStats.organicReach %></h3>
-            <p class="text-xs text-emerald-600 font-bold mt-2">+28% organski skok</p>
+
+          <!-- CARD 4: WHITE BAR CHART CARD (Ostvareni Upiti / Leads) -->
+          <div class="z-card-white z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[270px]">
+            <div class="flex justify-between items-start">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[#111113] text-xs">
+                  <i class="fa-solid fa-bullseye text-xs text-zorange"></i>
+                </div>
+                <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500">Ostvareni Upiti</span>
+              </div>
+              <span class="text-[10px] font-bold text-gray-400 uppercase">Target 300 Upita</span>
+            </div>
+
+            <!-- Vertical Bar Chart in Electric Orange -->
+            <div id="meta-card-bar-leads" class="w-full h-[100px]"></div>
+
+            <div class="flex items-center justify-between border-t border-gray-100 pt-3">
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase mb-0.5">FB & IG Konverzije</p>
+                <h3 class="text-3xl font-black text-[#111113] tracking-tight"><%= client.metaStats.resultsValue %></h3>
+              </div>
+              <div class="flex -space-x-2">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&fit=crop" class="w-7 h-7 rounded-full border-2 border-white object-cover" />
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=100&fit=crop" class="w-7 h-7 rounded-full border-2 border-white object-cover" />
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100&fit=crop" class="w-7 h-7 rounded-full border-2 border-white object-cover" />
+              </div>
+            </div>
           </div>
+
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
@@ -1068,6 +1193,71 @@
       /* ----------------------------------------------------
          META ECHARTS SETUP
          ---------------------------------------------------- */
+      // Meta Ads Card 1: Gauge (Potrošnja Meta Ads)
+      let metaCardGaugeChart, metaCardSparkChart, metaCardBarChart;
+      const metaGaugeElem = document.getElementById('meta-card-gauge-spend');
+      if (metaGaugeElem) {
+        metaCardGaugeChart = echarts.init(metaGaugeElem);
+        metaCardGaugeChart.setOption({
+          series: [{
+            type: 'gauge',
+            startAngle: 180,
+            endAngle: 0,
+            min: 0,
+            max: 100,
+            pointer: { show: false },
+            progress: { show: true, roundCap: true, itemStyle: { color: '#FF5F00' } },
+            axisLine: { lineStyle: { width: 14, color: [[1, 'rgba(255, 255, 255, 0.15)']] } },
+            splitLine: { show: false },
+            axisTick: { show: false },
+            axisLabel: { show: false },
+            data: [{ value: 82, name: '' }],
+            detail: { show: false }
+          }]
+        });
+      }
+
+      // Meta Ads Card 2: Sparkline CPA
+      const metaSparkElem = document.getElementById('meta-card-sparkline-cpa');
+      if (metaSparkElem) {
+        metaCardSparkChart = echarts.init(metaSparkElem);
+        metaCardSparkChart.setOption({
+          grid: { top: 5, bottom: 5, left: 5, right: 5 },
+          xAxis: { type: 'category', show: false, data: ['1','2','3','4','5','6','7','8','9','10','11','12'] },
+          yAxis: { type: 'value', show: false },
+          series: [{
+            data: [18.5, 17.2, 16.8, 15.9, 16.4, 15.1, 14.8, 14.2, 14.5, 13.9, 14.1, 14.2],
+            type: 'line',
+            smooth: true,
+            showSymbol: false,
+            lineStyle: { width: 3, color: '#FF5F00' },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: 'rgba(255, 95, 0, 0.25)' },
+                { offset: 1, color: 'rgba(255, 95, 0, 0.0)' }
+              ])
+            }
+          }]
+        });
+      }
+
+      // Meta Ads Card 4: Bar Leads
+      const metaBarElem = document.getElementById('meta-card-bar-leads');
+      if (metaBarElem) {
+        metaCardBarChart = echarts.init(metaBarElem);
+        metaCardBarChart.setOption({
+          grid: { top: 5, bottom: 5, left: 5, right: 5 },
+          xAxis: { type: 'category', show: false, data: ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'] },
+          yAxis: { type: 'value', show: false },
+          series: [{
+            data: [12, 18, 15, 22, 28, 25, 30, 26, 32, 29, 35, 31, 38, 34, 40],
+            type: 'bar',
+            barWidth: '55%',
+            itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] }
+          }]
+        });
+      }
+
       const metaEffElem = document.getElementById('meta-chart-efficiency');
       if (metaEffElem) {
         efficiencyChart = echarts.init(metaEffElem);
@@ -1264,6 +1454,10 @@
           setTimeout(() => {
             panelMeta.classList.remove('opacity-0', 'scale-95');
             panelMeta.classList.add('opacity-100', 'scale-100');
+            if (metaCardGaugeChart) metaCardGaugeChart.resize();
+            if (metaCardSparkChart) metaCardSparkChart.resize();
+            if (metaCardBarChart) metaCardBarChart.resize();
+
             if (efficiencyChart) efficiencyChart.resize();
             if (platformsChart) platformsChart.resize();
             if (audienceChart) audienceChart.resize();
