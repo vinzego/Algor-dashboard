@@ -770,7 +770,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Profitabilnost oglasa: ROAS (povrat na uloženo) u odnosu na trošak po konverziji (CPA).</p>
-                <div id="meta-chart-roas-cpa" class="w-full h-[240px]"></div>
+                <div id="meta-chart-roas-cpa" class="w-full h-[280px]"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
                 💡 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.roasCpa.decisionNote %>
@@ -789,7 +789,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Relevantnost poruke: Odvajanje klika na web link od općih lajkova i komentara.</p>
-                <div id="meta-chart-ctr-link-all" class="w-full h-[240px]"></div>
+                <div id="meta-chart-ctr-link-all" class="w-full h-[280px]"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
                 🎯 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.ctrLinkAll.decisionNote %>
@@ -811,7 +811,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Trošak po kliku (CPC) i trošak na 1.000 impresija (CPM) na Meta aukcijama.</p>
-                <div id="meta-chart-cpc-cpm" class="w-full h-[240px]"></div>
+                <div id="meta-chart-cpc-cpm" class="w-full h-[280px]"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
                 💰 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.cpcCpm.decisionNote %>
@@ -830,7 +830,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Prosječan broj prikazivanja oglasa istoj osobi (Signal za zamjenu na ~3-4x).</p>
-                <div id="meta-chart-frequency" class="w-full h-[240px]"></div>
+                <div id="meta-chart-frequency" class="w-full h-[280px]"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
                 ⚠️ <strong>Odluka:</strong> <%= client.metaDecisionMetrics.frequency.decisionNote %>
@@ -852,7 +852,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Hook (prve 3 sec) vs Hold (ThruPlay zadržavanje pažnje do poruke).</p>
-                <div id="meta-chart-hook-hold" class="w-full h-[240px]"></div>
+                <div id="meta-chart-hook-hold" class="w-full h-[280px]"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
                 🎬 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.hookHoldRate.decisionNote %>
@@ -871,7 +871,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Stopa napuštanja prije učitavanja (Gubitak > 20-25% znači sporo web mjesto).</p>
-                <div id="meta-chart-landing-clicks" class="w-full h-[240px]"></div>
+                <div id="meta-chart-landing-clicks" class="w-full h-[280px]"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
                 ⚡ <strong>Odluka:</strong> <%= client.metaDecisionMetrics.landingVsClicks.decisionNote %>
@@ -893,7 +893,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Postotak posjetitelja koji dovrše kupnju, upit ili prijavu na stranici.</p>
-                <div id="meta-chart-conversion-rate" class="w-full h-[240px]"></div>
+                <div id="meta-chart-conversion-rate" class="w-full h-[280px]"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
                 🛒 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.conversionRate.decisionNote %>
@@ -912,7 +912,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Ukupni trošak oglašavanja podijeljen s brojem novih kupaca/klijenata.</p>
-                <div id="meta-chart-cac" class="w-full h-[240px]"></div>
+                <div id="meta-chart-cac" class="w-full h-[280px]"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
                 💵 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.cacLtv.decisionNote %>
@@ -1421,7 +1421,7 @@
         chartMetaRoasCpa.setOption({
           tooltip: { trigger: 'axis' },
           legend: { data: ['ROAS (Povrat x)', 'CPA ($ Trošak)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
-          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          grid: { top: 25, bottom: 45, left: '3%', right: '3%', containLabel: true },
           xAxis: { type: 'category', data: mDecData.roasCpa.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
           yAxis: [
             { type: 'value', name: 'ROAS', axisLabel: { fontFamily: 'Urbanist', color: '#111113', fontSize: 10, formatter: '{value}x' } },
@@ -1441,7 +1441,7 @@
         chartMetaCtrLinkAll.setOption({
           tooltip: { trigger: 'axis' },
           legend: { data: ['CTR Link (%)', 'CTR All (Opći %)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
-          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          grid: { top: 25, bottom: 45, left: '3%', right: '3%', containLabel: true },
           xAxis: { type: 'category', data: mDecData.ctrLinkAll.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
           yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10, formatter: '{value}%' } },
           series: [
@@ -1458,7 +1458,7 @@
         chartMetaCpcCpm.setOption({
           tooltip: { trigger: 'axis' },
           legend: { data: ['CPC ($ Klik)', 'CPM ($ 1k Impresija)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
-          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          grid: { top: 25, bottom: 45, left: '3%', right: '3%', containLabel: true },
           xAxis: { type: 'category', data: mDecData.cpcCpm.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
           yAxis: [
             { type: 'value', name: 'CPC', axisLabel: { fontFamily: 'Urbanist', color: '#FF5F00', fontSize: 10, formatter: '${value}' } },
@@ -1478,7 +1478,7 @@
         chartMetaFrequency.setOption({
           tooltip: { trigger: 'axis' },
           legend: { data: ['Prosječna Frekvencija', 'Kritična Granica Ad Fatigue (3.5x)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
-          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          grid: { top: 25, bottom: 45, left: '3%', right: '3%', containLabel: true },
           xAxis: { type: 'category', data: mDecData.frequency.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
           yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10, formatter: '{value}x' } },
           series: [
@@ -1495,7 +1495,7 @@
         chartMetaHookHold.setOption({
           tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
           legend: { data: ['Hook Rate (3s / Impresije %)', 'Hold Rate (ThruPlay / 3s %)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
-          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          grid: { top: 25, bottom: 45, left: '3%', right: '3%', containLabel: true },
           xAxis: { type: 'category', data: mDecData.hookHoldRate.videos, axisLabel: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 10, rotate: 10 } },
           yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10, formatter: '{value}%' } },
           series: [
@@ -1512,7 +1512,7 @@
         chartMetaLandingClicks.setOption({
           tooltip: { trigger: 'axis' },
           legend: { data: ['Klikovi na Link (Clicks)', 'Otvorene Stranice (Landing Views)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
-          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          grid: { top: 25, bottom: 45, left: '3%', right: '3%', containLabel: true },
           xAxis: { type: 'category', data: mDecData.landingVsClicks.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
           yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
           series: [
@@ -1529,7 +1529,7 @@
         chartMetaConversionRate.setOption({
           tooltip: { trigger: 'axis' },
           legend: { data: ['Stopa Konverzije (CR %)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
-          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          grid: { top: 25, bottom: 45, left: '3%', right: '3%', containLabel: true },
           xAxis: { type: 'category', data: mDecData.conversionRate.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
           yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10, formatter: '{value}%' } },
           series: [
@@ -1545,7 +1545,7 @@
         chartMetaCac.setOption({
           tooltip: { trigger: 'axis' },
           legend: { data: ['Trošak Novog Klijenta (CAC $)'], bottom: 0, textStyle: { fontFamily: 'Urbanist', color: '#111113', fontWeight: 700, fontSize: 11 } },
-          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          grid: { top: 25, bottom: 45, left: '3%', right: '3%', containLabel: true },
           xAxis: { type: 'category', data: mDecData.cacLtv.days, axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10 } },
           yAxis: { type: 'value', axisLabel: { fontFamily: 'Urbanist', color: '#6B7280', fontSize: 10, formatter: '${value}' } },
           series: [
@@ -1704,9 +1704,7 @@
         
         if (panelMeta) {
           panelMeta.classList.remove('hidden');
-          setTimeout(() => {
-            panelMeta.classList.remove('opacity-0', 'scale-95');
-            panelMeta.classList.add('opacity-100', 'scale-100');
+          const resizeMeta = () => {
             if (metaCardGaugeChart) metaCardGaugeChart.resize();
             if (metaCardSparkChart) metaCardSparkChart.resize();
             if (metaCardBarChart) metaCardBarChart.resize();
@@ -1719,7 +1717,15 @@
             if (chartMetaLandingClicks) chartMetaLandingClicks.resize();
             if (chartMetaConversionRate) chartMetaConversionRate.resize();
             if (chartMetaCac) chartMetaCac.resize();
+          };
+
+          setTimeout(() => {
+            panelMeta.classList.remove('opacity-0', 'scale-95');
+            panelMeta.classList.add('opacity-100', 'scale-100');
+            resizeMeta();
           }, 50);
+          setTimeout(resizeMeta, 150);
+          setTimeout(resizeMeta, 350);
         }
       }
       
