@@ -92,6 +92,59 @@
             <i class="fa-solid fa-chevron-down text-[10px] opacity-75"></i>
           </button>
 
+          <!-- Notification Bell Icon (Obavijesti & Upozorenja) -->
+          <div class="relative">
+            <button id="btn-notifications" onclick="toggleNotifications()" class="relative w-9 h-9 rounded-full bg-gray-100 hover:bg-black hover:text-white border border-black/5 flex items-center justify-center text-[#111113] transition-all duration-200 shadow-xs" title="Marketinške obavijesti i preporuke">
+              <i class="fa-solid fa-bell text-xs"></i>
+              <!-- Red Alert Badge Count -->
+              <span class="absolute -top-1 -right-1 w-4 h-4 bg-zorange text-white text-[9px] font-black rounded-full flex items-center justify-center border border-white shadow-xs">
+                <%= client.executiveHealthCheck.criticalIssues.length + client.executiveHealthCheck.actionFixes.length %>
+              </span>
+            </button>
+
+            <!-- Notification Dropdown Popover -->
+            <div id="dropdown-notifications" class="hidden absolute right-0 mt-3 w-80 md:w-96 bg-white rounded-[2rem] shadow-2xl border border-black/10 p-5 z-50 transition-all duration-200 text-[#111113]">
+              <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-xl bg-zorange text-white flex items-center justify-center font-black text-xs shadow-xs">
+                    <i class="fa-solid fa-bell"></i>
+                  </div>
+                  <h4 class="text-xs font-black uppercase tracking-wider text-[#111113]">Upozorenja & Preporučeni Popravci</h4>
+                </div>
+                <span class="z-badge-green text-[10px] px-2.5 py-0.5"><%= client.executiveHealthCheck.overallHealth %></span>
+              </div>
+
+              <!-- Scrollable Alert Items List -->
+              <div class="space-y-3 max-h-80 overflow-y-auto pr-1">
+                <!-- Critical Issues (Što ne valja / Potrebno popraviti) -->
+                <div class="space-y-2">
+                  <p class="text-[10px] font-black uppercase tracking-wider text-rose-600 flex items-center gap-1">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Potrebno popraviti u marketingu (<%= client.executiveHealthCheck.criticalIssues.length %>)
+                  </p>
+                  <% client.executiveHealthCheck.criticalIssues.forEach(item => { %>
+                    <div class="bg-rose-50 border border-rose-100 rounded-xl p-3 text-xs font-bold text-rose-950">
+                      <strong class="block text-rose-900 mb-0.5"><%= item.title %></strong>
+                      <p class="text-[11px] font-semibold text-rose-800 leading-tight"><%= item.desc %></p>
+                    </div>
+                  <% }); %>
+                </div>
+
+                <!-- Action Fixes (Preporučene radnje) -->
+                <div class="space-y-2 pt-2 border-t border-gray-100">
+                  <p class="text-[10px] font-black uppercase tracking-wider text-zorange flex items-center gap-1">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Preporučeni brzi popravci (<%= client.executiveHealthCheck.actionFixes.length %>)
+                  </p>
+                  <% client.executiveHealthCheck.actionFixes.forEach(item => { %>
+                    <div class="bg-orange-50 border border-orange-100 rounded-xl p-3 text-xs font-bold text-orange-950">
+                      <strong class="block text-orange-950 mb-0.5"><%= item.title %></strong>
+                      <p class="text-[11px] font-semibold text-gray-600 leading-tight">Utjecaj: <%= item.impact %></p>
+                    </div>
+                  <% }); %>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- User Profile Avatar -->
           <div class="relative w-9 h-9 rounded-full bg-gray-200 border-2 border-white shadow-xs overflow-hidden">
             <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Avatar" class="w-full h-full object-cover" />
@@ -129,74 +182,6 @@
       <!-- SECTION 1: 360° OVERVIEW (ZELLIFY UI CARDS MATCHING REFERENCE IMAGE) -->
       <section id="panel-advanced-analytics" class="transition-all duration-300 opacity-100 scale-100">
         
-        <!-- EXECUTIVE HEALTH SUMMARY BANNER (Što valja / Što ne valja / Kako popraviti) -->
-        <div class="z-card-white rounded-[2rem] p-6 mb-8 shadow-sm border border-black/5">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5 border-b border-gray-100 pb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center font-black text-lg shadow-sm">
-                <i class="fa-solid fa-heart-pulse text-zorange"></i>
-              </div>
-              <div>
-                <h4 class="text-base font-black text-[#111113] uppercase tracking-wider">Brzi uvid u zdravlje marketinga (At-A-Glance Status)</h4>
-                <p class="text-xs text-gray-500 font-bold">Što funkcionira, što zahtijeva pažnju i što poduzeti za brzi napredak</p>
-              </div>
-            </div>
-            <span class="z-badge-green px-4 py-1.5 text-xs uppercase shadow-xs self-start md:self-auto">
-              Ukupni Status: <%= client.executiveHealthCheck.overallHealth %>
-            </span>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <!-- Column 1: What Works Great (Što valja) -->
-            <div class="bg-emerald-50 rounded-2xl p-4 border border-emerald-100">
-              <div class="flex items-center gap-2 mb-3 pb-2 border-b border-emerald-200/60">
-                <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
-                <h5 class="text-xs font-black text-emerald-950 uppercase tracking-wider">🟢 Što odlično funkcionira</h5>
-              </div>
-              <ul class="space-y-2.5">
-                <% client.executiveHealthCheck.goodHighlights.forEach(item => { %>
-                  <li class="text-xs font-bold text-emerald-950 leading-relaxed bg-white p-3 rounded-xl border border-emerald-100 shadow-2xs">
-                    <strong class="block text-emerald-900 mb-0.5"><%= item.title %></strong>
-                    <%= item.desc %>
-                  </li>
-                <% }); %>
-              </ul>
-            </div>
-
-            <!-- Column 2: What Needs Attention (Što ne valja) -->
-            <div class="bg-rose-50 rounded-2xl p-4 border border-rose-100">
-              <div class="flex items-center gap-2 mb-3 pb-2 border-b border-rose-200/60">
-                <i class="fa-solid fa-triangle-exclamation text-rose-600 text-sm"></i>
-                <h5 class="text-xs font-black text-rose-950 uppercase tracking-wider">🔴 Što ne valja (Zahtijeva pažnju)</h5>
-              </div>
-              <ul class="space-y-2.5">
-                <% client.executiveHealthCheck.criticalIssues.forEach(item => { %>
-                  <li class="text-xs font-bold text-rose-950 leading-relaxed bg-white p-3 rounded-xl border border-rose-100 shadow-2xs">
-                    <strong class="block text-rose-900 mb-0.5"><%= item.title %></strong>
-                    <%= item.desc %>
-                  </li>
-                <% }); %>
-              </ul>
-            </div>
-
-            <!-- Column 3: Actionable Fixes (Kako popraviti) -->
-            <div class="bg-orange-50 rounded-2xl p-4 border border-orange-100">
-              <div class="flex items-center gap-2 mb-3 pb-2 border-b border-orange-200/60">
-                <i class="fa-solid fa-wand-magic-sparkles text-zorange text-sm"></i>
-                <h5 class="text-xs font-black text-orange-950 uppercase tracking-wider">💡 Preporučeni brzi popravak</h5>
-              </div>
-              <ul class="space-y-2.5">
-                <% client.executiveHealthCheck.actionFixes.forEach(item => { %>
-                  <li class="text-xs font-bold text-orange-950 leading-relaxed bg-white p-3 rounded-xl border border-orange-100 shadow-2xs">
-                    <strong class="block text-orange-950 mb-0.5"><%= item.title %></strong>
-                    <span class="text-gray-600 font-semibold">Utjecaj: <%= item.impact %></span>
-                  </li>
-                <% }); %>
-              </ul>
-            </div>
-          </div>
-        </div>
-
         <!-- ZELLIFY TOP WIDGETS ROW (MATCHING REFERENCE IMAGE CARDS 1 - 4) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           
@@ -1213,6 +1198,25 @@
         }
       }
     }
+
+    // Toggle Notification Popover Dropdown
+    function toggleNotifications() {
+      const popover = document.getElementById('dropdown-notifications');
+      if (popover) {
+        popover.classList.toggle('hidden');
+      }
+    }
+
+    // Close notification dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      const btn = document.getElementById('btn-notifications');
+      const popover = document.getElementById('dropdown-notifications');
+      if (popover && !popover.classList.contains('hidden')) {
+        if (!popover.contains(e.target) && btn && !btn.contains(e.target)) {
+          popover.classList.add('hidden');
+        }
+      }
+    });
   </script>
 </body>
 </html>
