@@ -999,6 +999,37 @@
               /* CLIENT DASHBOARD VIEW */
               <section className="space-y-6">
                 
+                {/* PROMINENT CLIENT HEADER WITH NAME & BADGES */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 px-2 py-1">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-11 h-11 rounded-full bg-[#111113] text-white flex items-center justify-center font-black text-sm shadow-md">
+                      {currentClientObj.logo || currentClientObj.name.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                      <h2 className="text-3xl font-black tracking-tight text-[#111113] dark:text-white flex items-center gap-3">
+                        <span>{currentClientObj.name}</span>
+                        <span className={`px-3 py-0.5 rounded-full text-xs font-black uppercase ${
+                          currentClientObj.status === 'Healthy' 
+                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                            : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                        }`}>
+                          {currentClientObj.status === 'Healthy' ? '✓ Healthy' : '⚠️ Needs Attention'}
+                        </span>
+                      </h2>
+                      <p className="text-xs text-gray-500 font-bold mt-0.5">
+                        {currentClientObj.industry || 'Digital Marketing Agency'} • Marketing Dashboard
+                      </p>
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={() => setIsHomeView(true)}
+                    className="px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 text-xs font-black text-gray-600 dark:text-gray-300 hover:text-[#111113] dark:hover:text-white transition-colors flex items-center gap-2 border border-gray-200 dark:border-gray-700"
+                  >
+                    <i className="fa-solid fa-arrow-left text-xs"></i> Svi Klijenti
+                  </button>
+                </div>
+
                 {/* TABS NAVIGATION & COMPACT AI INTERVENTIONS BAR */}
                 <div className="space-y-4">
                   {/* 3 Main Tabs */}
