@@ -557,6 +557,150 @@
           </div>
         </div>
 
+        <!-- MONTHLY POSTS SECTION (OBJAVE U TEKUĆEM MJESECU) WITH TABLE & GALLERY VIEWS -->
+        <div class="z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 mb-8">
+          
+          <!-- SECTION HEADER WITH CONTROLS -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-5 mb-6">
+            <div>
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-zorange text-white flex items-center justify-center font-black text-xs shadow-xs">
+                  <i class="fa-solid fa-photo-film"></i>
+                </div>
+                <h3 class="text-xl font-black text-[#111113] uppercase tracking-wider">Objave u Tekućem Mjesecu</h3>
+              </div>
+              <p class="text-xs text-gray-500 font-bold mt-1">Pregled svih objavljenih kreativa s brojem pregleda, lajkova, komentara i dijeljenja</p>
+            </div>
+
+            <!-- CONTROLS: PLATFORM FILTER & VIEW MODE TOGGLE -->
+            <div class="flex flex-wrap items-center gap-3">
+              
+              <!-- Platform Filter Pills -->
+              <div class="bg-gray-100 p-1 rounded-full flex items-center gap-1 text-xs font-bold">
+                <button onclick="filterPosts('all')" id="post-filter-all" class="px-3 py-1.5 rounded-full bg-white text-[#111113] shadow-xs font-black transition-all">Sve</button>
+                <button onclick="filterPosts('instagram')" id="post-filter-instagram" class="px-3 py-1.5 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-1">
+                  <i class="fa-brands fa-instagram text-pink-600"></i> Instagram
+                </button>
+                <button onclick="filterPosts('facebook')" id="post-filter-facebook" class="px-3 py-1.5 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-1">
+                  <i class="fa-brands fa-facebook-f text-blue-600"></i> Facebook
+                </button>
+                <button onclick="filterPosts('tiktok')" id="post-filter-tiktok" class="px-3 py-1.5 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-1">
+                  <i class="fa-brands fa-tiktok text-black"></i> TikTok
+                </button>
+              </div>
+
+              <!-- View Switcher (Table vs Gallery) -->
+              <div class="bg-gray-100 p-1 rounded-full flex items-center gap-1 text-xs font-bold border border-black/5">
+                <button onclick="switchPostsView('table')" id="btn-view-table" class="px-3 py-1.5 rounded-full bg-white text-[#111113] shadow-xs font-black transition-all flex items-center gap-1.5">
+                  <i class="fa-solid fa-list text-xs"></i> <span>Tablica</span>
+                </button>
+                <button onclick="switchPostsView('gallery')" id="btn-view-gallery" class="px-3 py-1.5 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-1.5">
+                  <i class="fa-solid fa-border-all text-xs"></i> <span>Galerija</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- VIEW 1: TABLE VIEW (DEFAULT) -->
+          <div id="posts-view-table" class="overflow-x-auto transition-all">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="text-gray-400 uppercase tracking-wider font-bold text-[10px] border-b border-gray-100">
+                  <th class="py-3 px-3">Kreativa / Objava</th>
+                  <th class="py-3 px-3">Platforma & Datum</th>
+                  <th class="py-3 px-3 text-right">👁️ Pregledi</th>
+                  <th class="py-3 px-3 text-right">❤️ Lajkovi</th>
+                  <th class="py-3 px-3 text-right">💬 Komentari</th>
+                  <th class="py-3 px-3 text-right">🔄 Dijeljenja</th>
+                  <th class="py-3 px-3 text-right">Stopa Angažmana</th>
+                  <th class="py-3 px-3 text-center">Status / Uvid</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 font-bold text-[#111113]">
+                <% client.socialMediaStats.creatives.forEach(post => { %>
+                  <tr class="post-row-item hover:bg-gray-50/80 transition-colors" data-platform="<%= post.platform.toLowerCase() %>">
+                    <td class="py-3 px-3">
+                      <div class="flex items-center gap-3">
+                        <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="w-12 h-12 rounded-xl object-cover border border-black/5 shadow-xs" />
+                        <div>
+                          <p class="font-black text-sm text-[#111113] leading-tight"><%= post.title %></p>
+                          <span class="text-[10px] text-gray-400 font-bold uppercase"><%= post.type %></span>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="py-3 px-3">
+                      <p class="flex items-center gap-1.5 text-xs text-gray-700 font-extrabold">
+                        <i class="<%= post.platformIcon %>"></i> <%= post.platform %>
+                      </p>
+                      <p class="text-[10px] text-gray-400 font-semibold"><%= post.date %></p>
+                    </td>
+                    <td class="py-3 px-3 text-right font-black text-[#111113] text-sm"><%= post.impressions %></td>
+                    <td class="py-3 px-3 text-right text-rose-600 font-black"><%= post.likes %></td>
+                    <td class="py-3 px-3 text-right text-blue-600 font-black"><%= post.comments %></td>
+                    <td class="py-3 px-3 text-right text-zorange font-black"><%= post.shares %></td>
+                    <td class="py-3 px-3 text-right font-black"><%= post.engagementRate %></td>
+                    <td class="py-3 px-3 text-center">
+                      <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-xs <%= post.badgeClass %>">
+                        <%= post.badge %>
+                      </span>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- VIEW 2: GALLERY VIEW (4 CARDS PER ROW: grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6) -->
+          <div id="posts-view-gallery" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-all">
+            <% client.socialMediaStats.creatives.forEach(post => { %>
+              <div class="post-card-item z-card-white border border-gray-100 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-platform="<%= post.platform.toLowerCase() %>">
+                <div>
+                  <!-- Image Header with Platform Badge -->
+                  <div class="relative h-44 w-full overflow-hidden bg-gray-100">
+                    <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-full text-[10px] font-black text-[#111113] flex items-center gap-1 shadow-xs border border-black/5">
+                      <i class="<%= post.platformIcon %>"></i> <%= post.platform %>
+                    </div>
+                    <div class="absolute top-3 right-3">
+                      <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border shadow-xs <%= post.badgeClass %>">
+                        <%= post.badge %>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Post Content Details -->
+                  <div class="p-4">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1"><%= post.date %> • <%= post.type %></p>
+                    <h4 class="font-black text-sm text-[#111113] leading-snug line-clamp-2 mb-3"><%= post.title %></h4>
+                  </div>
+                </div>
+
+                <!-- Metrics Grid Footer -->
+                <div class="p-3 bg-gray-50 border-t border-gray-100 grid grid-cols-4 gap-1 text-center text-xs">
+                  <div class="p-1">
+                    <span class="text-[9px] text-gray-400 block font-bold">👁️ Pregledi</span>
+                    <strong class="text-[#111113] text-xs font-black"><%= post.impressions %></strong>
+                  </div>
+                  <div class="p-1">
+                    <span class="text-[9px] text-gray-400 block font-bold">❤️ Lajkovi</span>
+                    <strong class="text-rose-600 text-xs font-black"><%= post.likes %></strong>
+                  </div>
+                  <div class="p-1">
+                    <span class="text-[9px] text-gray-400 block font-bold">💬 Komentari</span>
+                    <strong class="text-blue-600 text-xs font-black"><%= post.comments %></strong>
+                  </div>
+                  <div class="p-1">
+                    <span class="text-[9px] text-gray-400 block font-bold">🔄 Dijeljenja</span>
+                    <strong class="text-zorange text-xs font-black"><%= post.shares %></strong>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+
+        </div>
+
       </section>
 
       <!-- SECTION 2: META ADS -->
@@ -1277,6 +1421,61 @@
             if (socialFormatsChart) socialFormatsChart.resize();
           }, 50);
         }
+      }
+    }
+
+    // Filter Posts by Platform
+    function filterPosts(platform) {
+      const filterBtns = ['all', 'instagram', 'facebook', 'tiktok'];
+      filterBtns.forEach(p => {
+        const btn = document.getElementById(`post-filter-${p}`);
+        if (btn) {
+          if (p === platform) {
+            btn.className = 'px-3 py-1.5 rounded-full bg-white text-[#111113] shadow-xs font-black transition-all';
+          } else {
+            btn.className = 'px-3 py-1.5 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-1';
+          }
+        }
+      });
+
+      const tableRows = document.querySelectorAll('.post-row-item');
+      tableRows.forEach(row => {
+        const plat = (row.getAttribute('data-platform') || '').toLowerCase();
+        if (platform === 'all' || plat.includes(platform)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      const galleryCards = document.querySelectorAll('.post-card-item');
+      galleryCards.forEach(card => {
+        const plat = (card.getAttribute('data-platform') || '').toLowerCase();
+        if (platform === 'all' || plat.includes(platform)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Switch Posts View Mode (Table vs Gallery)
+    function switchPostsView(viewMode) {
+      const btnTable = document.getElementById('btn-view-table');
+      const btnGallery = document.getElementById('btn-view-gallery');
+      const viewTable = document.getElementById('posts-view-table');
+      const viewGallery = document.getElementById('posts-view-gallery');
+
+      if (viewMode === 'table') {
+        btnTable.className = 'px-3 py-1.5 rounded-full bg-white text-[#111113] shadow-xs font-black transition-all flex items-center gap-1.5';
+        btnGallery.className = 'px-3 py-1.5 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-1.5';
+        viewTable.classList.remove('hidden');
+        viewGallery.classList.add('hidden');
+      } else {
+        btnGallery.className = 'px-3 py-1.5 rounded-full bg-white text-[#111113] shadow-xs font-black transition-all flex items-center gap-1.5';
+        btnTable.className = 'px-3 py-1.5 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-1.5';
+        viewGallery.classList.remove('hidden');
+        viewTable.classList.add('hidden');
       }
     }
 
