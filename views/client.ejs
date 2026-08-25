@@ -49,13 +49,9 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo, useRef } = React;
 
-    // --- MOCK DATASETS & ACCOUNT DEFINITIONS ---
-    const ACCOUNTS = [
-      { id: 'acme-corp', name: 'Acme Corp', package: 'Enterprise' },
-      { id: 'zellify-tech', name: 'Zellify Tech', package: 'Pro Agency' },
-      { id: 'apex-studio', name: 'Apex Studio', package: 'Growth' },
-      { id: 'luxe-commerce', name: 'Luxe Commerce', package: 'Scale' }
-    ];
+    // --- ACCOUNTS DATA FROM EXPRESS BACKEND ---
+    const ACCOUNTS = <%- JSON.stringify(clients.map(c => ({ id: c.id, name: c.name, package: c.package }))) %>;
+    const INITIAL_CLIENT_ID = '<%= client.id %>';
 
     const DATE_RANGES = [
       { id: '7d', label: 'Zadnjih 7 dana (Last 7 Days)' },
@@ -114,7 +110,7 @@
     // --- MAIN REACT DASHBOARD APPLICATION ---
     function DashboardApp() {
       const [activeView, setActiveView] = useState('instagram'); // 'instagram' | 'meta-ads'
-      const [selectedAccount, setSelectedAccount] = useState('acme-corp');
+      const [selectedAccount, setSelectedAccount] = useState(INITIAL_CLIENT_ID);
       const [dateRange, setDateRange] = useState('30d');
       const [isLoading, setIsLoading] = useState(false);
       const [darkMode, setDarkMode] = useState(false);
@@ -135,11 +131,13 @@
         }
       }, [darkMode]);
 
-      // Trigger simulated skeleton loading state when changing date or account
+      // Redirect to selected client URL route
       const handleAccountChange = (e) => {
-        setIsLoading(true);
-        setSelectedAccount(e.target.value);
-        setTimeout(() => setIsLoading(false), 350);
+        const newId = e.target.value;
+        setSelectedAccount(newId);
+        if (newId !== INITIAL_CLIENT_ID) {
+          window.location.href = `/client/${newId}`;
+        }
       };
 
       const handleDateChange = (e) => {
@@ -370,15 +368,21 @@
             {/* TOP BAR: BRAND + SELECTORS + THEME TOGGLE */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-gray-200 dark:border-gray-800">
               
-              {/* Brand Logo & Tenant Badge */}
+              {/* Brand Logo & Tenant Badge + Back to All Clients Link */}
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-[#111113] text-white flex items-center justify-center font-black text-lg shadow-md border border-white/10">
-                  <i className="fa-solid fa-bolt-lightning text-zorange"></i>
-                </div>
+                <a 
+                  href="/" 
+                  className="w-10 h-10 rounded-2xl bg-[#111113] text-white flex items-center justify-center font-black text-sm shadow-md border border-white/10 hover:bg-zorange transition-colors"
+                  title="Povratak na pregled svih klijenata"
+                >
+                  <i className="fa-solid fa-arrow-left text-zorange"></i>
+                </a>
                 <div>
                   <h1 className="text-2xl font-black tracking-tight text-[#111113] dark:text-white flex items-center gap-1.5">
                     ZELLIFY<span className="text-zorange">.</span>
-                    <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange border border-orange-200 dark:border-orange-900">Agency Edition</span>
+                    <a href="/" className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange border border-orange-200 dark:border-orange-900 hover:bg-zorange hover:text-white transition-colors">
+                      ← Svi Klijenti
+                    </a>
                   </h1>
                   <p className="text-xs text-gray-500 font-semibold">Client Marketing Analytics System</p>
                 </div>
