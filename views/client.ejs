@@ -332,88 +332,88 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-          <!-- 1. Reach & Impressions (Novi korisnici vs Postojeća publika) -->
+          <!-- 1. Reach & Impressions / Organic vs Paid Reach -->
           <div class="lg:col-span-7 z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 flex flex-col justify-between">
             <div>
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
                 <div>
-                  <h4 class="text-base font-black text-[#111113] uppercase tracking-wider">Reach & Impressions (Doseg i Impresije)</h4>
-                  <p class="text-xs text-gray-500 font-semibold">Novi korisnici u odnosu na postojeću publiku</p>
+                  <h4 id="card1-title" class="text-base font-black text-[#111113] uppercase tracking-wider">Reach & Impressions (Doseg i Impresije)</h4>
+                  <p id="card1-sub" class="text-xs text-gray-500 font-semibold">Novi korisnici u odnosu na postojeću publiku</p>
                 </div>
-                <span class="z-badge-orange text-[10px] px-3 py-1 text-white shadow-xs self-start sm:self-auto">72% Novi Doseg</span>
+                <span id="card1-badge" class="z-badge-orange text-[10px] px-3 py-1 text-white shadow-xs self-start sm:self-auto">72% Novi Doseg</span>
               </div>
               <div id="chart-reach-impressions" class="w-full" style="height: 280px;"></div>
             </div>
-            <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+            <div id="card1-note" class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
               💡 <strong>Odluka:</strong> <%= client.strategicDecisionMetrics.reachImpressions.decisionNote %>
             </div>
           </div>
 
-          <!-- 2. Engagement Rate po Dosegu (ERR %) -->
+          <!-- 2. Engagement Rate po Dosegu / Page Engaged Users -->
           <div class="lg:col-span-5 z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 flex flex-col justify-between">
             <div>
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
                 <div>
-                  <h4 class="text-base font-black text-[#111113] uppercase tracking-wider">Engagement Rate po Dosegu (ERR %)</h4>
-                  <p class="text-xs text-gray-500 font-semibold">Točniji pokazatelj od engagementa po broju pratitelja</p>
+                  <h4 id="card2-title" class="text-base font-black text-[#111113] uppercase tracking-wider">Engagement Rate po Dosegu (ERR %)</h4>
+                  <p id="card2-sub" class="text-xs text-gray-500 font-semibold">Točniji pokazatelj od engagementa po broju pratitelja</p>
                 </div>
-                <span class="z-badge-black text-[10px] px-3 py-1 shadow-xs self-start sm:self-auto">ERR: 6.2% Prosjek</span>
+                <span id="card2-badge" class="z-badge-black text-[10px] px-3 py-1 shadow-xs self-start sm:self-auto">ERR: 6.2% Prosjek</span>
               </div>
               <div id="chart-err-rate" class="w-full" style="height: 280px;"></div>
             </div>
-            <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+            <div id="card2-note" class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
               🎯 <strong>Uvid:</strong> <%= client.strategicDecisionMetrics.err.decisionNote %>
             </div>
           </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-          <!-- 3. Saves & Shares (Spremanja i Dijeljenja) -->
+          <!-- 3. Saves & Shares / Share & Comment Ratio -->
           <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 flex flex-col justify-between">
             <div>
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
                 <div>
-                  <h4 class="text-base font-black text-[#111113] uppercase tracking-wider">Saves & Shares (Spremanja i Dijeljenja)</h4>
-                  <p class="text-xs text-gray-500 font-semibold">Ključni signali za algoritam i vrijednost sadržaja</p>
+                  <h4 id="card3-title" class="text-base font-black text-[#111113] uppercase tracking-wider">Saves & Shares (Spremanja i Dijeljenja)</h4>
+                  <p id="card3-sub" class="text-xs text-gray-500 font-semibold">Ključni signali za algoritam i vrijednost sadržaja</p>
                 </div>
-                <span class="z-badge-black text-[10px] px-3 py-1 shadow-xs self-start sm:self-auto">Algoritamski Signal</span>
+                <span id="card3-badge" class="z-badge-black text-[10px] px-3 py-1 shadow-xs self-start sm:self-auto">Algoritamski Signal</span>
               </div>
               <div id="chart-saves-shares" class="w-full" style="height: 280px;"></div>
             </div>
-            <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+            <div id="card3-note" class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
               📌 <strong>Analiza:</strong> <%= client.strategicDecisionMetrics.savesShares.decisionNote %>
             </div>
           </div>
 
-          <!-- 4. Follower Growth Rate & Unfollows -->
+          <!-- 4. Follower Growth Rate / Page Views & CTA Action Clicks -->
           <div class="lg:col-span-6 z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 flex flex-col justify-between">
             <div>
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
                 <div>
-                  <h4 class="text-base font-black text-[#111113] uppercase tracking-wider">Follower Growth Rate & Unfollows</h4>
-                  <p class="text-xs text-gray-500 font-semibold">Trend rasta i pada baze umjesto fiksnog broja</p>
+                  <h4 id="card4-title" class="text-base font-black text-[#111113] uppercase tracking-wider">Follower Growth Rate & Unfollows</h4>
+                  <p id="card4-sub" class="text-xs text-gray-500 font-semibold">Trend rasta i pada baze umjesto fiksnog broja</p>
                 </div>
-                <span class="z-badge-green text-[10px] px-3 py-1 shadow-xs self-start sm:self-auto">Neto +1,380 Pratitelja</span>
+                <span id="card4-badge" class="z-badge-green text-[10px] px-3 py-1 shadow-xs self-start sm:self-auto">Neto +1,380 Pratitelja</span>
               </div>
               <div id="chart-follower-growth" class="w-full" style="height: 280px;"></div>
             </div>
-            <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+            <div id="card4-note" class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
               📈 <strong>Trend:</strong> <%= client.strategicDecisionMetrics.followerGrowth.decisionNote %>
             </div>
           </div>
         </div>
 
-        <!-- 5. Profile Visits & Website Taps -->
+        <!-- 5. Profile Visits & Website Taps / Video Performance 3-sec vs 1-min Views -->
         <div class="z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 mb-8">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 border-b border-gray-100 pb-3">
             <div>
-              <h4 class="text-base font-black text-[#111113] uppercase tracking-wider">Profile Visits & Website Taps (Prijelaz u Namjeru Kupi)</h4>
-              <p class="text-xs text-gray-500 font-semibold">Konverzija iz pasivnog gledatelja u namjeru istraživanja ponude i klika na link</p>
+              <h4 id="card5-title" class="text-base font-black text-[#111113] uppercase tracking-wider">Profile Visits & Website Taps (Prijelaz u Namjeru Kupi)</h4>
+              <p id="card5-sub" class="text-xs text-gray-500 font-semibold">Konverzija iz pasivnog gledatelja u namjeru istraživanja ponude i klika na link</p>
             </div>
-            <span class="z-badge-orange text-[10px] px-3.5 py-1 text-white shadow-xs self-start sm:self-auto">28.5% Click-Through na Bio Link</span>
+            <span id="card5-badge" class="z-badge-orange text-[10px] px-3.5 py-1 text-white shadow-xs self-start sm:self-auto">28.5% Click-Through na Bio Link</span>
           </div>
           <div id="chart-profile-visits" class="w-full" style="height: 280px;"></div>
-          <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
+          <div id="card5-note" class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 text-xs font-bold text-gray-700 mt-3">
             🛒 <strong>Konverzija:</strong> <%= client.strategicDecisionMetrics.profileVisits.decisionNote %>
           </div>
         </div>
@@ -877,52 +877,112 @@
       const btnIg = document.getElementById('btn-platform-ig');
       const btnFb = document.getElementById('btn-platform-fb');
 
+      // Elements to update
+      const c1Title = document.getElementById('card1-title');
+      const c1Sub = document.getElementById('card1-sub');
+      const c1Badge = document.getElementById('card1-badge');
+      const c1Note = document.getElementById('card1-note');
+
+      const c2Title = document.getElementById('card2-title');
+      const c2Sub = document.getElementById('card2-sub');
+      const c2Badge = document.getElementById('card2-badge');
+      const c2Note = document.getElementById('card2-note');
+
+      const c3Title = document.getElementById('card3-title');
+      const c3Sub = document.getElementById('card3-sub');
+      const c3Badge = document.getElementById('card3-badge');
+      const c3Note = document.getElementById('card3-note');
+
+      const c4Title = document.getElementById('card4-title');
+      const c4Sub = document.getElementById('card4-sub');
+      const c4Badge = document.getElementById('card4-badge');
+      const c4Note = document.getElementById('card4-note');
+
+      const c5Title = document.getElementById('card5-title');
+      const c5Sub = document.getElementById('card5-sub');
+      const c5Badge = document.getElementById('card5-badge');
+      const c5Note = document.getElementById('card5-note');
+
       if (platform === 'instagram') {
         if (btnIg) btnIg.className = 'px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-200 bg-[#111113] text-white shadow-xs flex items-center gap-2';
         if (btnFb) btnFb.className = 'px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 bg-gray-100 text-gray-600 hover:bg-gray-200 shadow-2xs flex items-center gap-2';
 
+        if (c1Title) c1Title.innerHTML = 'Reach & Impressions (Doseg i Impresije)';
+        if (c1Sub) c1Sub.innerHTML = 'Novi korisnici u odnosu na postojeću publiku';
+        if (c1Badge) c1Badge.innerHTML = '72% Novi Doseg';
+        if (c1Note) c1Note.innerHTML = '💡 <strong>Odluka:</strong> <%= client.strategicDecisionMetrics.reachImpressions.decisionNote %>';
+
+        if (c2Title) c2Title.innerHTML = 'Engagement Rate po Dosegu (ERR %)';
+        if (c2Sub) c2Sub.innerHTML = 'Točniji pokazatelj od engagementa po broju pratitelja';
+        if (c2Badge) c2Badge.innerHTML = 'ERR: 6.2% Prosjek';
+        if (c2Note) c2Note.innerHTML = '🎯 <strong>Uvid:</strong> <%= client.strategicDecisionMetrics.err.decisionNote %>';
+
+        if (c3Title) c3Title.innerHTML = 'Saves & Shares (Spremanja i Dijeljenja)';
+        if (c3Sub) c3Sub.innerHTML = 'Ključni signali za algoritam i vrijednost sadržaja';
+        if (c3Badge) c3Badge.innerHTML = 'Algoritamski Signal';
+        if (c3Note) c3Note.innerHTML = '📌 <strong>Analiza:</strong> <%= client.strategicDecisionMetrics.savesShares.decisionNote %>';
+
+        if (c4Title) c4Title.innerHTML = 'Follower Growth Rate & Unfollows';
+        if (c4Sub) c4Sub.innerHTML = 'Trend rasta i pada baze umjesto fiksnog broja';
+        if (c4Badge) c4Badge.innerHTML = 'Neto +1,380 Pratitelja';
+        if (c4Note) c4Note.innerHTML = '📈 <strong>Trend:</strong> <%= client.strategicDecisionMetrics.followerGrowth.decisionNote %>';
+
+        if (c5Title) c5Title.innerHTML = 'Profile Visits & Website Taps (Bio Link)';
+        if (c5Sub) c5Sub.innerHTML = 'Konverzija iz pasivnog gledatelja u namjeru istraživanja ponude i klika na link';
+        if (c5Badge) c5Badge.innerHTML = '28.5% Click-Through na Bio Link';
+        if (c5Note) c5Note.innerHTML = '🛒 <strong>Konverzija:</strong> <%= client.strategicDecisionMetrics.profileVisits.decisionNote %>';
+
         if (chartReachImpressions) {
           chartReachImpressions.setOption({
+            legend: { data: ['Doseg Novih Korisnika (Non-Followers)', 'Doseg Pratitelja (Followers)'] },
             series: [
-              { data: [1200, 1800, 2400, 3100, 2800, 4200, 4900, 5600, 6100, 5800, 7200, 8100, 9400, 8900, 10200, 11500, 12800, 13400, 14800, 16200, 15900, 17400, 18600, 19200, 21500, 22800, 24100, 23500, 25800, 28400] },
-              { data: [800, 950, 1100, 1300, 1250, 1500, 1650, 1800, 1900, 1850, 2100, 2300, 2500, 2400, 2700, 2900, 3100, 3200, 3400, 3700, 3600, 3900, 4100, 4200, 4600, 4800, 5100, 5000, 5400, 5800] }
+              { name: 'Doseg Novih Korisnika (Non-Followers)', type: 'line', data: [1200, 1800, 2400, 3100, 2800, 4200, 4900, 5600, 6100, 5800, 7200, 8100, 9400, 8900, 10200, 11500, 12800, 13400, 14800, 16200, 15900, 17400, 18600, 19200, 21500, 22800, 24100, 23500, 25800, 28400], lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } },
+              { name: 'Doseg Pratitelja (Followers)', type: 'line', data: [800, 950, 1100, 1300, 1250, 1500, 1650, 1800, 1900, 1850, 2100, 2300, 2500, 2400, 2700, 2900, 3100, 3200, 3400, 3700, 3600, 3900, 4100, 4200, 4600, 4800, 5100, 5000, 5400, 5800], lineStyle: { width: 2, color: '#111113' }, itemStyle: { color: '#111113' } }
             ]
-          });
+          }, true);
         }
 
         if (chartErrRate) {
           chartErrRate.setOption({
+            legend: { data: ['ERR po Dosegu (%)', 'Prosjek Industrije (2.5%)'] },
             series: [
-              { data: [4.8, 5.2, 5.0, 5.9, 6.4, 5.8, 6.1, 6.7, 7.2, 6.9, 7.5, 7.1, 7.8, 7.4, 8.1, 7.6, 8.3, 7.9, 8.5, 8.0, 7.8, 8.2, 8.6, 8.1, 8.7, 8.4, 8.9, 8.6, 9.1, 9.4] }
+              { name: 'ERR po Dosegu (%)', type: 'line', data: [4.8, 5.2, 5.0, 5.9, 6.4, 5.8, 6.1, 6.7, 7.2, 6.9, 7.5, 7.1, 7.8, 7.4, 8.1, 7.6, 8.3, 7.9, 8.5, 8.0, 7.8, 8.2, 8.6, 8.1, 8.7, 8.4, 8.9, 8.6, 9.1, 9.4], lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } },
+              { name: 'Prosjek Industrije (2.5%)', type: 'line', data: Array(30).fill(2.5), lineStyle: { width: 2, type: 'dashed', color: '#6B7280' }, itemStyle: { color: '#6B7280' } }
             ]
-          });
+          }, true);
         }
 
         if (chartSavesShares) {
           chartSavesShares.setOption({
+            legend: { data: ['Spremanja (Saves)', 'Dijeljenja (Shares)'] },
+            xAxis: { type: 'category', data: ['Post 1', 'Post 2', 'Post 3', 'Post 4', 'Post 5', 'Post 6'] },
             series: [
-              { data: [140, 180, 220, 310, 290, 410] },
-              { data: [90, 120, 160, 240, 210, 320] }
+              { name: 'Spremanja (Saves)', type: 'bar', data: [140, 180, 220, 310, 290, 410], itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } },
+              { name: 'Dijeljenja (Shares)', type: 'bar', data: [90, 120, 160, 240, 210, 320], itemStyle: { color: '#111113', borderRadius: [4, 4, 0, 0] } }
             ]
-          });
+          }, true);
         }
 
         if (chartFollowerGrowth) {
           chartFollowerGrowth.setOption({
+            legend: { data: ['Novi Pratitelji', 'Nisu više pratitelji (Unfollows)'] },
+            xAxis: { type: 'category', data: decData.followerGrowth.days },
             series: [
-              { data: [45, 52, 68, 74, 82, 91, 105, 112, 98, 125, 134, 142, 118, 156, 168] },
-              { data: [8, 12, 10, 14, 11, 15, 18, 14, 16, 12, 19, 15, 17, 13, 21] }
+              { name: 'Novi Pratitelji', type: 'bar', data: [45, 52, 68, 74, 82, 91, 105, 112, 98, 125, 134, 142, 118, 156, 168], itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } },
+              { name: 'Nisu više pratitelji (Unfollows)', type: 'bar', data: [8, 12, 10, 14, 11, 15, 18, 14, 16, 12, 19, 15, 17, 13, 21], itemStyle: { color: '#EF4444', borderRadius: [4, 4, 0, 0] } }
             ]
-          });
+          }, true);
         }
 
         if (chartProfileVisits) {
           chartProfileVisits.setOption({
+            legend: { data: ['Posjete Profilu', 'Klikovi na Web Link (Bio Taps)'] },
+            xAxis: { type: 'category', data: decData.profileVisits.days },
             series: [
-              { data: [320, 410, 480, 520, 610, 590, 720, 810, 780, 890, 940, 1020, 980, 1120, 1240] },
-              { data: [95, 125, 140, 165, 190, 180, 230, 260, 245, 285, 305, 340, 320, 370, 410] }
+              { name: 'Posjete Profilu', type: 'line', data: [320, 410, 480, 520, 610, 590, 720, 810, 780, 890, 940, 1020, 980, 1120, 1240], smooth: true, lineStyle: { width: 3, color: '#111113' }, itemStyle: { color: '#111113' } },
+              { name: 'Klikovi na Web Link (Bio Taps)', type: 'line', data: [95, 125, 140, 165, 190, 180, 230, 260, 245, 285, 305, 340, 320, 370, 410], smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
             ]
-          });
+          }, true);
         }
 
         filterPosts('instagram');
@@ -930,48 +990,82 @@
         if (btnFb) btnFb.className = 'px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-200 bg-[#111113] text-white shadow-xs flex items-center gap-2';
         if (btnIg) btnIg.className = 'px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 bg-gray-100 text-gray-600 hover:bg-gray-200 shadow-2xs flex items-center gap-2';
 
+        if (c1Title) c1Title.innerHTML = '1. Organic vs. Paid Reach (page_impressions)';
+        if (c1Sub) c1Sub.innerHTML = 'Omjer besplatnog organskog dosega (algoritam & dijeljenja) i plaćene distribucije.';
+        if (c1Badge) c1Badge.innerHTML = 'Facebook Reach 🚀';
+        if (c1Note) c1Note.innerHTML = '💡 <strong>Marketinška Odluka:</strong> Ako organski doseg pada, signal je da Facebookov algoritam ne prepoznaje sadržaj kao viralan i da se morate više osloniti na formate koji potiču diskusiju (ili pojačati budžet za distribuciju).';
+
+        if (c2Title) c2Title.innerHTML = '2. Page Engaged Users & Post Reactions';
+        if (c2Sub) c2Sub.innerHTML = 'Dnevni trend jedinstvenih ljudi koji su kliknuli, komentirali, podijelili ili ostavili reakciju.';
+        if (c2Badge) c2Badge.innerHTML = 'Zdravlje Publike ❤️';
+        if (c2Note) c2Note.innerHTML = '🎯 <strong>Marketinška Odluka:</strong> Mjeri stvarno „zdravlje” publike. Ako doseg raste, a broj angažiranih korisnika stagnira, privlačite pogrešnu publiku ili su naslovi/teme nezanimljivi.';
+
+        if (c3Title) c3Title.innerHTML = '3. Share & Comment Ratio (Viralni Pokretač)';
+        if (c3Sub) c3Sub.innerHTML = 'Broj dijeljenja (Shares) i komentara u odnosu na obične lajkove po objavi.';
+        if (c3Badge) c3Badge.innerHTML = 'Boost Signal 🔄';
+        if (c3Note) c3Note.innerHTML = '📌 <strong>Marketinška Odluka:</strong> Na Facebooku su Shares glavni pokretač besplatnog viralnog dosega. Objavu koja ima visok broj dijeljenja odmah pretvorite u plaćeni oglas (Boost) jer dokazano rezonira s publikom.';
+
+        if (c4Title) c4Title.innerHTML = '4. Page Views & CTA Action Clicks';
+        if (c4Sub) c4Sub.innerHTML = 'Posjete Facebook stranici (page_views_total) i klikovi na glavno gumb na profilu (Send Message, Shop Now).';
+        if (c4Badge) c4Badge.innerHTML = 'Prodajni Kanal 🛒';
+        if (c4Note) c4Note.innerHTML = '📈 <strong>Marketinška Odluka:</strong> Pokazuje koliko Facebook stranica služi kao prodajni kanal. Ako imate puno posjeta stranici, a malo klikova na CTA gumb, potrebno je promijeniti CTA ponudu ili doraditi vizualni opis stranice.';
+
+        if (c5Title) c5Title.innerHTML = '5. Video Performance: 3-sec vs. 1-min Views (Lijevak)';
+        if (c5Sub) c5Sub.innerHTML = 'Razlika između korisnika koji su vidjeli samo uvod (3s) i onih koji su odgledali minutu ili cijeli video.';
+        if (c5Badge) c5Badge.innerHTML = 'Video Lijevak 🎬';
+        if (c5Note) c5Note.innerHTML = '🛒 <strong>Marketinška Odluka:</strong> Pomaže u optimizaciji video sadržaja — ako većina odustane u prve 3 sekunde, uvod je prespor; ako ostanu preko 1 minute, publika je spremna za prodajni poziv na akciju na kraju videa.';
+
         if (chartReachImpressions) {
           chartReachImpressions.setOption({
+            legend: { data: ['Organski Doseg (page_posts_impressions)', 'Plaćeni Doseg (page_impressions)'] },
             series: [
-              { data: [600, 850, 1100, 1450, 1300, 1900, 2200, 2500, 2800, 2600, 3200, 3700, 4100, 3900, 4600, 5100, 5700, 6000, 6600, 7200, 7000, 7800, 8300, 8600, 9500, 10100, 10800, 10500, 11600, 12800] },
-              { data: [1200, 1350, 1500, 1700, 1650, 1900, 2050, 2200, 2300, 2250, 2500, 2700, 2900, 2800, 3100, 3300, 3500, 3600, 3800, 4100, 4000, 4300, 4500, 4600, 5000, 5200, 5500, 5400, 5800, 6200] }
+              { name: 'Organski Doseg (page_posts_impressions)', type: 'line', data: [3400, 3100, 3800, 4200, 3900, 4500, 5100, 4800, 5600, 6200, 5900, 6400, 6800, 6500, 7100, 7800, 7500, 8200, 8600, 8300, 8900, 9400, 9100, 9700, 10200, 9900, 10600, 11200, 10800, 11500], lineStyle: { width: 3, color: '#1877F2' }, itemStyle: { color: '#1877F2' } },
+              { name: 'Plaćeni Doseg (page_impressions)', type: 'line', data: [5800, 6200, 7100, 8500, 7900, 9200, 10500, 9800, 11200, 12400, 11800, 13100, 14200, 13600, 15100, 16400, 15800, 17200, 18500, 17900, 19400, 20800, 20200, 21900, 23100, 22500, 24200, 25600, 24900, 26800], lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
             ]
-          });
+          }, true);
         }
 
         if (chartErrRate) {
           chartErrRate.setOption({
+            legend: { data: ['Page Engaged Users (Dnevno)', 'Post Reactions & Comments'] },
             series: [
-              { data: [3.2, 3.5, 3.1, 3.8, 4.1, 3.7, 4.0, 4.3, 4.6, 4.2, 4.8, 4.5, 5.0, 4.7, 5.2, 4.9, 5.4, 5.1, 5.6, 5.3, 5.1, 5.5, 5.8, 5.4, 5.9, 5.6, 6.1, 5.8, 6.3, 6.6] }
+              { name: 'Page Engaged Users (Dnevno)', type: 'line', data: [850, 920, 1150, 1420, 1310, 1680, 1950, 1820, 2150, 2410, 2280, 2640, 2910, 2780, 3120, 3450, 3310, 3680, 3950, 3820, 4150, 4420, 4280, 4650, 4920, 4780, 5150, 5420, 5280, 5650], lineStyle: { width: 3, color: '#111113' }, itemStyle: { color: '#111113' } },
+              { name: 'Post Reactions & Comments', type: 'line', data: [310, 350, 420, 560, 490, 680, 790, 720, 880, 990, 920, 1080, 1210, 1140, 1320, 1480, 1410, 1590, 1720, 1650, 1820, 1980, 1910, 2090, 2220, 2150, 2340, 2480, 2410, 2590], lineStyle: { width: 2, color: '#E1306C' }, itemStyle: { color: '#E1306C' } }
             ]
-          });
+          }, true);
         }
 
         if (chartSavesShares) {
           chartSavesShares.setOption({
+            legend: { data: ['Dijeljenja (Shares)', 'Komentari (Comments)', 'Reakcije (Lajkovi)'] },
+            xAxis: { type: 'category', data: ['FB Post 1', 'FB Post 2', 'FB Post 3', 'FB Post 4', 'FB Post 5', 'FB Post 6'] },
             series: [
-              { data: [60, 85, 110, 150, 130, 190] },
-              { data: [180, 240, 310, 450, 410, 590] }
+              { name: 'Dijeljenja (Shares)', type: 'bar', data: [210, 340, 180, 520, 410, 680], itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } },
+              { name: 'Komentari (Comments)', type: 'bar', data: [140, 220, 110, 380, 290, 450], itemStyle: { color: '#1877F2', borderRadius: [4, 4, 0, 0] } },
+              { name: 'Reakcije (Lajkovi)', type: 'bar', data: [450, 680, 320, 980, 850, 1240], itemStyle: { color: '#6B7280', borderRadius: [4, 4, 0, 0] } }
             ]
-          });
+          }, true);
         }
 
         if (chartFollowerGrowth) {
           chartFollowerGrowth.setOption({
+            legend: { data: ['Ukupne Posjete Stranici (page_views_total)', 'CTA Gumb Klikovi (Send Message / Shop)'] },
+            xAxis: { type: 'category', data: decData.followerGrowth.days },
             series: [
-              { data: [20, 25, 32, 36, 40, 44, 50, 55, 48, 60, 65, 70, 58, 75, 82] },
-              { data: [5, 8, 6, 9, 7, 10, 12, 9, 11, 8, 13, 10, 11, 8, 14] }
+              { name: 'Ukupne Posjete Stranici (page_views_total)', type: 'line', data: [420, 480, 550, 680, 610, 740, 820, 790, 910, 980, 940, 1050, 1120, 1080, 1210], lineStyle: { width: 3, color: '#111113' }, itemStyle: { color: '#111113' } },
+              { name: 'CTA Gumb Klikovi (Send Message / Shop)', type: 'line', data: [85, 110, 135, 175, 150, 195, 230, 215, 260, 285, 270, 315, 340, 325, 380], lineStyle: { width: 3, color: '#059669' }, itemStyle: { color: '#059669' } }
             ]
-          });
+          }, true);
         }
 
         if (chartProfileVisits) {
           chartProfileVisits.setOption({
+            legend: { data: ['Broj Pregleda Videa (page_video_views)'] },
+            xAxis: { type: 'category', data: ['Uvod (3-sec Views)', 'Zadržavanje (15-sec)', 'Duboki Pregled (1-min Views)', 'Cijeli Video (100% Retencija)'] },
             series: [
-              { data: [180, 230, 270, 310, 360, 340, 420, 470, 450, 520, 550, 600, 580, 670, 730] },
-              { data: [50, 70, 85, 100, 115, 110, 135, 155, 145, 170, 180, 200, 190, 220, 245] }
+              { name: 'Broj Pregleda Videa (page_video_views)', type: 'bar', data: [18400, 11200, 6400, 3800], itemStyle: { color: '#FF5F00', borderRadius: [6, 6, 0, 0] } }
             ]
-          });
+          }, true);
         }
 
         filterPosts('facebook');
