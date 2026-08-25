@@ -109,6 +109,7 @@
       const [isHomeView, setIsHomeView] = useState(SERVER_CLIENT_ID === null);
       
       const [clientTab, setClientTab] = useState('organic'); // 'organic' | 'meta-ads' | 'google-ads'
+      const [organicPlatform, setOrganicPlatform] = useState('instagram'); // 'instagram' | 'facebook' | 'combined'
       const [dateRange, setDateRange] = useState('30d');
       const [isLoading, setIsLoading] = useState(false);
       const [darkMode, setDarkMode] = useState(false);
@@ -221,7 +222,6 @@
           }
         } catch (err) {
           console.error(err);
-          // Local fallback
           const slugId = newClientForm.name.toLowerCase().replace(/\s+/g, '-');
           const mockCreated = {
             id: slugId,
@@ -250,7 +250,6 @@
         if (!customPrompt) setAiInputText('');
         setIsAiTyping(true);
 
-        // Add temporary AI streaming message
         const aiMsgId = Date.now() + 1;
         setAiMessages(prev => [
           ...prev, 
@@ -300,14 +299,13 @@
         } catch (err) {
           setAiMessages(prev => prev.map(m => m.id === aiMsgId ? {
             ...m,
-            content: `**AI Analiza za ${currentClientObj.name}:**\n\nMetrike za **${clientTab.toUpperCase()}** pokazuju stabilne performanse uz ciljani CPA od **${currentClientObj.financialTargets ? currentClientObj.financialTargets.targetCPA : '$15.00'}**.\n\nPreporučujem povećanje budžeta za 15% na najjačim kreativi.`
+            content: `**AI Analiza za ${currentClientObj.name}:**\n\nMetrike za **${clientTab.toUpperCase()}** (Platforma: ${organicPlatform.toUpperCase()}) pokazuju stabilne performanse uz ciljani CPA od **${currentClientObj.financialTargets ? currentClientObj.financialTargets.targetCPA : '$15.00'}**.`
           } : m));
         } finally {
           setIsAiTyping(false);
         }
       };
 
-      // Action triggers from inline AI buttons
       const triggerAiIntervention = (promptText) => {
         setIsAiOpen(true);
         handleSendAiMessage(promptText);
@@ -323,42 +321,154 @@
       // --- MOCK DATASETS & ECHARTS OPTIONS ---
       const mult = dateRange === '7d' ? 0.35 : dateRange === 'this_month' ? 0.85 : 1.0;
 
-      // TAB 1: Organic Data
-      const organicData = useMemo(() => ({
-        reach: Math.round(128450 * mult).toLocaleString(),
-        err: '6.4%',
-        netFollowers: `+${Math.round(1380 * mult)}`,
-        websiteTaps: Math.round(3890 * mult).toLocaleString(),
-        reachTrendOption: {
+      // TAB 1: Dynamic Organic Data (Instagram, Facebook, Combined)
+      const organicData = useMemo(() => {
+        const isIg = organicPlatform === 'instagram';
+        const isFb = organicPlatform === 'facebook';
+        const isComb = organicPlatform === 'combined';
+
+        // Dynamic Reach
+        const reachVal = isIg 
+          ? Math.round(128450 * mult) 
+          : isFb 
+          ? Math.round(195200 * mult) 
+          : Math.round(323650 * mult);
+
+        // Dynamic ERR
+        const errVal = isIg ? '6.4%' : isFb ? '5.2%' : '5.8%';
+
+        // Dynamic Growth Label & Value
+        const growthLabel = isIg 
+          ? 'Net Follower Growth' 
+          : isFb 
+          ? 'Net Page Likes' 
+          : 'Net Growth (Followers & Likes)';
+        const growthVal = isIg 
+          ? `+${Math.round(1380 * mult)}` 
+          : isFb 
+          ? `+${Math.round(2140 * mult)}` 
+          : `+${Math.round(3520 * mult)}`;
+
+        // Dynamic Conversion Actions Label & Value
+        const actionLabel = isIg 
+          ? 'Profile & Website Taps' 
+          : isFb 
+          ? 'Page Views & CTA Clicks' 
+          : 'Total Actions (Taps & CTA)';
+        const actionVal = isIg 
+          ? Math.round(3890 * mult).toLocaleString() 
+          : isFb 
+          ? Math.round(5120 * mult).toLocaleString() 
+          : Math.round(9010 * mult).toLocaleString();
+
+        // Chart 1: Reach vs Impressions Option
+        const reachTrendOption = {
           tooltip: { trigger: 'axis' },
           legend: { data: ['Total Reach', 'Total Impressions'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
           grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
           xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
           yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
           series: [
-            { name: 'Total Reach', type: 'line', data: [8200, 9400, 11200, 10800, 12500, 14100, 13800, 15200, 16800, 15900, 17400, 18600].map(v => Math.round(v * mult)), smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, areaStyle: { color: 'rgba(255, 95, 0, 0.15)' }, itemStyle: { color: '#FF5F00' } },
-            { name: 'Total Impressions', type: 'line', data: [24000, 27500, 31000, 29800, 34200, 38900, 37500, 41200, 44800, 42900, 46100, 49500].map(v => Math.round(v * mult)), smooth: true, lineStyle: { width: 3, color: darkMode ? '#E4E4E7' : '#111113' }, itemStyle: { color: darkMode ? '#E4E4E7' : '#111113' } }
+            { 
+              name: 'Total Reach', 
+              type: 'line', 
+              data: (isIg 
+                ? [8200, 9400, 11200, 10800, 12500, 14100, 13800, 15200, 16800, 15900, 17400, 18600] 
+                : isFb 
+                ? [12400, 14200, 15800, 16100, 18200, 19400, 20100, 21500, 22400, 21800, 23500, 24800] 
+                : [20600, 23600, 27000, 26900, 30700, 33500, 33900, 36700, 39200, 37700, 40900, 43400]
+              ).map(v => Math.round(v * mult)), 
+              smooth: true, 
+              lineStyle: { width: 3, color: isFb ? '#1877F2' : '#FF5F00' }, 
+              areaStyle: { color: isFb ? 'rgba(24, 119, 242, 0.15)' : 'rgba(255, 95, 0, 0.15)' }, 
+              itemStyle: { color: isFb ? '#1877F2' : '#FF5F00' } 
+            },
+            { 
+              name: 'Total Impressions', 
+              type: 'line', 
+              data: (isIg 
+                ? [24000, 27500, 31000, 29800, 34200, 38900, 37500, 41200, 44800, 42900, 46100, 49500] 
+                : isFb 
+                ? [38000, 41200, 45800, 44100, 49500, 52400, 51800, 56200, 59100, 58400, 62100, 65800] 
+                : [62000, 68700, 76800, 73900, 83700, 91300, 89300, 97400, 103900, 101300, 108200, 115300]
+              ).map(v => Math.round(v * mult)), 
+              smooth: true, 
+              lineStyle: { width: 3, color: darkMode ? '#E4E4E7' : '#111113' }, 
+              itemStyle: { color: darkMode ? '#E4E4E7' : '#111113' } 
+            }
           ]
-        },
-        engagementOption: {
+        };
+
+        // Chart 2: Engagement Breakdown Option
+        const engagementLegend = isIg
+          ? ['Saves (Core Signal)', 'Shares (Core Signal)', 'Likes', 'Comments']
+          : isFb
+          ? ['Shares (Virality Signal)', 'Comments (Discussion)', 'Page Reactions']
+          : ['Saves & Shares', 'Comments & Discussion', 'Likes & Reactions'];
+
+        const engagementSeries = isIg ? [
+          { name: 'Saves (Core Signal)', type: 'bar', stack: 'total', data: [340, 520, 410, 680, 590, 810], itemStyle: { color: '#FF5F00' } },
+          { name: 'Shares (Core Signal)', type: 'bar', stack: 'total', data: [210, 380, 290, 450, 390, 560], itemStyle: { color: darkMode ? '#E4E4E7' : '#111113' } },
+          { name: 'Likes', type: 'bar', stack: 'total', data: [1200, 1850, 1420, 2100, 1950, 2600], itemStyle: { color: '#E1306C' } },
+          { name: 'Comments', type: 'bar', stack: 'total', data: [180, 290, 210, 340, 280, 410], itemStyle: { color: '#1877F2', borderRadius: [4, 4, 0, 0] } }
+        ] : isFb ? [
+          { name: 'Shares (Virality Signal)', type: 'bar', stack: 'total', data: [450, 620, 510, 780, 690, 910], itemStyle: { color: '#1877F2' } },
+          { name: 'Comments (Discussion)', type: 'bar', stack: 'total', data: [320, 480, 390, 550, 490, 660], itemStyle: { color: '#059669' } },
+          { name: 'Page Reactions', type: 'bar', stack: 'total', data: [1400, 2150, 1620, 2400, 2150, 2900], itemStyle: { color: '#F59E0B', borderRadius: [4, 4, 0, 0] } }
+        ] : [
+          { name: 'Saves & Shares', type: 'bar', stack: 'total', data: [790, 1140, 920, 1460, 1280, 1720], itemStyle: { color: '#FF5F00' } },
+          { name: 'Comments & Discussion', type: 'bar', stack: 'total', data: [500, 770, 600, 890, 770, 1070], itemStyle: { color: '#1877F2' } },
+          { name: 'Likes & Reactions', type: 'bar', stack: 'total', data: [2600, 4000, 3040, 4500, 4100, 5500], itemStyle: { color: '#E1306C', borderRadius: [4, 4, 0, 0] } }
+        ];
+
+        const engagementOption = {
           tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-          legend: { data: ['Saves (Core Signal)', 'Shares (Core Signal)', 'Likes', 'Comments'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
+          legend: { data: engagementLegend, bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
           grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
           xAxis: { type: 'category', data: ['Post #1', 'Post #2', 'Post #3', 'Post #4', 'Post #5', 'Post #6'], axisLabel: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 10 } },
           yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
+          series: engagementSeries
+        };
+
+        // Chart 3: Audience Health Option (New Follows/Likes vs Unfollows/Unlikes)
+        const audienceHealthOption = {
+          tooltip: { trigger: 'axis' },
+          legend: { data: [isFb ? 'New Likes (+)' : 'New Follows (+)', isFb ? 'Unlikes (-)' : 'Unfollows (-)', 'Net Growth'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
+          grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+          xAxis: { type: 'category', data: getDays(10), axisLabel: { color: '#6B7280', fontSize: 10 } },
+          yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
           series: [
-            { name: 'Saves (Core Signal)', type: 'bar', stack: 'total', data: [340, 520, 410, 680, 590, 810], itemStyle: { color: '#FF5F00' } },
-            { name: 'Shares (Core Signal)', type: 'bar', stack: 'total', data: [210, 380, 290, 450, 390, 560], itemStyle: { color: darkMode ? '#E4E4E7' : '#111113' } },
-            { name: 'Likes', type: 'bar', stack: 'total', data: [1200, 1850, 1420, 2100, 1950, 2600], itemStyle: { color: '#E1306C' } },
-            { name: 'Comments', type: 'bar', stack: 'total', data: [180, 290, 210, 340, 280, 410], itemStyle: { color: '#1877F2', borderRadius: [4, 4, 0, 0] } }
+            { name: isFb ? 'New Likes (+)' : 'New Follows (+)', type: 'bar', data: [85, 110, 95, 140, 165, 150, 180, 210, 195, 230].map(v => Math.round(v * (isFb ? 1.5 : 1))), itemStyle: { color: '#059669', borderRadius: [4, 4, 0, 0] } },
+            { name: isFb ? 'Unlikes (-)' : 'Unfollows (-)', type: 'bar', data: [-18, -24, -20, -32, -28, -25, -30, -35, -29, -38].map(v => Math.round(v * (isFb ? 1.5 : 1))), itemStyle: { color: '#EF4444', borderRadius: [0, 0, 4, 4] } },
+            { name: 'Net Growth', type: 'line', data: [67, 86, 75, 108, 137, 125, 150, 175, 166, 192].map(v => Math.round(v * (isFb ? 1.5 : 1))), smooth: true, lineStyle: { width: 3, color: isFb ? '#1877F2' : '#FF5F00' }, itemStyle: { color: isFb ? '#1877F2' : '#FF5F00' } }
           ]
-        },
-        posts: [
-          { id: 1, thumb: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&fit=crop', caption: 'Ljetni popust 20% na sve usluge! 🚀', type: 'Reel', reach: 42100, err: '7.8%', saves: 890, shares: 640 },
-          { id: 2, thumb: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=120&fit=crop', caption: 'Vodič kroz marketing strategiju 📊', type: 'Carousel', reach: 31400, err: '6.5%', saves: 1120, shares: 480 },
-          { id: 3, thumb: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=120&fit=crop', caption: 'Kako doći do više konverzija uz Meta Ads? 💡', type: 'Reel', reach: 28900, err: '5.9%', saves: 740, shares: 390 }
-        ]
-      }), [mult, darkMode]);
+        };
+
+        // Table Posts Data with Platform Branding
+        const allPosts = [
+          { id: 1, platform: 'instagram', icon: 'fa-brands fa-instagram text-pink-500', thumb: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&fit=crop', caption: 'Ljetni popust 20% na sve usluge! 🚀', type: 'Reel', reach: 42100, err: '7.8%', coreActionLabel: 'Saves', coreActionValue: 890 },
+          { id: 2, platform: 'facebook', icon: 'fa-brands fa-facebook text-blue-600', thumb: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=120&fit=crop', caption: 'Objava novog vodiča za poslovne klijente 📈', type: 'Link Post', reach: 38400, err: '6.9%', coreActionLabel: 'Shares', coreActionValue: 720 },
+          { id: 3, platform: 'instagram', icon: 'fa-brands fa-instagram text-pink-500', thumb: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=120&fit=crop', caption: 'Vodič kroz marketing strategiju 📊', type: 'Carousel', reach: 31400, err: '6.5%', coreActionLabel: 'Saves', coreActionValue: 1120 },
+          { id: 4, platform: 'facebook', icon: 'fa-brands fa-facebook text-blue-600', thumb: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=120&fit=crop', caption: 'Kako doći do više konverzija uz Meta Ads? 💡', type: 'Video Post', reach: 29800, err: '5.8%', coreActionLabel: 'Shares', coreActionValue: 540 }
+        ];
+
+        const posts = isComb 
+          ? allPosts 
+          : allPosts.filter(p => p.platform === organicPlatform);
+
+        return {
+          reach: reachVal.toLocaleString(),
+          err: errVal,
+          growthLabel,
+          growthVal,
+          actionLabel,
+          actionVal,
+          reachTrendOption,
+          engagementOption,
+          audienceHealthOption,
+          posts
+        };
+      }, [organicPlatform, mult, darkMode]);
 
       // TAB 2: Meta Ads Data
       const metaAdsData = useMemo(() => ({
@@ -461,9 +571,7 @@
       return (
         <div className="max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-8 py-5 transition-all duration-300">
           
-          {/* ========================================================================= */}
-          {/* 1. GLOBAL TOP NAVIGATION BAR */}
-          {/* ========================================================================= */}
+          {/* TOP NAVIGATION BAR */}
           <header className="mb-6">
             <div className="bg-white dark:bg-[#161618] rounded-full px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-sm border border-gray-200 dark:border-gray-800">
               
@@ -493,10 +601,8 @@
                 </div>
               </div>
 
-              {/* Center / Right Controls: Account Selector + Date Picker + Alerts + AI Assistant Button */}
+              {/* Right Controls */}
               <div className="flex items-center gap-3 flex-wrap">
-                
-                {/* Account Switcher Dropdown */}
                 <div className="relative flex items-center gap-1 bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-full px-3.5 py-1.5 text-xs font-bold">
                   <i className="fa-solid fa-building text-zorange text-xs"></i>
                   <select 
@@ -513,7 +619,6 @@
                   </select>
                 </div>
 
-                {/* Global Date Range Picker */}
                 <div className="relative flex items-center gap-1 bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-full px-3.5 py-1.5 text-xs font-bold">
                   <i className="fa-solid fa-calendar-days text-zorange text-xs"></i>
                   <select 
@@ -529,26 +634,21 @@
                   </select>
                 </div>
 
-                {/* Light / Dark Mode Switcher */}
                 <button 
                   onClick={() => setDarkMode(!darkMode)} 
                   className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[#111113] dark:text-white flex items-center justify-center hover:border-zorange transition-colors"
-                  title="Promijeni temu"
                 >
                   <i className={`fa-solid ${darkMode ? 'fa-sun text-amber-400' : 'fa-moon text-indigo-600'} text-xs`}></i>
                 </button>
 
-                {/* AI Alerts Bell Notification Badge */}
                 <button 
                   onClick={() => { setIsAiOpen(true); triggerAiIntervention('Prikaži sve kritične AI alerte za trenutnog klijenta.'); }}
                   className="relative w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-900 text-amber-800 dark:text-amber-200 flex items-center justify-center hover:scale-105 transition-transform"
-                  title="AI Upozorenja"
                 >
                   <i className="fa-solid fa-bell text-xs"></i>
                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-black flex items-center justify-center animate-pulse">2</span>
                 </button>
 
-                {/* Prominent AI Assistant Toggle Button */}
                 <button 
                   onClick={() => setIsAiOpen(!isAiOpen)}
                   className="z-badge-black px-4 py-2 text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-md hover:bg-zorange hover:text-white transition-all transform active:scale-95"
@@ -557,21 +657,15 @@
                   <span>AI Assistant</span>
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
                 </button>
-
               </div>
             </div>
           </header>
 
-          {/* ========================================================================= */}
-          {/* 2. MAIN CONTENT AREA */}
-          {/* ========================================================================= */}
+          {/* MAIN CONTENT AREA */}
           <main>
             {isHomeView ? (
-              /* ----------------------------------------------------------------------- */
-              /* HOME VIEW: CLIENT PORTFOLIO GRID & ONBOARDING MODAL */
-              /* ----------------------------------------------------------------------- */
+              /* HOME VIEW */
               <section className="space-y-8">
-                {/* Hero Header & Add Client Action */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-[#161618] rounded-[2rem] p-8 shadow-xs border border-gray-200 dark:border-gray-800">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
@@ -596,7 +690,6 @@
                   </button>
                 </div>
 
-                {/* Client Cards Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {clientsList.map(client => (
                     <div 
@@ -605,7 +698,6 @@
                       className="z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[360px] relative overflow-hidden group cursor-pointer shadow-xs border border-gray-200 dark:border-gray-800"
                     >
                       <div>
-                        {/* Top Badge & Initials */}
                         <div className="flex justify-between items-start mb-4">
                           <div className="w-12 h-12 rounded-2xl bg-[#111113] text-white flex items-center justify-center font-black text-lg shadow-md group-hover:scale-110 transition-transform">
                             {client.logo || client.name.slice(0, 2).toUpperCase()}
@@ -619,13 +711,11 @@
                           </span>
                         </div>
 
-                        {/* Client Name & Industry */}
                         <h3 className="text-xl font-black text-[#111113] dark:text-white tracking-tight group-hover:text-zorange transition-colors">
                           {client.name}
                         </h3>
                         <p className="text-xs text-gray-500 font-bold mt-0.5">{client.industry || 'Digital Agency'}</p>
 
-                        {/* Spend & ROAS Metrics */}
                         <div className="grid grid-cols-2 gap-3 mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
                           <div>
                             <span className="text-[10px] font-extrabold uppercase text-gray-400 block">Mjesečni Spend</span>
@@ -642,7 +732,6 @@
                         </div>
                       </div>
 
-                      {/* Action Button */}
                       <button className="w-full py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-[#111113] dark:text-white text-xs font-black uppercase tracking-wider group-hover:bg-zorange group-hover:text-white transition-colors flex items-center justify-center gap-2">
                         Otvori Nadzornu Ploču <i className="fa-solid fa-arrow-right text-xs"></i>
                       </button>
@@ -651,14 +740,12 @@
                 </div>
               </section>
             ) : (
-              /* ----------------------------------------------------------------------- */
-              /* CLIENT DASHBOARD VIEW (TABS + AI URGENT INTERVENTIONS + METRICS) */
-              /* ----------------------------------------------------------------------- */
+              /* CLIENT DASHBOARD VIEW */
               <section className="space-y-6">
                 
                 {/* TABS NAVIGATION & COMPACT AI INTERVENTIONS BAR */}
                 <div className="space-y-4">
-                  {/* 3 Main Tabs: Organic (IG & FB), Meta Ads, Google Ads */}
+                  {/* 3 Main Tabs */}
                   <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-3">
                     <button 
                       onClick={() => setClientTab('organic')}
@@ -734,11 +821,57 @@
                   </div>
                 ) : clientTab === 'organic' ? (
                   /* ========================================================================= */
-                  /* TAB 1: ORGANIC (IG & FB) */
+                  /* TAB 1: ORGANIC (INSTAGRAM & FACEBOOK) WITH SEGMENTED PLATFORM TOGGLE */
                   /* ========================================================================= */
                   <div className="space-y-6">
-                    {/* Top 4 KPI Cards */}
+                    
+                    {/* SLEEK SEGMENTED CONTROL PLATFORM TOGGLE SWITCH */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white dark:bg-[#161618] rounded-2xl p-3 px-5 shadow-xs border border-gray-200 dark:border-gray-800">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-black uppercase text-gray-400 tracking-wider">Odabir Platforme:</span>
+                        <div className="inline-flex bg-gray-100 dark:bg-gray-800/80 rounded-full p-1 border border-gray-200 dark:border-gray-700">
+                          <button 
+                            onClick={() => setOrganicPlatform('instagram')}
+                            className={`px-4 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-2 ${
+                              organicPlatform === 'instagram'
+                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
+                                : 'text-gray-500 hover:text-[#111113] dark:hover:text-white'
+                            }`}
+                          >
+                            <i className="fa-brands fa-instagram text-sm"></i> Instagram
+                          </button>
+                          <button 
+                            onClick={() => setOrganicPlatform('facebook')}
+                            className={`px-4 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-2 ${
+                              organicPlatform === 'facebook'
+                                ? 'bg-blue-600 text-white shadow-md'
+                                : 'text-gray-500 hover:text-[#111113] dark:hover:text-white'
+                            }`}
+                          >
+                            <i className="fa-brands fa-facebook text-sm"></i> Facebook
+                          </button>
+                          <button 
+                            onClick={() => setOrganicPlatform('combined')}
+                            className={`px-4 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-2 ${
+                              organicPlatform === 'combined'
+                                ? 'bg-[#111113] dark:bg-white text-white dark:text-[#111113] shadow-md'
+                                : 'text-gray-500 hover:text-[#111113] dark:hover:text-white'
+                            }`}
+                          >
+                            <i className="fa-solid fa-layer-group text-zorange text-xs"></i> Combined
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="text-xs font-bold text-gray-400">
+                        Aktivni prikaz: <strong className="text-[#111113] dark:text-white capitalize">{organicPlatform} Organic</strong>
+                      </div>
+                    </div>
+
+                    {/* TOP 4 DYNAMIC KPI CARDS */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                      
+                      {/* CARD 1: Total Reach (with Organic vs Paid ratio if Facebook) */}
                       <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
                         <div className="flex justify-between items-start mb-2">
                           <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-950/60 text-zorange flex items-center justify-center text-xs">
@@ -749,10 +882,19 @@
                         <div>
                           <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Total Reach</span>
                           <h3 className="text-2xl font-black text-[#111113] dark:text-white">{organicData.reach}</h3>
-                          <p className="text-[10px] text-gray-400 font-bold mt-1">Jedinstveni dosegnuti korisnici</p>
+                          {organicPlatform === 'facebook' ? (
+                            <div className="mt-1.5 flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 text-[9px] font-black">
+                                64% Org / 36% Paid
+                              </span>
+                            </div>
+                          ) : (
+                            <p className="text-[10px] text-gray-400 font-bold mt-1">Dosegnuti jedinstveni računi</p>
+                          )}
                         </div>
                       </div>
 
+                      {/* CARD 2: Engagement Rate (ERR) */}
                       <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
                         <div className="flex justify-between items-start mb-2">
                           <div className="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-950/60 text-pink-600 flex items-center justify-center text-xs">
@@ -763,10 +905,11 @@
                         <div>
                           <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Engagement Rate (ERR)</span>
                           <h3 className="text-2xl font-black text-[#111113] dark:text-white">{organicData.err}</h3>
-                          <p className="text-[10px] text-gray-400 font-bold mt-1">Stopa angažmana po dosegu</p>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">Interakcije / Doseg * 100</p>
                         </div>
                       </div>
 
+                      {/* CARD 3: Audience Growth (Dynamic Label) */}
                       <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
                         <div className="flex justify-between items-start mb-2">
                           <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center text-xs">
@@ -775,28 +918,30 @@
                           <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 text-[10px] font-black">+24.5%</span>
                         </div>
                         <div>
-                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Net Follower Growth</span>
-                          <h3 className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{organicData.netFollowers}</h3>
-                          <p className="text-[10px] text-gray-400 font-bold mt-1">Novi pratitelji</p>
+                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">{organicData.growthLabel}</span>
+                          <h3 className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{organicData.growthVal}</h3>
+                          <p className="text-[10px] text-gray-400 font-bold mt-1">Neto prirast u razdoblju</p>
                         </div>
                       </div>
 
+                      {/* CARD 4: Conversion Actions (Dynamic Label) */}
                       <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
                         <div className="flex justify-between items-start mb-2">
                           <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center text-xs">
-                            <i className="fa-solid fa-link"></i>
+                            <i className="fa-solid fa-arrow-pointer"></i>
                           </div>
                           <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 text-[10px] font-black">+18.3%</span>
                         </div>
                         <div>
-                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">Website Taps</span>
-                          <h3 className="text-2xl font-black text-[#111113] dark:text-white">{organicData.websiteTaps}</h3>
-                          <p className="text-[10px] text-zorange font-bold mt-1">Bio Link Klikovi</p>
+                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 block mb-1">{organicData.actionLabel}</span>
+                          <h3 className="text-2xl font-black text-[#111113] dark:text-white">{organicData.actionVal}</h3>
+                          <p className="text-[10px] text-zorange font-bold mt-1">Akcije posjetitelja</p>
                         </div>
                       </div>
+
                     </div>
 
-                    {/* Charts Row */}
+                    {/* CHARTS ROW 1: REACH VS IMPRESSIONS & DYNAMIC ENGAGEMENT BREAKDOWN */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                       <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
                         <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">Reach vs. Impressions Trend</h4>
@@ -804,53 +949,73 @@
                       </div>
 
                       <div className="lg:col-span-5 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
-                        <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">Engagement Breakdown</h4>
+                        <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">
+                          Engagement Breakdown ({organicPlatform.toUpperCase()})
+                        </h4>
                         <EChartComponent option={organicData.engagementOption} style={{ height: '280px', width: '100%' }} />
                       </div>
                     </div>
 
-                    {/* Content Leaderboard Table */}
-                    <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs overflow-hidden">
-                      <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-4">Content Leaderboard</h4>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left text-xs">
-                          <thead>
-                            <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-black uppercase">
-                              <th className="py-3 px-2">Objava</th>
-                              <th className="py-3 px-2">Tip</th>
-                              <th className="py-3 px-2">Reach</th>
-                              <th className="py-3 px-2">ERR %</th>
-                              <th className="py-3 px-2">Saves</th>
-                              <th className="py-3 px-2">Shares</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
-                            {organicData.posts.map(post => (
-                              <tr key={post.id}>
-                                <td className="py-3 px-2 flex items-center gap-3">
-                                  <img src={post.thumb} className="w-9 h-9 rounded-xl object-cover" />
-                                  <span className="text-[#111113] dark:text-white font-black">{post.caption}</span>
-                                </td>
-                                <td className="py-3 px-2">
-                                  <span className="px-2.5 py-1 rounded-full bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-300 text-[10px] font-black">{post.type}</span>
-                                </td>
-                                <td className="py-3 px-2">{post.reach.toLocaleString()}</td>
-                                <td className="py-3 px-2 text-zorange font-black">{post.err}</td>
-                                <td className="py-3 px-2">{post.saves}</td>
-                                <td className="py-3 px-2">{post.shares}</td>
+                    {/* CHARTS ROW 2: AUDIENCE HEALTH & CONTENT LEADERBOARD TABLE */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                      <div className="lg:col-span-5 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                        <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">
+                          Audience Health (New vs Unfollows/Unlikes)
+                        </h4>
+                        <EChartComponent option={organicData.audienceHealthOption} style={{ height: '280px', width: '100%' }} />
+                      </div>
+
+                      {/* Content Leaderboard Table */}
+                      <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
+                        <div className="flex justify-between items-center mb-4">
+                          <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider">Content Leaderboard</h4>
+                          <span className="text-xs font-bold text-gray-400">{organicData.posts.length} Objava</span>
+                        </div>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs">
+                            <thead>
+                              <tr className="border-b border-gray-100 dark:border-gray-800 text-gray-400 font-black uppercase">
+                                <th className="py-3 px-2">Kreativa</th>
+                                <th className="py-3 px-2">Platforma</th>
+                                <th className="py-3 px-2">Tip Objave</th>
+                                <th className="py-3 px-2">Reach</th>
+                                <th className="py-3 px-2">ERR %</th>
+                                <th className="py-3 px-2">Core Action</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-800 font-bold">
+                              {organicData.posts.map(post => (
+                                <tr key={post.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                  <td className="py-3 px-2 flex items-center gap-3">
+                                    <img src={post.thumb} className="w-9 h-9 rounded-xl object-cover shadow-xs" />
+                                    <span className="text-[#111113] dark:text-white font-black truncate max-w-[160px]">{post.caption}</span>
+                                  </td>
+                                  <td className="py-3 px-2">
+                                    <span className="flex items-center gap-1.5 font-bold">
+                                      <i className={post.icon}></i>
+                                      <span className="capitalize text-[11px]">{post.platform}</span>
+                                    </span>
+                                  </td>
+                                  <td className="py-3 px-2">
+                                    <span className="px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 text-[10px] font-black">{post.type}</span>
+                                  </td>
+                                  <td className="py-3 px-2 text-[#111113] dark:text-white">{post.reach.toLocaleString()}</td>
+                                  <td className="py-3 px-2 text-zorange font-black">{post.err}</td>
+                                  <td className="py-3 px-2">
+                                    <span className="text-gray-700 dark:text-gray-300">{post.coreActionValue} {post.coreActionLabel}</span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
+
                   </div>
                 ) : clientTab === 'meta-ads' ? (
-                  /* ========================================================================= */
                   /* TAB 2: META ADS */
-                  /* ========================================================================= */
                   <div className="space-y-6">
-                    {/* Top 4 KPI Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                       <div className="z-card-dark rounded-[2rem] p-5 flex flex-col justify-between shadow-xl">
                         <div className="flex justify-between items-start mb-2">
@@ -909,7 +1074,6 @@
                       </div>
                     </div>
 
-                    {/* Charts Row */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                       <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
                         <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">Efficiency Trend (Spend vs. ROAS)</h4>
@@ -922,7 +1086,6 @@
                       </div>
                     </div>
 
-                    {/* Funnel Leakage & Creative Leaderboard */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                       <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
                         <div className="flex justify-between items-center mb-3">
@@ -964,11 +1127,8 @@
                     </div>
                   </div>
                 ) : (
-                  /* ========================================================================= */
                   /* TAB 3: GOOGLE ADS */
-                  /* ========================================================================= */
                   <div className="space-y-6">
-                    {/* Top 4 KPI Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                       <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-5 flex flex-col justify-between shadow-xs">
                         <div className="flex justify-between items-start mb-2">
@@ -1027,7 +1187,6 @@
                       </div>
                     </div>
 
-                    {/* Charts Row */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                       <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs">
                         <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider mb-3">Traffic vs. Cost (Clicks vs CPC)</h4>
@@ -1040,12 +1199,11 @@
                       </div>
                     </div>
 
-                    {/* Top Search Terms Table & AI Negative Keyword Suggestions */}
                     <div className="z-card-white dark:bg-[#161618] rounded-[2rem] p-6 shadow-xs overflow-hidden">
                       <div className="flex justify-between items-center mb-4">
                         <div>
                           <h4 className="text-sm font-black text-[#111113] dark:text-white uppercase tracking-wider">Top Search Terms & AI Negative Keywords</h4>
-                          <p className="text-xs text-gray-500 font-semibold">Identificirajte irelevantne termine za ugradnju negativnih ključnih riječi</p>
+                          <p className="text-xs text-gray-500 font-semibold">Identificirajte irerelevantne termine za ugradnju negativnih ključnih riječi</p>
                         </div>
                         <span className="text-xs font-bold text-gray-400">Negativnih ključnih riječi: {negativeKeywords.length}</span>
                       </div>
@@ -1101,12 +1259,8 @@
             )}
           </main>
 
-          {/* ========================================================================= */}
-          {/* 4. AI ASSISTANT PANEL (RIGHT SLIDE-OUT SIDEBAR) */}
-          {/* ========================================================================= */}
+          {/* AI ASSISTANT PANEL */}
           <div className={`fixed inset-y-0 right-0 w-full sm:w-[420px] bg-white dark:bg-[#161618] shadow-2xl z-50 transform transition-transform duration-300 ease-in-out border-l border-gray-200 dark:border-gray-800 flex flex-col ${isAiOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-            
-            {/* Sidebar Header */}
             <div className="p-5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between bg-gray-50 dark:bg-[#111113]">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-zorange text-white flex items-center justify-center text-xs font-black shadow-sm">
@@ -1128,16 +1282,14 @@
               </button>
             </div>
 
-            {/* Dynamic Context Banner */}
             <div className="bg-orange-50 dark:bg-orange-950/40 border-b border-orange-200 dark:border-orange-900/60 px-5 py-2.5 text-[11px] font-bold text-orange-900 dark:text-orange-200 flex items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <i className="fa-solid fa-circle-dot text-zorange text-[9px] animate-pulse"></i>
-                Analyzing: <strong>{isHomeView ? 'Agency Portfolio' : clientTab.toUpperCase()}</strong> ({dateRange})
+                Analyzing: <strong>{isHomeView ? 'Agency Portfolio' : `${clientTab.toUpperCase()} (${organicPlatform})`}</strong> ({dateRange})
               </span>
               <span className="text-[10px] font-black uppercase text-zorange">Live Context</span>
             </div>
 
-            {/* Quick Action Chips */}
             <div className="p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-[#161618] flex items-center gap-2 overflow-x-auto">
               <button 
                 onClick={() => handleSendAiMessage('Napravi brzu dijagnostiku trenutnog prikaza i predloži optimizacije.')}
@@ -1159,19 +1311,15 @@
               </button>
             </div>
 
-            {/* Chat Messages Area */}
             <div className="flex-1 p-5 overflow-y-auto space-y-4 font-sans">
               {aiMessages.map(msg => (
                 <div key={msg.id} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
-                  
-                  {/* Thought Steps if available */}
                   {msg.thoughts && msg.thoughts.map((th, idx) => (
                     <div key={idx} className="text-[10px] font-bold text-gray-400 mb-1 flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-lg animate-pulse">
                       <i className="fa-solid fa-gear text-zorange text-[9px] animate-spin"></i> {th}
                     </div>
                   ))}
 
-                  {/* Message Bubble */}
                   <div className={`p-4 rounded-2xl text-xs leading-relaxed max-w-[90%] ${
                     msg.sender === 'user'
                       ? 'bg-zorange text-white rounded-br-none font-bold shadow-sm'
@@ -1180,7 +1328,6 @@
                     <div dangerouslySetInnerHTML={{ __html: msg.content.replace(/\n/g, '<br/>') }} />
                   </div>
 
-                  {/* Interactive Action Buttons inside Chat */}
                   {msg.actions && (
                     <div className="mt-2.5 flex flex-wrap gap-2">
                       {msg.actions.map((act, i) => (
@@ -1194,7 +1341,6 @@
                       ))}
                     </div>
                   )}
-
                 </div>
               ))}
 
@@ -1205,7 +1351,6 @@
               )}
             </div>
 
-            {/* Chat Input Area */}
             <div className="p-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161618]">
               <form 
                 onSubmit={(e) => { e.preventDefault(); handleSendAiMessage(); }}
@@ -1238,14 +1383,11 @@
 
           </div>
 
-          {/* ========================================================================= */}
-          {/* 5. "ADD NEW CLIENT" ONBOARDING MODAL */}
-          {/* ========================================================================= */}
+          {/* "ADD NEW CLIENT" MODAL */}
           {isAddModalOpen && (
             <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
               <div className="bg-white dark:bg-[#161618] rounded-[2rem] max-w-2xl w-full p-7 shadow-2xl border border-gray-200 dark:border-gray-800 my-8 space-y-6">
                 
-                {/* Modal Header */}
                 <div className="flex justify-between items-center border-b border-gray-100 dark:border-gray-800 pb-4">
                   <div>
                     <h3 className="text-xl font-black text-[#111113] dark:text-white tracking-tight">Add New Client (Onboarding)</h3>
@@ -1255,8 +1397,6 @@
                 </div>
 
                 <form onSubmit={handleAddClientSubmit} className="space-y-6">
-                  
-                  {/* GROUP 1: BUSINESS CONTEXT */}
                   <div className="space-y-3">
                     <h4 className="text-xs font-black uppercase text-zorange tracking-wider flex items-center gap-1.5">
                       <i className="fa-solid fa-building"></i> 1. Poslovni Kontekst (Business Context)
@@ -1310,7 +1450,6 @@
                     </div>
                   </div>
 
-                  {/* GROUP 2: FINANCIAL TARGETS */}
                   <div className="space-y-3 pt-3 border-t border-gray-100 dark:border-gray-800">
                     <h4 className="text-xs font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-wider flex items-center gap-1.5">
                       <i className="fa-solid fa-chart-line"></i> 2. Financijski Ciljevi (Financial Targets)
@@ -1349,7 +1488,6 @@
                     </div>
                   </div>
 
-                  {/* GROUP 3: INTEGRATIONS & TECHNICAL IDS */}
                   <div className="space-y-3 pt-3 border-t border-gray-100 dark:border-gray-800">
                     <h4 className="text-xs font-black uppercase text-blue-600 dark:text-blue-400 tracking-wider flex items-center gap-1.5">
                       <i className="fa-solid fa-plug"></i> 3. Integracije i Tehnički ID-ovi
@@ -1388,7 +1526,6 @@
                     </div>
                   </div>
 
-                  {/* Actions */}
                   <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
                     <button 
                       type="button" 
@@ -1404,7 +1541,6 @@
                       Spremi Klijenta & Pokreni AI Analysis
                     </button>
                   </div>
-
                 </form>
 
               </div>
