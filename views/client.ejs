@@ -560,11 +560,11 @@
         <!-- MONTHLY POSTS SECTION (OBJAVE) WITH TABLE & GALLERY VIEWS -->
         <div class="z-card-white z-card-white-hover rounded-[2rem] p-7 shadow-sm border border-black/5 mb-8">
           
-          <!-- SECTION HEADER WITH CONTROLS -->
-          <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 border-b border-gray-100 pb-5 mb-6">
+          <!-- SECTION TOP ROW: TITLE + PARAGRAPH + VIEW TOGGLE -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4 mb-4">
             <div>
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-zorange text-white flex items-center justify-center font-black text-xs shadow-xs">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-2xl bg-zorange text-white flex items-center justify-center font-black text-sm shadow-xs">
                   <i class="fa-solid fa-photo-film"></i>
                 </div>
                 <h3 class="text-2xl font-black text-[#111113] uppercase tracking-wider">Objave</h3>
@@ -572,49 +572,64 @@
               <p class="text-xs text-gray-500 font-bold mt-1">Pregled svih objavljenih kreativa s brojem pregleda, lajkova, komentara i dijeljenja</p>
             </div>
 
-            <!-- CONTROLS: DATE FILTER, PLATFORM FILTER & VIEW MODE TOGGLE -->
-            <div class="flex flex-wrap items-center gap-3">
-              
-              <!-- Date Range Filter Selector -->
-              <div class="bg-gray-100 p-1.5 rounded-full flex flex-wrap items-center gap-2 text-xs font-bold border border-black/5">
-                <span class="text-[10px] text-gray-500 font-extrabold uppercase px-2">Datum:</span>
-                <div class="flex items-center gap-1.5 bg-white px-3 py-1 rounded-full shadow-2xs border border-black/5">
-                  <span class="text-[10px] text-gray-400 font-bold uppercase">Od</span>
-                  <input type="date" id="filter-date-start" onchange="applyFilters()" class="text-xs font-bold text-[#111113] bg-transparent focus:outline-none cursor-pointer" />
-                </div>
-                <div class="flex items-center gap-1.5 bg-white px-3 py-1 rounded-full shadow-2xs border border-black/5">
-                  <span class="text-[10px] text-gray-400 font-bold uppercase">Do</span>
-                  <input type="date" id="filter-date-end" onchange="applyFilters()" class="text-xs font-bold text-[#111113] bg-transparent focus:outline-none cursor-pointer" />
-                </div>
-                <button onclick="setDatePreset('month')" class="px-2.5 py-1 rounded-full bg-white text-[#111113] hover:bg-zorange hover:text-white transition-colors text-[10px] font-black shadow-2xs">Tekući Mjesec</button>
-                <button onclick="setDatePreset('all')" class="px-2.5 py-1 rounded-full bg-white text-gray-600 hover:bg-black hover:text-white transition-colors text-[10px] font-bold shadow-2xs">Sve</button>
-              </div>
-
-              <!-- Platform Filter Pills -->
-              <div class="bg-gray-100 p-1 rounded-full flex items-center gap-1 text-xs font-bold border border-black/5">
-                <button onclick="setPlatformFilter('all')" id="post-filter-all" class="px-3 py-1.5 rounded-full bg-white text-[#111113] shadow-xs font-black transition-all">Sve</button>
-                <button onclick="setPlatformFilter('instagram')" id="post-filter-instagram" class="px-3 py-1.5 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-1">
-                  <i class="fa-brands fa-instagram text-pink-600"></i> Instagram
-                </button>
-                <button onclick="setPlatformFilter('facebook')" id="post-filter-facebook" class="px-3 py-1.5 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-1">
-                  <i class="fa-brands fa-facebook-f text-blue-600"></i> Facebook
-                </button>
-                <button onclick="setPlatformFilter('tiktok')" id="post-filter-tiktok" class="px-3 py-1.5 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-1">
-                  <i class="fa-brands fa-tiktok text-black"></i> TikTok
-                </button>
-              </div>
-
-              <!-- View Switcher (Table vs Gallery) -->
-              <div class="bg-gray-100 p-1 rounded-full flex items-center gap-1 text-xs font-bold border border-black/5">
-                <button onclick="switchPostsView('table')" id="btn-view-table" class="px-3 py-1.5 rounded-full bg-white text-[#111113] shadow-xs font-black transition-all flex items-center gap-1.5">
-                  <i class="fa-solid fa-list text-xs"></i> <span>Tablica</span>
-                </button>
-                <button onclick="switchPostsView('gallery')" id="btn-view-gallery" class="px-3 py-1.5 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-1.5">
-                  <i class="fa-solid fa-border-all text-xs"></i> <span>Galerija</span>
-                </button>
-              </div>
-
+            <!-- View Switcher (Table vs Gallery) -->
+            <div class="bg-gray-100 p-1.5 rounded-full flex items-center gap-1 text-xs font-bold border border-black/5 self-start sm:self-auto">
+              <button onclick="switchPostsView('table')" id="btn-view-table" class="px-4 py-2 rounded-full bg-white text-[#111113] shadow-xs font-black transition-all flex items-center gap-2">
+                <i class="fa-solid fa-list text-xs"></i> <span>Tablica</span>
+              </button>
+              <button onclick="switchPostsView('gallery')" id="btn-view-gallery" class="px-4 py-2 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-2 font-black">
+                <i class="fa-solid fa-border-all text-xs"></i> <span>Galerija</span>
+              </button>
             </div>
+          </div>
+
+          <!-- SECTION SECOND ROW (BELOW TITLE & PARAGRAPH): PLATFORM & DATE FILTERS BAR -->
+          <div class="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+            
+            <!-- 1. Platform Filter Pills (Odabir Mreže - Moved directly under title/paragraph) -->
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <span class="text-xs font-black text-[#111113] uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-filter text-zorange"></i> Odabir Mreže:
+              </span>
+              <div class="bg-white p-1 rounded-full flex items-center gap-1 text-xs font-bold border border-black/5 shadow-2xs">
+                <button onclick="setPlatformFilter('all')" id="post-filter-all" class="px-4 py-2 rounded-full bg-[#111113] text-white shadow-xs font-black transition-all">Sve Mreže</button>
+                <button onclick="setPlatformFilter('instagram')" id="post-filter-instagram" class="px-4 py-2 rounded-full text-gray-700 hover:text-[#111113] transition-all font-black flex items-center gap-1.5">
+                  <i class="fa-brands fa-instagram text-pink-600 text-sm"></i> Instagram
+                </button>
+                <button onclick="setPlatformFilter('facebook')" id="post-filter-facebook" class="px-4 py-2 rounded-full text-gray-700 hover:text-[#111113] transition-all font-black flex items-center gap-1.5">
+                  <i class="fa-brands fa-facebook-f text-blue-600 text-sm"></i> Facebook
+                </button>
+                <button onclick="setPlatformFilter('tiktok')" id="post-filter-tiktok" class="px-4 py-2 rounded-full text-gray-700 hover:text-[#111113] transition-all font-black flex items-center gap-1.5">
+                  <i class="fa-brands fa-tiktok text-black text-sm"></i> TikTok
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Prominent Large Date Selector Dropdown (Odabir Datuma - Big & High Contrast) -->
+            <div class="flex items-center gap-3 flex-wrap">
+              <span class="text-xs font-black text-[#111113] uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-calendar-days text-zorange"></i> Odabir Datuma:
+              </span>
+              
+              <div class="flex items-center gap-2 flex-wrap">
+                <!-- Start Date Input -->
+                <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl shadow-2xs border border-gray-300">
+                  <span class="text-xs font-black text-gray-500 uppercase">Od:</span>
+                  <input type="date" id="filter-date-start" onchange="applyFilters()" class="text-sm font-black text-[#111113] bg-transparent focus:outline-none cursor-pointer" />
+                </div>
+                
+                <!-- End Date Input -->
+                <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl shadow-2xs border border-gray-300">
+                  <span class="text-xs font-black text-gray-500 uppercase">Do:</span>
+                  <input type="date" id="filter-date-end" onchange="applyFilters()" class="text-sm font-black text-[#111113] bg-transparent focus:outline-none cursor-pointer" />
+                </div>
+
+                <!-- Presets -->
+                <button onclick="setDatePreset('month')" class="px-3.5 py-2 rounded-xl bg-white text-[#111113] border border-gray-200 hover:bg-zorange hover:text-white hover:border-zorange transition-colors text-xs font-black shadow-2xs">Tekući Mjesec</button>
+                <button onclick="setDatePreset('all')" class="px-3.5 py-2 rounded-xl bg-white text-gray-600 border border-gray-200 hover:bg-black hover:text-white hover:border-black transition-colors text-xs font-extrabold shadow-2xs">Sve</button>
+              </div>
+            </div>
+
           </div>
 
           <!-- VIEW 1: TABLE VIEW (DEFAULT) -->
@@ -1490,9 +1505,9 @@
         const btn = document.getElementById(`post-filter-${p}`);
         if (btn) {
           if (p === platform) {
-            btn.className = 'px-3 py-1.5 rounded-full bg-white text-[#111113] shadow-xs font-black transition-all';
+            btn.className = 'px-4 py-2 rounded-full bg-[#111113] text-white shadow-xs font-black transition-all';
           } else {
-            btn.className = 'px-3 py-1.5 rounded-full text-gray-600 hover:text-[#111113] transition-all flex items-center gap-1';
+            btn.className = 'px-4 py-2 rounded-full text-gray-700 hover:text-[#111113] transition-all font-black flex items-center gap-1.5';
           }
         }
       });
