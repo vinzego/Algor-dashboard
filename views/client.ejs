@@ -1349,6 +1349,9 @@
       let metaChartsInitialized = false;
 
       function initMetaCharts() {
+        const pMeta = document.getElementById('panel-meta');
+        if (!pMeta || pMeta.classList.contains('hidden')) return;
+
         if (metaChartsInitialized) {
           resizeMetaCharts();
           return;
