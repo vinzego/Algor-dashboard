@@ -53,12 +53,6 @@
     const INITIAL_CLIENTS = <%- JSON.stringify(clients) %>;
     const SERVER_CLIENT_ID = <%= client ? `'${client.id}'` : 'null' %>;
 
-    const DATE_RANGES = [
-      { id: '7d', label: 'Zadnjih 7 dana (Last 7 Days)' },
-      { id: '30d', label: 'Zadnjih 30 dana (Last 30 Days)' },
-      { id: 'this_month', label: 'Ovaj Mjesec (This Month)' }
-    ];
-
     const getDays = (count = 12) => Array.from({ length: count }, (_, i) => `${i + 1}.08.`);
 
     // --- REUSABLE ECHARTS REACT COMPONENT WITH RESIZEOBSERVER ---
@@ -182,24 +176,6 @@
         return clientsList.find(c => c.id === selectedAccount) || clientsList[0];
       }, [clientsList, selectedAccount]);
 
-      // Handle Client Change
-      const handleAccountChange = (e) => {
-        const id = e.target.value;
-        if (id === 'HOME') {
-          setIsHomeView(true);
-          return;
-        }
-        setIsLoading(true);
-        setSelectedAccount(id);
-        setIsHomeView(false);
-        setTimeout(() => setIsLoading(false), 300);
-      };
-
-      const handleDateChange = (e) => {
-        setIsLoading(true);
-        setDateRange(e.target.value);
-        setTimeout(() => setIsLoading(false), 300);
-      };
 
       // Open Client Dashboard from Home Card
       const openClientDashboard = (clientId) => {
