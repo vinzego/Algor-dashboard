@@ -212,28 +212,35 @@
             </div>
           </div>
 
-          <!-- CARD 2: WHITE LINE SPARKLINE CARD (Like Revenue Card in Image) -->
+          <!-- CARD 2: WHITE LINE SPARKLINE CARD (Ukupan broj pratitelja na IG i FB) -->
           <div class="z-card-white z-card-white-hover rounded-[2rem] p-6 flex flex-col justify-between h-[270px]">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-start">
               <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[#111113] text-xs">
-                  <i class="fa-solid fa-wallet"></i>
+                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-zorange text-xs">
+                  <i class="fa-solid fa-users"></i>
                 </div>
-                <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500">Ukupni Prihod</span>
+                <div>
+                  <span class="text-xs font-extrabold uppercase tracking-wider text-gray-500 block">Ukupno Pratitelja</span>
+                  <span class="text-[10px] text-gray-400 font-bold flex items-center gap-1">
+                    <i class="fa-brands fa-instagram text-pink-600"></i> IG + <i class="fa-brands fa-facebook-f text-blue-600"></i> FB
+                  </span>
+                </div>
               </div>
-              <button class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-black hover:text-white transition-colors">
-                <i class="fa-solid fa-chevron-right text-xs"></i>
-              </button>
+              <span class="z-badge-orange text-[10px] px-2.5 py-0.5 text-white shadow-xs">+5.8%</span>
             </div>
 
             <!-- ECharts Sparkline Trend -->
-            <div id="z-chart-revenue-sparkline" class="w-full h-[110px]"></div>
+            <div id="z-chart-revenue-sparkline" class="w-full h-[95px]"></div>
 
-            <div class="flex items-center justify-between border-t border-gray-100 pt-3">
+            <div class="flex items-center justify-between border-t border-gray-100 pt-2.5">
               <div>
-                <h3 class="text-3xl font-black text-[#111113] tracking-tight"><%= client.advancedAnalytics.blended.totalRevenue %></h3>
+                <h3 class="text-3xl font-black text-[#111113] tracking-tight">24,850</h3>
+                <p class="text-[10px] text-gray-400 font-bold">Rast u tekućem mjesecu</p>
               </div>
-              <span class="z-badge-black text-xs px-3 py-1 shadow-xs">+4%</span>
+              <div class="text-right text-[10px] font-bold space-y-0.5">
+                <p class="text-pink-600 flex items-center justify-end gap-1"><i class="fa-brands fa-instagram"></i> 16,200</p>
+                <p class="text-blue-600 flex items-center justify-end gap-1"><i class="fa-brands fa-facebook-f"></i> 8,650</p>
+              </div>
             </div>
           </div>
 
