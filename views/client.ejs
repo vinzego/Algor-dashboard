@@ -882,22 +882,13 @@
           <main>
             {isHomeView ? (
               /* HOME VIEW */
-              <section className="space-y-8">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-[#161618] rounded-[2rem] p-8 shadow-xs border border-gray-200 dark:border-gray-800">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 text-[10px] font-black">
-                        ● Svi sustavi aktivni
-                      </span>
-                      <span className="text-xs text-gray-400 font-bold">Ukupno klijenata: {clientsList.length}</span>
-                    </div>
-                    <h2 className="text-3xl font-black tracking-tight text-[#111113] dark:text-white">
-                      {greeting} 👋
-                    </h2>
-                    <p className="text-xs text-gray-500 font-semibold mt-1">
-                      Upravljajte marketing kampanjama, budžetima i AI optimizacijama vaših klijenata.
-                    </p>
-                  </div>
+              <section className="space-y-6">
+                
+                {/* CLEAN MINIMALIST HOME HEADER (GREETING + ADD CLIENT BUTTON) */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-2 py-1">
+                  <h2 className="text-3xl font-black tracking-tight text-[#111113] dark:text-white">
+                    {greeting} 👋
+                  </h2>
                   
                   <button 
                     onClick={() => setIsAddModalOpen(true)}
