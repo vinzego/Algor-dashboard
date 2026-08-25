@@ -770,7 +770,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Profitabilnost oglasa: ROAS (povrat na uloženo) u odnosu na trošak po konverziji (CPA).</p>
-                <div id="meta-chart-roas-cpa" class="w-full h-[280px]"></div>
+                <div id="meta-chart-roas-cpa" style="width: 100%; height: 280px; min-height: 280px;"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 💡 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.roasCpa.decisionNote %>
@@ -789,7 +789,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Relevantnost poruke: Odvajanje klika na web link od općih lajkova i komentara.</p>
-                <div id="meta-chart-ctr-link-all" class="w-full h-[280px]"></div>
+                <div id="meta-chart-ctr-link-all" style="width: 100%; height: 280px; min-height: 280px;"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 🎯 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.ctrLinkAll.decisionNote %>
@@ -811,7 +811,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Trošak po kliku (CPC) i trošak na 1.000 impresija (CPM) na Meta aukcijama.</p>
-                <div id="meta-chart-cpc-cpm" class="w-full h-[280px]"></div>
+                <div id="meta-chart-cpc-cpm" style="width: 100%; height: 280px; min-height: 280px;"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 💰 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.cpcCpm.decisionNote %>
@@ -830,7 +830,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Prosječan broj prikazivanja oglasa istoj osobi (Signal za zamjenu na ~3-4x).</p>
-                <div id="meta-chart-frequency" class="w-full h-[280px]"></div>
+                <div id="meta-chart-frequency" style="width: 100%; height: 280px; min-height: 280px;"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 ⚠️ <strong>Odluka:</strong> <%= client.metaDecisionMetrics.frequency.decisionNote %>
@@ -852,7 +852,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Hook (prve 3 sec) vs Hold (ThruPlay zadržavanje pažnje do poruke).</p>
-                <div id="meta-chart-hook-hold" class="w-full h-[280px]"></div>
+                <div id="meta-chart-hook-hold" style="width: 100%; height: 280px; min-height: 280px;"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 🎬 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.hookHoldRate.decisionNote %>
@@ -871,7 +871,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Stopa napuštanja prije učitavanja (Gubitak > 20-25% znači sporo web mjesto).</p>
-                <div id="meta-chart-landing-clicks" class="w-full h-[280px]"></div>
+                <div id="meta-chart-landing-clicks" style="width: 100%; height: 280px; min-height: 280px;"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 ⚡ <strong>Odluka:</strong> <%= client.metaDecisionMetrics.landingVsClicks.decisionNote %>
@@ -893,7 +893,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Postotak posjetitelja koji dovrše kupnju, upit ili prijavu na stranici.</p>
-                <div id="meta-chart-conversion-rate" class="w-full h-[280px]"></div>
+                <div id="meta-chart-conversion-rate" style="width: 100%; height: 280px; min-height: 280px;"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 🛒 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.conversionRate.decisionNote %>
@@ -912,7 +912,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-gray-500 font-medium mb-3">Ukupni trošak oglašavanja podijeljen s brojem novih kupaca/klijenata.</p>
-                <div id="meta-chart-cac" class="w-full h-[280px]"></div>
+                <div id="meta-chart-cac" style="width: 100%; height: 280px; min-height: 280px;"></div>
               </div>
               <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 text-xs font-bold text-gray-700 mt-3 w-full">
                 💵 <strong>Odluka:</strong> <%= client.metaDecisionMetrics.cacLtv.decisionNote %>
@@ -1566,43 +1566,15 @@
     }
 
     function resizeMetaCharts() {
-      const ids = [
-        { id: 'meta-card-gauge-spend', chart: metaCardGaugeChart, h: 100 },
-        { id: 'meta-card-sparkline-cpa', chart: metaCardSparkChart, h: 60 },
-        { id: 'meta-card-bar-leads', chart: metaCardBarChart, h: 100 },
-        { id: 'meta-chart-roas-cpa', chart: chartMetaRoasCpa, h: 280 },
-        { id: 'meta-chart-ctr-link-all', chart: chartMetaCtrLinkAll, h: 280 },
-        { id: 'meta-chart-cpc-cpm', chart: chartMetaCpcCpm, h: 280 },
-        { id: 'meta-chart-frequency', chart: chartMetaFrequency, h: 280 },
-        { id: 'meta-chart-hook-hold', chart: chartMetaHookHold, h: 280 },
-        { id: 'meta-chart-landing-clicks', chart: chartMetaLandingClicks, h: 280 },
-        { id: 'meta-chart-conversion-rate', chart: chartMetaConversionRate, h: 280 },
-        { id: 'meta-chart-cac', chart: chartMetaCac, h: 280 }
+      const instances = [
+        metaCardGaugeChart, metaCardSparkChart, metaCardBarChart,
+        chartMetaRoasCpa, chartMetaCtrLinkAll, chartMetaCpcCpm,
+        chartMetaFrequency, chartMetaHookHold, chartMetaLandingClicks,
+        chartMetaConversionRate, chartMetaCac
       ];
-
-      ids.forEach(item => {
-        const el = document.getElementById(item.id);
-        if (el) {
-          el.style.width = '100%';
-          const parent = el.parentElement;
-          const parentWidth = parent ? parent.clientWidth : 0;
-          if (item.chart) {
-            if (parentWidth > 50) {
-              item.chart.resize({ width: parentWidth, height: item.h });
-            } else {
-              item.chart.resize();
-            }
-          }
-        }
+      instances.forEach(chart => {
+        if (chart) chart.resize();
       });
-    }
-
-    if (typeof ResizeObserver !== 'undefined') {
-      const metaObserver = new ResizeObserver(() => {
-        resizeMetaCharts();
-      });
-      const pMeta = document.getElementById('panel-meta');
-      if (pMeta) metaObserver.observe(pMeta);
     }
 
       /* ----------------------------------------------------
@@ -1694,6 +1666,8 @@
 
       if (socialPlatformsChart) socialPlatformsChart.resize();
       if (socialFormatsChart) socialFormatsChart.resize();
+
+      initMetaCharts();
     });
 
     // Tab switching logic (ZELLIFY Capsule Navigation)
