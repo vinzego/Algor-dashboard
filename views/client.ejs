@@ -66,7 +66,7 @@
     // Helper for generating dynamic daily arrays
     const getDays = (count = 14) => Array.from({ length: count }, (_, i) => `${i + 1}.08.`);
 
-    // --- REUSABLE ECHARTS REACT COMPONENT ---
+    // --- REUSABLE ECHARTS REACT COMPONENT WITH RESIZEOBSERVER ---
     const EChartComponent = ({ option, style = { width: '100%', height: '280px' } }) => {
       const chartRef = useRef(null);
       const instanceRef = useRef(null);
@@ -78,16 +78,25 @@
         }
         instanceRef.current.setOption(option, true);
 
-        const handleResize = () => {
-          if (instanceRef.current) instanceRef.current.resize();
+        const resizeChart = () => {
+          if (instanceRef.current) {
+            instanceRef.current.resize();
+          }
         };
-        window.addEventListener('resize', handleResize);
+
+        const observer = new ResizeObserver(() => {
+          resizeChart();
+        });
+        observer.observe(chartRef.current);
+
+        window.addEventListener('resize', resizeChart);
         return () => {
-          window.removeEventListener('resize', handleResize);
+          observer.disconnect();
+          window.removeEventListener('resize', resizeChart);
         };
       }, [option]);
 
-      return <div ref={chartRef} style={style} />;
+      return <div ref={chartRef} style={style} className="w-full min-w-0 max-w-full" />;
     };
 
     // --- SKELETON LOADER COMPONENT ---
@@ -253,14 +262,14 @@
           spendRoasOption: {
             tooltip: { trigger: 'axis' },
             legend: { data: ['Daily Spend ($)', 'Blended ROAS (x)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
-            grid: { top: 30, bottom: 40, left: 10, right: 10, containLabel: true },
+            grid: { top: 30, bottom: 40, left: 15, right: 15, containLabel: true },
             xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
             yAxis: [
               { type: 'value', name: 'Spend ($)', axisLabel: { color: '#6B7280', fontSize: 10, formatter: '${value}' } },
               { type: 'value', name: 'ROAS (x)', min: 0, max: 6, axisLabel: { color: '#FF5F00', fontSize: 10, formatter: '{value}x' } }
             ],
             series: [
-              { name: 'Daily Spend ($)', type: 'bar', data: [210, 240, 280, 310, 290, 340, 420, 390, 450, 480, 460, 520].map(v => Math.round(v * mult)), itemStyle: { color: darkMode ? '#3F3F46' : '#111113', borderRadius: [4, 4, 0, 0] } },
+              { name: 'Daily Spend ($)', type: 'bar', barWidth: '35%', data: [210, 240, 280, 310, 290, 340, 420, 390, 450, 480, 460, 520].map(v => Math.round(v * mult)), itemStyle: { color: darkMode ? '#3F3F46' : '#111113', borderRadius: [4, 4, 0, 0] } },
               { name: 'Blended ROAS (x)', type: 'line', yAxisIndex: 1, data: [4.8, 4.6, 4.3, 3.9, 4.2, 4.5, 3.8, 4.1, 4.4, 4.2, 4.5, 4.3], smooth: true, lineStyle: { width: 3, color: '#FF5F00' }, itemStyle: { color: '#FF5F00' } }
             ]
           },
@@ -268,7 +277,7 @@
           fatigueOption: {
             tooltip: { trigger: 'axis' },
             legend: { data: ['Ad Frequency', 'CTR Link (%)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
-            grid: { top: 30, bottom: 40, left: 10, right: 10, containLabel: true },
+            grid: { top: 30, bottom: 40, left: 15, right: 15, containLabel: true },
             xAxis: { type: 'category', data: getDays(12), axisLabel: { color: '#6B7280', fontSize: 10 } },
             yAxis: [
               { type: 'value', name: 'Frequency', min: 1, max: 5, axisLabel: { color: '#EF4444', fontSize: 10, formatter: '{value}x' } },
@@ -282,25 +291,25 @@
           // Chart 3: Funnel Leakage (Link Clicks vs Landing Page Views)
           funnelOption: {
             tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-            legend: { data: ['Outbound Link Clicks', 'Verified Landing Page Views'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
-            grid: { top: 20, bottom: 40, left: 10, right: 10, containLabel: true },
+            legend: { data: ['Outbound Link Clicks', 'Verified Landing Page Views'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
+            grid: { top: 20, bottom: 45, left: 15, right: 15, containLabel: true },
             xAxis: { type: 'category', data: ['Tjedan 1', 'Tjedan 2', 'Tjedan 3', 'Tjedan 4'], axisLabel: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
             yAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10 } },
             series: [
-              { name: 'Outbound Link Clicks', type: 'bar', data: [1240, 1480, 1620, 1850].map(v => Math.round(v * mult)), itemStyle: { color: '#1877F2', borderRadius: [4, 4, 0, 0] } },
-              { name: 'Verified Landing Page Views', type: 'bar', data: [940, 1120, 1210, 1380].map(v => Math.round(v * mult)), itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } }
+              { name: 'Outbound Link Clicks', type: 'bar', barWidth: '35%', data: [1240, 1480, 1620, 1850].map(v => Math.round(v * mult)), itemStyle: { color: '#1877F2', borderRadius: [4, 4, 0, 0] } },
+              { name: 'Verified Landing Page Views', type: 'bar', barWidth: '35%', data: [940, 1120, 1210, 1380].map(v => Math.round(v * mult)), itemStyle: { color: '#FF5F00', borderRadius: [4, 4, 0, 0] } }
             ]
           },
           // Chart 4: Video Creative Retention (Hook Rate vs Hold Rate)
           retentionOption: {
             tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-            legend: { data: ['Hook Rate (3s Views / Impressions %)', 'Hold Rate (ThruPlays / 3s Views %)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700 } },
-            grid: { top: 20, bottom: 40, left: 80, right: 20, containLabel: true },
+            legend: { data: ['Hook Rate (3s Views / Impressions %)', 'Hold Rate (ThruPlays / 3s Views %)'], bottom: 0, textStyle: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
+            grid: { top: 20, bottom: 45, left: 10, right: 20, containLabel: true },
             xAxis: { type: 'value', axisLabel: { color: '#6B7280', fontSize: 10, formatter: '{value}%' } },
             yAxis: { type: 'category', data: ['Ad 1: Ljetni Popust', 'Ad 2: Vodič Strategija', 'Ad 3: Demo Proizvoda', 'Ad 4: Klijent Review'], axisLabel: { color: darkMode ? '#A1A1AA' : '#111113', fontWeight: 700, fontSize: 11 } },
             series: [
-              { name: 'Hook Rate (3s Views / Impressions %)', type: 'bar', data: [44.2, 38.5, 51.0, 31.4], itemStyle: { color: '#FF5F00', borderRadius: [0, 4, 4, 0] } },
-              { name: 'Hold Rate (ThruPlays / 3s Views %)', type: 'bar', data: [28.4, 22.1, 35.8, 19.2], itemStyle: { color: darkMode ? '#E4E4E7' : '#111113', borderRadius: [0, 4, 4, 0] } }
+              { name: 'Hook Rate (3s Views / Impressions %)', type: 'bar', barWidth: '30%', data: [44.2, 38.5, 51.0, 31.4], itemStyle: { color: '#FF5F00', borderRadius: [0, 4, 4, 0] } },
+              { name: 'Hold Rate (ThruPlays / 3s Views %)', type: 'bar', barWidth: '30%', data: [28.4, 22.1, 35.8, 19.2], itemStyle: { color: darkMode ? '#E4E4E7' : '#111113', borderRadius: [0, 4, 4, 0] } }
             ]
           },
           // Chart 5: Platform & Placement Breakdown
@@ -554,7 +563,7 @@
                 {/* CHARTS ROW 1: REACH TREND & ENGAGEMENT BREAKDOWN */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                   {/* CHART 1: Reach & Impressions Trend */}
-                  <div className="lg:col-span-7 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                  <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
                     <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
                         <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Reach & Impressions Trend</h4>
@@ -566,7 +575,7 @@
                   </div>
 
                   {/* CHART 2: Engagement Breakdown (Saves & Shares vs Likes & Comments) */}
-                  <div className="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                  <div className="lg:col-span-5 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
                     <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
                         <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Engagement Breakdown</h4>
@@ -581,7 +590,7 @@
                 {/* CHARTS ROW 2: FOLLOWER GROWTH & TOP PERFORMING POSTS TABLE */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                   {/* CHART 3: Follower Growth vs. Unfollows */}
-                  <div className="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                  <div className="lg:col-span-5 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
                     <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
                         <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Followers vs. Unfollows</h4>
@@ -593,7 +602,7 @@
                   </div>
 
                   {/* TABLE 4: Top Performing Posts / Reels */}
-                  <div className="lg:col-span-7 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs overflow-hidden">
+                  <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs overflow-hidden">
                     <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
                         <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Top Performing Posts & Reels</h4>
@@ -752,7 +761,7 @@
                 {/* CHARTS ROW 1: SPEND VS ROAS & AD FATIGUE WITH WARNING BADGE */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                   {/* CHART 1: Spend vs ROAS Trend (Dual Y-Axis) */}
-                  <div className="lg:col-span-7 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                  <div className="lg:col-span-7 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
                     <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
                         <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Spend vs. ROAS Trend</h4>
@@ -764,7 +773,7 @@
                   </div>
 
                   {/* CHART 2: Creative Health & Ad Fatigue (Frequency vs CTR) WITH WARNING BADGE */}
-                  <div className="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                  <div className="lg:col-span-5 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
                     <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
                         <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider flex items-center gap-2">
@@ -781,10 +790,10 @@
                   </div>
                 </div>
 
-                {/* CHARTS ROW 2: FUNNEL LEAKAGE & VIDEO RETENTION & PLACEMENTS */}
+                {/* CHARTS ROW 2: FUNNEL LEAKAGE & VIDEO RETENTION (BALANCED 6 & 6 COLS WITH RESIZEOBSERVER) */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                   {/* CHART 3: Funnel Leakage (Link Clicks vs Landing Page Views) */}
-                  <div className="lg:col-span-4 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                  <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
                     <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
                         <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Funnel Leakage</h4>
@@ -794,14 +803,14 @@
                         24.1% Drop-off Rate
                       </span>
                     </div>
-                    <EChartComponent option={metaAdsData.funnelOption} style={{ height: '270px', width: '100%' }} />
-                    <div className="mt-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 rounded-xl p-3 text-[11px] font-bold text-amber-900 dark:text-amber-200">
+                    <EChartComponent option={metaAdsData.funnelOption} style={{ height: '280px', width: '100%' }} />
+                    <div className="mt-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 rounded-xl p-3 text-[11px] font-bold text-amber-900 dark:text-amber-200">
                       ⚠️ Gubitak veći od 20% ukazuje na sporo učitavanje odredišne stranice ili tehnički problem piksela.
                     </div>
                   </div>
 
                   {/* CHART 4: Video Creative Retention (Hook Rate vs Hold Rate) */}
-                  <div className="lg:col-span-5 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                  <div className="lg:col-span-6 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
                     <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
                         <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Video Retention</h4>
@@ -809,18 +818,20 @@
                       </div>
                       <span className="z-badge-black text-[10px] px-3 py-1 shadow-xs">Video Funnel</span>
                     </div>
-                    <EChartComponent option={metaAdsData.retentionOption} style={{ height: '310px', width: '100%' }} />
+                    <EChartComponent option={metaAdsData.retentionOption} style={{ height: '340px', width: '100%' }} />
                   </div>
+                </div>
 
-                  {/* CHART 5: Platform & Placement Breakdown */}
-                  <div className="lg:col-span-3 z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
+                {/* CHARTS ROW 3: PLATFORM & PLACEMENT BREAKDOWN */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  <div className="lg:col-span-12 min-w-0 overflow-hidden z-card-white dark:bg-[#161618] z-card-white-hover rounded-[2rem] p-7 shadow-xs">
                     <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
                       <div>
-                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Placements</h4>
-                        <p className="text-xs text-gray-500 font-semibold">Raspodjela potrošnje po plasmanu</p>
+                        <h4 className="text-base font-black text-[#111113] dark:text-white uppercase tracking-wider">Platform & Placement Breakdown</h4>
+                        <p className="text-xs text-gray-500 font-semibold">Raspodjela potrošnje po plasmanu (Instagram Feed, Reels, Facebook Feed, Stories)</p>
                       </div>
                     </div>
-                    <EChartComponent option={metaAdsData.placementOption} style={{ height: '310px', width: '100%' }} />
+                    <EChartComponent option={metaAdsData.placementOption} style={{ height: '300px', width: '100%' }} />
                   </div>
                 </div>
 
