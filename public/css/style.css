@@ -1,61 +1,82 @@
-@import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,300..900;1,300..900&display=swap');
 
 :root {
-  --color-bg-main: #F4F5F7;
-  --color-card-white: #FFFFFF;
-  --color-card-dark: #111113;
-  --color-accent-orange: #FF5F00;
-  --color-accent-orange-hover: #E05300;
-  --color-text-dark: #111113;
-  --color-text-muted: #6B7280;
+  --color-bg-main: #F4F6F8;
+  --color-bg-dark: #080C14;
+  --color-card-white: rgba(255, 255, 255, 0.50);
+  --color-card-dark: rgba(15, 23, 42, 0.45);
+  --color-accent-emerald: #E9F52F;
+  --color-accent-cyan: #0EA5E9;
+  --color-accent-amber: #F59E0B;
+  --color-accent-rose: #F43F5E;
+  --color-text-dark: #0F172A;
+  --color-text-muted: #64748B;
   
   --font-urbanist: 'Urbanist', sans-serif;
 }
 
 body {
   font-family: var(--font-urbanist);
-  background-color: var(--color-bg-main);
+  background: linear-gradient(180deg, #B1CEE0 0%, #D4E3EE 20%, #E6E6E6 50%, #E6E6E6 100%) fixed;
   color: var(--color-text-dark);
   overflow-x: hidden;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ZELLIFY Inspired UI Cards */
+/* Standard Chart Cards with 40% transparency */
 .z-card-white {
-  background: #FFFFFF;
+  background: rgba(255, 255, 255, 0.40);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-radius: 2rem;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.03), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.60);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.03);
+  transition: all 0.25s ease-in-out;
+}
+
+/* Hero KPI Cards with 40% transparency */
+.z-card-hero {
+  background: rgba(255, 255, 255, 0.40);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.60);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.03);
   transition: all 0.25s ease-in-out;
 }
 
 .z-card-white-hover:hover {
-  box-shadow: 0 12px 30px 0 rgba(0, 0, 0, 0.07);
+  box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.05);
   transform: translateY(-2px);
 }
 
 .z-card-dark {
-  background: #111113;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   color: #FFFFFF;
   border-radius: 2rem;
-  box-shadow: 0 10px 30px -5px rgba(17, 17, 19, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 32px -5px rgba(0, 0, 0, 0.4);
   transition: all 0.25s ease-in-out;
 }
 
 .z-pill-nav {
-  background: #111113;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-radius: 9999px;
   padding: 0.35rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .z-pill-nav-item-active {
-  background: #FFFFFF;
+  background: #E9F52F;
   color: #111113;
   border-radius: 9999px;
   font-weight: 800;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 10px rgba(233, 245, 47, 0.3);
 }
 
 .z-pill-nav-item {
@@ -66,28 +87,34 @@ body {
 }
 
 .z-pill-nav-item:hover {
-  color: #FFFFFF;
+  color: #E9F52F;
 }
 
-/* Custom Orange Badge & Buttons */
-.z-badge-orange {
-  background-color: #FF5F00;
+/* Custom Refined Badges & Accents */
+.z-badge-orange, .z-badge-coral {
+  background-color: #E9F52F;
+  color: #111113;
+  border-radius: 9999px;
+  font-weight: 800;
+}
+
+.z-badge-lime, .z-badge-emerald {
+  background-color: #E9F52F;
+  color: #111113;
+  border-radius: 9999px;
+  font-weight: 800;
+}
+
+.z-badge-yellow, .z-badge-amber {
+  background-color: #F59E0B;
   color: #FFFFFF;
   border-radius: 9999px;
   font-weight: 800;
 }
 
 .z-badge-black {
-  background-color: #111113;
+  background-color: #0F172A;
   color: #FFFFFF;
-  border-radius: 9999px;
-  font-weight: 800;
-}
-
-.z-badge-green {
-  background-color: #ECFDF5;
-  color: #047857;
-  border: 1px solid #A7F3D0;
   border-radius: 9999px;
   font-weight: 800;
 }
@@ -209,3 +236,105 @@ span.flatpickr-weekday {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(17, 17, 19, 0.3);
 }
+
+/* Traffic Light Status Glowing Animations */
+@keyframes traffic-glow-green {
+  0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
+  50% { box-shadow: 0 0 16px rgba(16, 185, 129, 0.9); }
+}
+
+@keyframes traffic-glow-amber {
+  0%, 100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
+  50% { box-shadow: 0 0 16px rgba(245, 158, 11, 0.9); }
+}
+
+@keyframes traffic-glow-rose {
+  0%, 100% { box-shadow: 0 0 8px rgba(244, 63, 94, 0.6); }
+  50% { box-shadow: 0 0 16px rgba(244, 63, 94, 0.9); }
+}
+
+.traffic-green { animation: traffic-glow-green 2s infinite; }
+.traffic-amber { animation: traffic-glow-amber 2s infinite; }
+.traffic-rose { animation: traffic-glow-rose 1.5s infinite; }
+
+/* ==========================================================================
+   ZELLIFY DARK MODE OPTIMIZATIONS
+   ========================================================================== */
+html.dark, body.dark {
+  background-color: #000000 !important;
+  background-image: radial-gradient(circle at 50% 65%, rgba(14, 165, 233, 0.20) 0%, rgba(30, 58, 138, 0.12) 40%, transparent 75%) !important;
+  background-attachment: fixed !important;
+  color: #F8FAFC !important;
+}
+
+.dark .z-card-white,
+.dark .z-card-hero,
+.dark .z-card-dark {
+  background: rgba(28, 28, 28, 0.30) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.45) !important;
+  color: #F8FAFC !important;
+}
+
+.dark .z-card-white-hover:hover {
+  box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.6) !important;
+  border-color: rgba(233, 245, 47, 0.3) !important;
+}
+
+/* Custom Dark Scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: #080C14 !important;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 9999px !important;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Flatpickr Calendar Dark Mode */
+.dark .flatpickr-calendar {
+  background: #0D111A !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+  color: #F8FAFC !important;
+}
+
+.dark .flatpickr-calendar.arrowTop:before,
+.dark .flatpickr-calendar.arrowTop:after {
+  border-bottom-color: #0D111A !important;
+}
+
+.dark .flatpickr-months .flatpickr-month,
+.dark .flatpickr-months .flatpickr-prev-month,
+.dark .flatpickr-months .flatpickr-next-month {
+  color: #F8FAFC !important;
+  fill: #F8FAFC !important;
+}
+
+.dark .flatpickr-day {
+  color: #E2E8F0 !important;
+}
+
+.dark .flatpickr-day:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark .flatpickr-day.inRange {
+  background: rgba(120, 174, 196, 0.25) !important;
+  box-shadow: -5px 0 0 rgba(120, 174, 196, 0.25), 5px 0 0 rgba(120, 174, 196, 0.25) !important;
+  color: #FFFFFF !important;
+}
+
+.dark .flatpickr-day.selected,
+.dark .flatpickr-day.startRange,
+.dark .flatpickr-day.endRange {
+  background: #111113 !important;
+  border-color: #78AEC4 !important;
+  color: #FFFFFF !important;
+}
+
